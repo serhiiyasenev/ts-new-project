@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "TypeScript course - lesson 1 - basic setup, primitive and special types",
   "license": "ISC",
-  "author": "Igor Postrygan",
+  "author": "Serhii Yasenev",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
