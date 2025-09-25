@@ -1,10 +1,13 @@
 {
-  "name": "ts-new-project",
+  "name": "lesson-1",
   "version": "1.0.0",
-  "type": "commonjs",
-  "main": "dist/index.js",
+  "description": "TypeScript course - lesson 1 - basic setup, primitive and special types",
+  "license": "ISC",
+  "author": "Igor Postrygan",
+  "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node-dev --respawn src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js"
   },
