@@ -1,4 +1,4 @@
-import movies from './movies.json';
+import movies from '../movies.json';
 import { z } from 'zod';
 
 const schema = z.object({
