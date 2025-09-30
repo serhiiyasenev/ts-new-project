@@ -1,7 +1,7 @@
 {
-  "name": "lesson-1",
+  "name": "lesson-2",
   "version": "1.0.0",
-  "description": "TypeScript course - lesson 1 - basic setup, primitive and special types",
+  "description": "TypeScript course - lesson 2",
   "license": "ISC",
   "author": "Serhii Yasenev",
   "main": "index.js",
