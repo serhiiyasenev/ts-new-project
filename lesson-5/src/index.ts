@@ -1,3 +1,5 @@
+import './practical-task'
+
 class Vehicle {
     protected make: string;
     protected model: string;
