@@ -204,4 +204,11 @@ const userRecordExample: UserRecord = {
 };
 console.log(userRecordExample);
 
+type IsString<T> = T extends string ? "Yes" : "No";
+
+type ExtractString<T> = T extends string ? T : never;
+
+type NonString<T> = T extends string ? never : T;
+
+type ElementType<T> = T extends (infer U)[] ? U : T;
 
