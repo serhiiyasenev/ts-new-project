@@ -54,15 +54,15 @@ export class TaskManager {
         }
     }
 
-    private validateStatus(status: string): Status  {
+    private validateStatus(status: string): Status {
         return StatusSchema.options.includes(status as Status)
-            ? (status as any)
+            ? (status as Status)
             : DEFAULT_STATUS;
     }
 
-    private validatePriority(priority: string): Priority  {
+    private validatePriority(priority: string): Priority {
         return PrioritySchema.options.includes(priority as Priority)
-            ? (priority as any)
+            ? (priority as Priority)
             : DEFAULT_PRIORITY;
     }
 
@@ -97,8 +97,8 @@ export class TaskManager {
     }
 
     filterTasks(filters: {
-        status?: string;
-        priority?: string;
+        status?: Status;
+        priority?: Priority;
         createdAfter?: Date;
         createdBefore?: Date;
     }): Task[] {
