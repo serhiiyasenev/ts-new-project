@@ -56,13 +56,13 @@ export class TaskManager {
 
     private validateStatus(status: string): Status {
         return StatusSchema.options.includes(status as Status)
-            ? (status as Status)
+            ? status as Status
             : DEFAULT_STATUS;
     }
 
     private validatePriority(priority: string): Priority {
         return PrioritySchema.options.includes(priority as Priority)
-            ? (priority as Priority)
+            ? priority as Priority
             : DEFAULT_PRIORITY;
     }
 
