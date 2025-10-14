@@ -1,7 +1,9 @@
 import { Task } from './dto/task'
+import { Status } from './dto/status';
+import { Priority } from './dto/priority';
 import { DEFAULT_STATUS, DEFAULT_PRIORITY, DEFAULT_DESCRIPTION } from './constants';
-import * as fs from 'fs';
 import { PrioritySchema, StatusSchema, TaskSchema } from './task-schema';
+import * as fs from 'fs';
 
 export class TaskManager {
     private tasks: Task[] = [];
@@ -52,14 +54,14 @@ export class TaskManager {
         }
     }
 
-    private validateStatus(status: string): any {
-        return StatusSchema.options.includes(status as any)
+    private validateStatus(status: string): Status  {
+        return StatusSchema.options.includes(status as Status)
             ? (status as any)
             : DEFAULT_STATUS;
     }
 
-    private validatePriority(priority: string): any {
-        return PrioritySchema.options.includes(priority as any)
+    private validatePriority(priority: string): Priority  {
+        return PrioritySchema.options.includes(priority as Priority)
             ? (priority as any)
             : DEFAULT_PRIORITY;
     }

@@ -1,4 +1,3 @@
-// dto/task.ts
 import { z } from 'zod';
 import { Status } from './dto/status'
 import { Priority } from './dto/priority'
