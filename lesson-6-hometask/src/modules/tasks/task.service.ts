@@ -49,23 +49,23 @@ export class TaskService {
         return task;
     }
 
-delete(id: string): string {
-    const index = this.tasks.findIndex(task => task.id === id);
+    delete(id: string): string {
+        const index = this.tasks.findIndex(task => task.id === id);
 
-    if (index === -1) {
-        throw new Error(`Task with id "${id}" not found.`);
+        if (index === -1) {
+            throw new Error(`Task with id "${id}" not found.`);
+        }
+
+        this.tasks.splice(index, 1);
+        return `Task with id "${id}" deleted successfully.`;
     }
-
-    this.tasks.splice(index, 1);
-    return `Task with id "${id}" deleted successfully.`;
-}
 
     filter(filters: TaskFilterDto): Task[] {
         return this.tasks.filter(task => {
             if (filters.status && task.getStatus() !== filters.status) return false;
             if (filters.priority && task.getPriority() !== filters.priority) return false;
-            if (filters.createdAfter && task.createdAt < filters.createdAfter) return false;
-            if (filters.createdBefore && task.createdAt > filters.createdBefore) return false;
+            if (filters.createdAfter && task.getCreatedAt() < filters.createdAfter) return false;
+            if (filters.createdBefore && task.getCreatedAt() > filters.createdBefore) return false;
             if (filters.isAvailable !== undefined && task.getIsAvailable() !== filters.isAvailable) return false;
             return true;
         });

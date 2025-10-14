@@ -38,6 +38,7 @@ export class Task {
     getIsAvailable(): boolean { return this.isAvailable; }
     getUpdatedAt(): Date { return this.updatedAt; }
     getDeadline(): Date | undefined { return this.deadline; }
+    getCreatedAt(): Date { return this.createdAt; }
 
     // Setters with validation
     setTitle(title: string): void {
