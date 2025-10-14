@@ -1,7 +1,8 @@
-import { Status } from './dto/status'
-import { Priority } from './dto/priority'
 import { Task } from './dto/task'
+import { Status } from './dto/status';
+import { Priority } from './dto/priority';
 import { DEFAULT_STATUS, DEFAULT_PRIORITY, DEFAULT_DESCRIPTION } from './constants';
+import { PrioritySchema, StatusSchema, TaskSchema } from './task-schema';
 import * as fs from 'fs';
 
 export class TaskManager {
@@ -14,48 +15,61 @@ export class TaskManager {
     }
 
     private loadTasks(): void {
-        try {
-            const fileContent = fs.readFileSync(this.filePath, 'utf-8');
-            const jsonData = JSON.parse(fileContent);
-            
-            // Validate and transform the data
-            this.tasks = jsonData.tasks.map((task: any) => this.validateAndTransformTask(task));
-        } catch (error) {
-            console.error('Error loading tasks:', error);
+    try {
+        const fileContent = fs.readFileSync(this.filePath, 'utf-8');
+        const jsonData: unknown = JSON.parse(fileContent);
+
+        if (
+            typeof jsonData === 'object' &&
+            jsonData !== null &&
+            'tasks' in jsonData &&
+            Array.isArray((jsonData as any).tasks)
+        ) {
+            const tasksArray = (jsonData as { tasks: unknown[] }).tasks;
+            this.tasks = tasksArray.map((task: unknown) => this.validateAndTransformTask(task));
+        } else {
             this.tasks = [];
+        }
+    } catch (error) {
+        console.error('Error loading tasks:', error);
+        this.tasks = [];
+    }
+}
+
+    private validateAndTransformTask(taskData: unknown): Task {
+        try {
+            const parsed = TaskSchema.partial({
+                description: true
+            }).parse(taskData);
+
+            return {
+                ...parsed,
+                description: parsed.description || DEFAULT_DESCRIPTION,
+                status: this.validateStatus(parsed.status),
+                priority: this.validatePriority(parsed.priority)
+            };
+        } catch (error) {
+            console.error('Invalid task data, skipping:', error);
+            throw new Error('Task validation failed');
         }
     }
 
-    private validateAndTransformTask(taskData: any): Task {
-        return {
-            id: taskData.id,
-            title: taskData.title,
-            description: taskData.description || DEFAULT_DESCRIPTION,
-            createdAt: new Date(taskData.createdAt),
-            status: this.validateStatus(taskData.status),
-            priority: this.validatePriority(taskData.priority),
-            deadline: new Date(taskData.deadline)
-        };
-    }
-
     private validateStatus(status: string): Status {
-        return Object.values(Status).includes(status as Status) 
-            ? status as Status 
+        return StatusSchema.options.includes(status as Status)
+            ? status as Status
             : DEFAULT_STATUS;
     }
 
     private validatePriority(priority: string): Priority {
-        return Object.values(Priority).includes(priority as Priority)
+        return PrioritySchema.options.includes(priority as Priority)
             ? priority as Priority
             : DEFAULT_PRIORITY;
     }
 
-    // Get task by ID
     getTaskById(id: string): Task | undefined {
         return this.tasks.find(task => task.id === id);
     }
 
-    // Create new task
     createTask(task: Omit<Task, 'id'>): Task {
         const newTask: Task = {
             ...task,
@@ -65,7 +79,6 @@ export class TaskManager {
         return newTask;
     }
 
-    // Update task
     updateTask(id: string, updates: Partial<Omit<Task, 'id'>>): Task | undefined {
         const taskIndex = this.tasks.findIndex(task => task.id === id);
         if (taskIndex === -1) return undefined;
@@ -77,14 +90,12 @@ export class TaskManager {
         return this.tasks[taskIndex];
     }
 
-    // Delete task
     deleteTask(id: string): boolean {
         const initialLength = this.tasks.length;
         this.tasks = this.tasks.filter(task => task.id !== id);
         return this.tasks.length !== initialLength;
     }
 
-    // Filter tasks
     filterTasks(filters: {
         status?: Status;
         priority?: Priority;
@@ -100,15 +111,13 @@ export class TaskManager {
         });
     }
 
-    // Check if task is completed before deadline
     isTaskCompletedBeforeDeadline(id: string): boolean {
         const task = this.getTaskById(id);
         if (!task) return false;
-        
         return task.status === Status.DONE && new Date() <= task.deadline;
     }
 
     private generateId(): string {
-        return `task${Date.now()}${Math.floor(Math.random() * 1000)}`;
+        return `${Date.now()}${Math.floor(Math.random() * 1000)}`;
     }
 }
