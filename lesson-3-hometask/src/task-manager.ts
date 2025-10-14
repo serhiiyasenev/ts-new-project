@@ -114,7 +114,7 @@ export class TaskManager {
     isTaskCompletedBeforeDeadline(id: string): boolean {
         const task = this.getTaskById(id);
         if (!task) return false;
-        return task.status === 'done' && new Date() <= task.deadline;
+        return task.status === Status.DONE && new Date() <= task.deadline;
     }
 
     private generateId(): string {
