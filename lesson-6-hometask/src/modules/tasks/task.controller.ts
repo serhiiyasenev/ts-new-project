@@ -16,10 +16,16 @@ export class TaskController {
             const task = this.service.create(dto);
             console.log('✅ Task created successfully:', task.getTaskInfo());
             return task;
-        } catch (error: any) {
-            console.error('❌ Failed to create task:', error.message);
-            throw error;
+        } catch (error) {
+            if (error instanceof Error) {
+                console.error('❌ Failed to create task:', error.message);
+                throw error;
+            } else {
+                console.error('❌ Failed to create task:', error);
+                throw error;
+            }
         }
+        
     }
 
     getAllTasks(): Task[] {
