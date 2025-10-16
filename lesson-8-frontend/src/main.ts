@@ -4,6 +4,43 @@ import type { Task } from './types';
 
 // Initialize the app
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
+  <div class="modal-overlay">
+    <form class="task-edit-form">
+      <h3>Edit Task</h3>
+      <div class="form-group">
+        <label for="edit-title">Title</label>
+        <input type="text" id="edit-title" name="title" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-description">Description</label>
+        <textarea id="edit-description" name="description" required></textarea>
+      </div>
+      <div class="form-group">
+        <label for="edit-status">Status</label>
+        <select id="edit-status" name="status" required>
+          <option value="todo">Todo</option>
+          <option value="in_progress">In Progress</option>
+          <option value="done">Done</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="edit-priority">Priority</label>
+        <select id="edit-priority" name="priority" required>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="edit-deadline">Deadline</label>
+        <input type="date" id="edit-deadline" name="deadline">
+      </div>
+      <div class="form-actions">
+        <button type="button" class="cancel">Cancel</button>
+        <button type="submit">Save Changes</button>
+      </div>
+    </form>
+  </div>
   <div class="container">
     <h1>Task Manager</h1>
 
@@ -172,8 +209,12 @@ async function init() {
 
     // Sort tasks by creation date (newest first) and render them in appropriate columns
     tasks.forEach(task => {
-      const taskHtml = `
-        <div class="task-item" data-id="${task.id}">
+      const taskEl = document.createElement('div');
+      taskEl.className = 'task-item';
+      taskEl.setAttribute('draggable', 'true');
+      taskEl.dataset.id = task.id;
+      
+      taskEl.innerHTML = `
           <div class="task-header">
             <h3>${task.title}</h3>
             <div class="task-badges">
@@ -186,22 +227,74 @@ async function init() {
             ${task.deadline ? `<span>Deadline: ${new Date(task.deadline).toLocaleDateString()}</span>` : ''}
           </div>
           <div class="task-actions">
-            <button onclick="editTask('${task.id}')">Edit</button>
-            <button onclick="deleteTask('${task.id}')">Delete</button>
+            <button class="edit" onclick="editTask('${task.id}')">Edit</button>
+            <button class="delete" onclick="deleteTask('${task.id}')">Delete</button>
           </div>
-        </div>
+          <form class="task-edit-form">
+            <input type="text" name="title" value="${task.title}" required>
+            <textarea name="description" required>${task.description}</textarea>
+            <select name="status" required>
+              <option value="todo" ${task.status === 'todo' ? 'selected' : ''}>Todo</option>
+              <option value="in_progress" ${task.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
+              <option value="done" ${task.status === 'done' ? 'selected' : ''}>Done</option>
+            </select>
+            <select name="priority" required>
+              <option value="low" ${task.priority === 'low' ? 'selected' : ''}>Low</option>
+              <option value="medium" ${task.priority === 'medium' ? 'selected' : ''}>Medium</option>
+              <option value="high" ${task.priority === 'high' ? 'selected' : ''}>High</option>
+            </select>
+            <input type="date" name="deadline" value="${task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : ''}">
+            <div class="form-actions">
+              <button type="submit">Save</button>
+              <button type="button" class="cancel">Cancel</button>
+            </div>
+          </form>
       `;
+
+      // Add drag events
+      taskEl.addEventListener('dragstart', (e) => {
+        taskEl.classList.add('dragging');
+        e.dataTransfer?.setData('text/plain', task.id);
+      });
+
+      taskEl.addEventListener('dragend', () => {
+        taskEl.classList.remove('dragging');
+      });
+
+      // Add form submit handler
+      const form = taskEl.querySelector('.task-edit-form') as HTMLFormElement;
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const updatedTask = {
+          ...task,
+          title: formData.get('title') as string,
+          description: formData.get('description') as string,
+          status: formData.get('status') as string,
+          priority: formData.get('priority') as string,
+          deadline: formData.get('deadline') ? new Date(formData.get('deadline') as string) : null
+        };
+        await TaskAPI.updateTask(task.id, updatedTask);
+        form.classList.remove('active');
+        await loadTasks();
+      });
+
+      // Add cancel button handler
+      const cancelBtn = form.querySelector('.cancel') as HTMLButtonElement;
+      cancelBtn.addEventListener('click', () => {
+        form.classList.remove('active');
+      });
 
       // Add task to appropriate column
       switch(task.status) {
         case 'todo':
-          todoList.insertAdjacentHTML('beforeend', taskHtml);
+          todoList.appendChild(taskEl);
           break;
         case 'in_progress':
-          inProgressList.insertAdjacentHTML('beforeend', taskHtml);
+          inProgressList.appendChild(taskEl);
           break;
         case 'done':
-          doneList.insertAdjacentHTML('beforeend', taskHtml);
+          doneList.appendChild(taskEl);
           break;
       }
     });
@@ -253,6 +346,97 @@ async function init() {
         await TaskAPI.updateTask(id, { ...task, title: newTitle });
         await loadTasks();
       }
+    } catch (error) {
+      console.error('Error editing task:', error);
+    }
+  };
+
+  // Setup drag and drop for columns
+  const columns = document.querySelectorAll('.task-column');
+  columns.forEach(column => {
+    column.addEventListener('dragover', (e: Event) => {
+      e.preventDefault();
+      const dragEvent = e as DragEvent;
+      if (dragEvent.dataTransfer) {
+        dragEvent.dataTransfer.dropEffect = 'move';
+      }
+      column.classList.add('drag-over');
+    });
+
+    column.addEventListener('dragleave', () => {
+      column.classList.remove('drag-over');
+    });
+
+    column.addEventListener('drop', async (e: Event) => {
+      e.preventDefault();
+      column.classList.remove('drag-over');
+      
+      const dragEvent = e as DragEvent;
+      const taskId = dragEvent.dataTransfer?.getData('text/plain');
+      if (!taskId) return;
+
+      const newStatus = column.querySelector('h2')?.textContent?.toLowerCase().replace(/\s+/g, '_') || 'todo';
+      
+      try {
+        const task = await TaskAPI.getTaskById(taskId);
+        await TaskAPI.updateTask(taskId, { ...task, status: newStatus });
+        await loadTasks();
+      } catch (error) {
+        console.error('Error updating task status:', error);
+      }
+    });
+  });
+
+  // Update edit task handler
+  (window as any).editTask = async (id: string) => {
+    try {
+      const task = await TaskAPI.getTaskById(id);
+      const modalOverlay = document.querySelector('.modal-overlay');
+      const form = document.querySelector('.task-edit-form') as HTMLFormElement;
+      
+      // Fill form with task data
+      (form.querySelector('[name="title"]') as HTMLInputElement).value = task.title;
+      (form.querySelector('[name="description"]') as HTMLTextAreaElement).value = task.description;
+      (form.querySelector('[name="status"]') as HTMLSelectElement).value = task.status;
+      (form.querySelector('[name="priority"]') as HTMLSelectElement).value = task.priority;
+      (form.querySelector('[name="deadline"]') as HTMLInputElement).value = 
+        task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : '';
+
+      // Show modal
+      modalOverlay?.classList.add('active');
+      form.classList.add('active');
+
+      // Handle form submission
+      const handleSubmit = async (e: Event) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const updatedTask = {
+          ...task,
+          title: formData.get('title') as string,
+          description: formData.get('description') as string,
+          status: formData.get('status') as string,
+          priority: formData.get('priority') as string,
+          deadline: formData.get('deadline') ? new Date(formData.get('deadline') as string) : null
+        };
+        await TaskAPI.updateTask(task.id, updatedTask);
+        modalOverlay?.classList.remove('active');
+        form.classList.remove('active');
+        await loadTasks();
+        form.removeEventListener('submit', handleSubmit);
+      };
+
+      // Handle cancel
+      const handleCancel = () => {
+        modalOverlay?.classList.remove('active');
+        form.classList.remove('active');
+        form.removeEventListener('submit', handleSubmit);
+      };
+
+      form.addEventListener('submit', handleSubmit);
+      form.querySelector('.cancel')?.addEventListener('click', handleCancel);
+      modalOverlay?.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) handleCancel();
+      });
     } catch (error) {
       console.error('Error editing task:', error);
     }

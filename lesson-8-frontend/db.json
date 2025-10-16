@@ -5,9 +5,9 @@
       "title": "Complete Project Proposal",
       "description": "Draft and submit project proposal for client review",
       "createdAt": "2025-09-30T10:00:00Z",
-      "status": "in_progress",
-      "priority": "high",
-      "deadline": "2025-10-15T17:00:00Z"
+      "status": "todo",
+      "priority": "low",
+      "deadline": "2026-01-10T00:00:00.000Z"
     },
     {
       "id": "2",
@@ -32,7 +32,7 @@
       "title": "Code Review",
       "description": "Review pull requests from team members",
       "createdAt": "2025-09-30T11:20:00Z",
-      "status": "todo",
+      "status": "in_progress",
       "priority": "medium",
       "deadline": "2025-10-02T17:00:00Z"
     },
@@ -79,15 +79,6 @@
       "status": "todo",
       "priority": "high",
       "deadline": "2025-10-01T17:00:00Z"
-    },
-    {
-      "id": "3019",
-      "title": "111",
-      "description": "12122121212122",
-      "status": "in_progress",
-      "priority": "medium",
-      "createdAt": "2025-10-16T18:56:03.557Z",
-      "deadline": "2222-11-11T00:00:00.000Z"
     }
   ]
 }

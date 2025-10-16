@@ -207,12 +207,26 @@ button:hover {
   margin-bottom: 1rem;
   background: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
+  cursor: move;
+  user-select: none;
+  position: relative;
 }
 
 .task-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  border-color: #4CAF50;
+}
+
+.task-item.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.task-column.drag-over {
+  background-color: #f8f9fa;
+  border: 2px dashed #4CAF50;
 }
 
 .task-header {
@@ -266,12 +280,109 @@ button:hover {
 .task-actions button {
   padding: 0.4rem 0.8rem;
   font-size: 0.875rem;
+  margin-right: 0.5rem;
 }
 
-.task-actions button:first-child {
+.task-actions button.edit {
   background-color: #4a90e2;
 }
 
-.task-actions button:last-child {
+.task-actions button.delete {
   background-color: #dc3545;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.task-edit-form {
+  display: none;
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+  z-index: 1001;
+}
+
+.task-edit-form.active {
+  display: block;
+}
+
+.task-edit-form h3 {
+  margin: 0 0 1.5rem 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+}
+
+.task-edit-form input,
+.task-edit-form select,
+.task-edit-form textarea {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.task-edit-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.task-edit-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.form-actions button {
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.form-actions button[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+}
+
+.form-actions button.cancel {
+  background-color: #e2e8f0;
+  color: #4a5568;
+  border: none;
+}
+
+.form-actions button[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+.form-actions button.cancel:hover {
+  background-color: #cbd5e0;
 }
