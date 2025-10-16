@@ -4,6 +4,7 @@ import { Priority } from './dto/priority';
 import { DEFAULT_STATUS, DEFAULT_PRIORITY, DEFAULT_DESCRIPTION } from './constants';
 import { PrioritySchema, StatusSchema, TaskSchema } from './task-schema';
 import * as fs from 'fs';
+import * as z from 'zod';
 
 export class TaskManager {
     private tasks: Task[] = [];
@@ -18,15 +19,14 @@ export class TaskManager {
     try {
         const fileContent = fs.readFileSync(this.filePath, 'utf-8');
         const jsonData: unknown = JSON.parse(fileContent);
-
+        
         if (
             typeof jsonData === 'object' &&
             jsonData !== null &&
             'tasks' in jsonData &&
-            Array.isArray((jsonData as any).tasks)
+            Array.isArray(jsonData.tasks)
         ) {
-            const tasksArray = (jsonData as { tasks: unknown[] }).tasks;
-            this.tasks = tasksArray.map((task: unknown) => this.validateAndTransformTask(task));
+            this.tasks = z.array(TaskSchema).parse(jsonData.tasks);
         } else {
             this.tasks = [];
         }
