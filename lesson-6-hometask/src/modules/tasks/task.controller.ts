@@ -24,8 +24,7 @@ export class TaskController {
                 console.error('❌ Failed to create task:', error);
                 throw error;
             }
-        }
-        
+        } 
     }
 
     getAllTasks(): Task[] {
@@ -38,8 +37,13 @@ export class TaskController {
             if (!task) throw new Error(`Task with id "${id}" not found.`);
             return task;
         } catch (error: any) {
-            console.error(error.message);
-            throw error;
+            if (error instanceof Error) {
+                console.error('❌ Failed to create task:', error.message);
+                throw error;
+            } else {
+                console.error('❌ Failed to create task:', error);
+                throw error;
+            }
         }
     }
 
@@ -49,8 +53,13 @@ export class TaskController {
             console.log(`✅ Task ${id} updated successfully.`);
             return updated;
         } catch (error: any) {
-            console.error('❌ Failed to update task:', error.message);
-            throw error;
+            if (error instanceof Error) {
+                console.error('❌ Failed to create task:', error.message);
+                throw error;
+            } else {
+                console.error('❌ Failed to create task:', error);
+                throw error;
+            }
         }
     }
 
@@ -60,8 +69,13 @@ export class TaskController {
             console.log('🗑️', result);
             return result;
         } catch (error: any) {
-            console.error('❌ Failed to delete task:', error.message);
-            throw error;
+            if (error instanceof Error) {
+                console.error('❌ Failed to create task:', error.message);
+                throw error;
+            } else {
+                console.error('❌ Failed to create task:', error);
+                throw error;
+            }
         }
     }
 
