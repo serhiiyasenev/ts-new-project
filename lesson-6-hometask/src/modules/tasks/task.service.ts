@@ -1,10 +1,10 @@
-import { Task } from '../../dto/task';
 import { Status } from '../../dto/status';
 import { Priority } from '../../dto/priority';
 import { v4 as uuidv4 } from 'uuid';
 import { TaskCreateDto } from '../../dto/task-create.dto';
 import { TaskUpdateDto } from '../../dto/task-update.dto';
 import { TaskFilterDto } from '../../dto/task-filter.dto';
+import { Task } from './task.types';
 
 export class TaskService {
     private tasks: Task[] = [];

@@ -2,7 +2,7 @@ import { TaskService } from './task.service';
 import { TaskCreateDto } from '../../dto/task-create.dto';
 import { TaskUpdateDto } from '../../dto/task-update.dto';
 import { TaskFilterDto } from '../../dto/task-filter.dto';
-import { Task } from '../../dto/task';
+import { Task } from './task.types';
 
 export class TaskController {
     private readonly service: TaskService;
