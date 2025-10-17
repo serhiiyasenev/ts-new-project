@@ -1,7 +1,8 @@
 # Architecture Overview
 
 This document contains a high-level architecture diagram for a typical web application platform.
-The diagram is drawn with Mermaid and shows the main components and their interactions: clients, edge/network, API & services, data stores, messaging, background workers, and observability.
+
+The diagram shows the main components and their interactions: clients, edge/network, API & services, data stores, messaging, background workers, and observability.
 
 ```mermaid
 flowchart LR
