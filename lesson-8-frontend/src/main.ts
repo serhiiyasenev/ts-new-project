@@ -407,20 +407,6 @@ async function init() {
   };
 
   // Edit task handler
-  (window as any).editTask = async (id: string) => {
-    try {
-      const task = await TaskAPI.getTaskById(id);
-      // Here you would typically open a modal or form for editing
-      // For now, we'll use prompt for simplicity
-      const newTitle = prompt('Enter new title:', task.title);
-      if (newTitle) {
-        await TaskAPI.updateTask(id, { ...task, title: newTitle });
-        await loadTasks();
-      }
-    } catch (error) {
-      console.error('Error editing task:', error);
-    }
-  };
 
   // Setup drag and drop for columns
   const columns = document.querySelectorAll('.task-column');
