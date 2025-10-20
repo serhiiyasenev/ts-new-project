@@ -4,9 +4,9 @@ import type { Task } from './types';
 
 // Initialize the app
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div class="modal-overlay">
+  <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="edit-task-title">
     <form class="task-edit-form">
-      <h3>Edit Task</h3>
+      <h3 id="edit-task-title">Edit Task</h3>
       <div class="form-group">
         <label for="edit-title">Title</label>
         <input type="text" id="edit-title" name="title" required>
