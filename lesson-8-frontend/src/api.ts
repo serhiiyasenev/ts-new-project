@@ -1,19 +1,40 @@
 import type { Task } from './types';
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = 'http://localhost:3000';
+
+// Helper to safely read response text without throwing
+async function readErrorText(response: Response): Promise<string> {
+    try {
+        const text = await response.text();
+        return text?.trim() ?? '';
+    } catch {
+        return '';
+    }
+}
+
+// Helper to throw detailed errors for non-OK responses
+async function throwForBadResponse(response: Response, defaultMessage: string): Promise<void> {
+    if (!response.ok) {
+        const body = await readErrorText(response);
+        const detail = [response.status.toString(), response.statusText, body]
+            .filter(Boolean)
+            .join(' ');
+        throw new Error(`${defaultMessage}: ${detail}`);
+    }
+}
 
 export const TaskAPI = {
     // Get all tasks
     async getAllTasks(): Promise<Task[]> {
         const response = await fetch(`${API_URL}/tasks`);
-        if (!response.ok) throw new Error('Failed to fetch tasks');
+        await throwForBadResponse(response, 'Failed to fetch tasks');
         return response.json();
     },
 
     // Get task by ID
     async getTaskById(id: string): Promise<Task> {
         const response = await fetch(`${API_URL}/tasks/${id}`);
-        if (!response.ok) throw new Error('Failed to fetch task');
+        await throwForBadResponse(response, 'Failed to fetch task');
         return response.json();
     },
 
@@ -26,7 +47,7 @@ export const TaskAPI = {
             },
             body: JSON.stringify(task),
         });
-        if (!response.ok) throw new Error('Failed to create task');
+        await throwForBadResponse(response, 'Failed to create task');
         return response.json();
     },
 
@@ -39,7 +60,7 @@ export const TaskAPI = {
             },
             body: JSON.stringify(updates),
         });
-        if (!response.ok) throw new Error('Failed to update task');
+        await throwForBadResponse(response, 'Failed to update task');
         return response.json();
     },
 
@@ -48,6 +69,6 @@ export const TaskAPI = {
         const response = await fetch(`${API_URL}/tasks/${id}`, {
             method: 'DELETE',
         });
-        if (!response.ok) throw new Error('Failed to delete task');
+        await throwForBadResponse(response, 'Failed to delete task');
     }
 };

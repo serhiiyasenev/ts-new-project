@@ -1,6 +1,6 @@
 import './style.css';
 import { TaskAPI } from './api';
-import type { Task } from './types';
+import type { Priority, Status, Task } from './types';
 
 // Initialize the app
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
@@ -120,15 +120,15 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 
     <!-- Task List -->
     <div class="task-list">
-      <div class="task-column">
+      <div class="task-column" data-status="todo">
         <h2>TODO</h2>
         <div id="todoList"></div>
       </div>
-      <div class="task-column">
+      <div class="task-column" data-status="in_progress">
         <h2>IN PROGRESS</h2>
         <div id="inProgressList"></div>
       </div>
-      <div class="task-column">
+      <div class="task-column" data-status="done">
         <h2>DONE</h2>
         <div id="doneList"></div>
       </div>
@@ -139,6 +139,10 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 // Add event listeners and initialize functionality
 async function init() {
   const taskForm = document.querySelector<HTMLFormElement>('#taskForm')!;
+
+  // Declare task action functions in scope so listeners can reference them
+  let deleteTask: (id: string) => Promise<void>;
+  let editTask: (id: string) => Promise<void>;
 
   // Load and render tasks
   async function loadTasks() {
@@ -263,21 +267,21 @@ async function init() {
       taskEl.appendChild(actionsDiv);
 
       // Task edit form
-      const form = document.createElement('form');
-      form.className = 'task-edit-form';
+      const editForm = document.createElement('form');
+      editForm.className = 'task-edit-form';
       // Title input
       const titleInput = document.createElement('input');
       titleInput.type = 'text';
       titleInput.name = 'title';
       titleInput.required = true;
       titleInput.value = task.title;
-      form.appendChild(titleInput);
+      editForm.appendChild(titleInput);
       // Description textarea
       const descTextarea = document.createElement('textarea');
       descTextarea.name = 'description';
       descTextarea.required = true;
       descTextarea.value = task.description;
-      form.appendChild(descTextarea);
+      editForm.appendChild(descTextarea);
       // Status select
       const statusSelect = document.createElement('select');
       statusSelect.name = 'status';
@@ -289,7 +293,7 @@ async function init() {
         if (task.status === status) opt.selected = true;
         statusSelect.appendChild(opt);
       });
-      form.appendChild(statusSelect);
+      editForm.appendChild(statusSelect);
       // Priority select
       const prioritySelect = document.createElement('select');
       prioritySelect.name = 'priority';
@@ -301,13 +305,13 @@ async function init() {
         if (task.priority === priority) opt.selected = true;
         prioritySelect.appendChild(opt);
       });
-      form.appendChild(prioritySelect);
+      editForm.appendChild(prioritySelect);
       // Deadline input
       const deadlineInput = document.createElement('input');
       deadlineInput.type = 'date';
       deadlineInput.name = 'deadline';
       deadlineInput.value = task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : '';
-      form.appendChild(deadlineInput);
+      editForm.appendChild(deadlineInput);
       // Form actions
       const formActionsDiv = document.createElement('div');
       formActionsDiv.className = 'form-actions';
@@ -320,8 +324,8 @@ async function init() {
       cancelBtn.className = 'cancel';
       cancelBtn.textContent = 'Cancel';
       formActionsDiv.appendChild(cancelBtn);
-      form.appendChild(formActionsDiv);
-      taskEl.appendChild(form);
+      editForm.appendChild(formActionsDiv);
+      taskEl.appendChild(editForm);
       // Add drag events
       taskEl.addEventListener('dragstart', (e) => {
         taskEl.classList.add('dragging');
@@ -333,27 +337,29 @@ async function init() {
       });
 
       // Add form submit handler
-      const form = taskEl.querySelector('.task-edit-form') as HTMLFormElement;
-      form.addEventListener('submit', async (e) => {
+      const inlineForm = taskEl.querySelector('.task-edit-form') as HTMLFormElement;
+      inlineForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const formData = new FormData(form);
+        const formData = new FormData(inlineForm);
         const updatedTask = {
           ...task,
           title: formData.get('title') as string,
           description: formData.get('description') as string,
-          status: formData.get('status') as string,
-          priority: formData.get('priority') as string,
-          deadline: formData.get('deadline') ? new Date(formData.get('deadline') as string) : null
+          status: formData.get('status') as Status,
+          priority: formData.get('priority') as Priority,
+          deadline: formData.get('deadline')
+            ? new Date(formData.get('deadline') as string)
+            : null
         };
         await TaskAPI.updateTask(task.id, updatedTask);
-        form.classList.remove('active');
+        inlineForm.classList.remove('active');
         await loadTasks();
       });
 
       // Add cancel button handler
-      const cancelBtn = form.querySelector('.cancel') as HTMLButtonElement;
-      cancelBtn.addEventListener('click', () => {
-        form.classList.remove('active');
+      const inlineCancelBtn = inlineForm.querySelector('.cancel') as HTMLButtonElement;
+      inlineCancelBtn.addEventListener('click', () => {
+        inlineForm.classList.remove('active');
       });
 
       // Add task to appropriate column
@@ -379,10 +385,12 @@ async function init() {
     const newTask: Omit<Task, 'id'> = {
       title: formData.get('title') as string,
       description: formData.get('description') as string,
-      status: formData.get('status') as string,
-      priority: formData.get('priority') as string,
+      status: formData.get('status') as Status,
+      priority: formData.get('priority') as Priority,
       createdAt: new Date(),
-      deadline: formData.get('deadline') ? new Date(formData.get('deadline') as string) : null
+      deadline: formData.get('deadline')
+        ? new Date(formData.get('deadline') as string)
+        : null
     };
 
     try {
@@ -395,7 +403,7 @@ async function init() {
   });
 
   // Delete task handler
-  (window as any).deleteTask = async (id: string) => {
+  deleteTask = async (id: string) => {
     if (confirm('Are you sure you want to delete this task?')) {
       try {
         await TaskAPI.deleteTask(id);
@@ -405,6 +413,7 @@ async function init() {
       }
     }
   };
+  (window as any).deleteTask = deleteTask;
 
   // Edit task handler
 
@@ -436,7 +445,7 @@ async function init() {
       
       try {
         const task = await TaskAPI.getTaskById(taskId);
-        await TaskAPI.updateTask(taskId, { ...task, status: newStatus });
+        await TaskAPI.updateTask(taskId, { ...task, status: newStatus as Status });
         await loadTasks();
       } catch (error) {
         console.error('Error updating task status:', error);
@@ -445,7 +454,7 @@ async function init() {
   });
 
   // Update edit task handler
-  (window as any).editTask = async (id: string) => {
+  editTask = async (id: string) => {
     try {
       const task = await TaskAPI.getTaskById(id);
       const modalOverlay = document.querySelector('.modal-overlay');
@@ -471,9 +480,11 @@ async function init() {
           ...task,
           title: formData.get('title') as string,
           description: formData.get('description') as string,
-          status: formData.get('status') as string,
-          priority: formData.get('priority') as string,
-          deadline: formData.get('deadline') ? new Date(formData.get('deadline') as string) : null
+          status: formData.get('status') as Status,
+          priority: formData.get('priority') as Priority,
+          deadline: formData.get('deadline')
+            ? new Date(formData.get('deadline') as string)
+            : null
         };
         await TaskAPI.updateTask(task.id, updatedTask);
         modalOverlay?.classList.remove('active');
@@ -498,6 +509,7 @@ async function init() {
       console.error('Error editing task:', error);
     }
   };
+  (window as any).editTask = editTask;
 
   // Initial load
   await loadTasks();
