@@ -2,6 +2,11 @@ import './style.css';
 import { TaskAPI } from './api';
 import type { Priority, Status, Task } from './types';
 
+// Utility: capitalize first letter of a string
+function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 // Utility: sort tasks by creation date (newest first)
 function sortTasksByCreatedDate(tasks: Task[]): Task[] {
   return [...tasks].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -254,7 +259,7 @@ async function init() {
       badgesDiv.className = 'task-badges';
       const prioritySpan = document.createElement('span');
       prioritySpan.className = `badge priority-${task.priority}`;
-  prioritySpan.textContent = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
+      prioritySpan.textContent = capitalize(task.priority);
       badgesDiv.appendChild(prioritySpan);
       headerDiv.appendChild(badgesDiv);
       taskEl.appendChild(headerDiv);
