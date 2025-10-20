@@ -446,7 +446,7 @@ async function init() {
       const taskId = dragEvent.dataTransfer?.getData('text/plain');
       if (!taskId) return;
 
-      const newStatus = column.querySelector('h2')?.textContent?.toLowerCase().replace(/\s+/g, '_') || 'todo';
+      const newStatus = (column as HTMLElement).dataset.status || 'todo';
       
       try {
         const task = await TaskAPI.getTaskById(taskId);
