@@ -254,7 +254,7 @@ async function init() {
       badgesDiv.className = 'task-badges';
       const prioritySpan = document.createElement('span');
       prioritySpan.className = `badge priority-${task.priority}`;
-  prioritySpan.textContent = task.priority;
+  prioritySpan.textContent = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
       badgesDiv.appendChild(prioritySpan);
       headerDiv.appendChild(badgesDiv);
       taskEl.appendChild(headerDiv);
