@@ -89,15 +89,6 @@
       "priority": "medium",
       "createdAt": "2025-10-16T20:03:35.967Z",
       "deadline": "2025-10-17T00:00:00.000Z"
-    },
-    {
-      "id": "12",
-      "title": "Create New Task",
-      "description": "Create New TaskCreate New Task",
-      "status": "todo",
-      "priority": "high",
-      "createdAt": "2025-10-20T20:41:14.328Z",
-      "deadline": null
     }
   ]
 }
