@@ -14,7 +14,7 @@
       "title": "Update Documentation",
       "description": "Update API documentation with new endpoints",
       "createdAt": "2025-09-29T14:30:00Z",
-      "status": "todo",
+      "status": "in_progress",
       "priority": "high",
       "deadline": "2025-10-05T00:00:00.000Z"
     },
@@ -32,7 +32,7 @@
       "title": "Code Review",
       "description": "Review pull requests from team members",
       "createdAt": "2025-09-30T11:20:00Z",
-      "status": "in_progress",
+      "status": "todo",
       "priority": "medium",
       "deadline": "2025-10-02T00:00:00.000Z"
     },
@@ -68,7 +68,7 @@
       "title": "Client Meeting Preparation",
       "description": "Prepare presentation for client meeting",
       "createdAt": "2025-09-30T09:00:00Z",
-      "status": "in_progress",
+      "status": "todo",
       "priority": "medium",
       "deadline": "2025-10-03T17:00:00Z"
     },
@@ -95,9 +95,9 @@
       "title": "Create New Task",
       "description": "Create New TaskCreate New Task",
       "status": "todo",
-      "priority": "medium",
+      "priority": "high",
       "createdAt": "2025-10-20T20:41:14.328Z",
-      "deadline": "2025-10-31T00:00:00.000Z"
+      "deadline": null
     }
   ]
 }
