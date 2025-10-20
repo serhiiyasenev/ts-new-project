@@ -254,7 +254,7 @@ async function init() {
       badgesDiv.className = 'task-badges';
       const prioritySpan = document.createElement('span');
       prioritySpan.className = `badge priority-${task.priority}`;
-      prioritySpan.textContent = task.priority.toLowerCase();
+  prioritySpan.textContent = task.priority;
       badgesDiv.appendChild(prioritySpan);
       headerDiv.appendChild(badgesDiv);
       taskEl.appendChild(headerDiv);
@@ -407,7 +407,7 @@ async function init() {
 
   // Show modal
   modalOverlay?.classList.add('active');
-  form.classList.add('active');
+  form?.classList.add('active');
 
   // Controller to auto-clean listeners on cancel/submit
   const controller = new AbortController();

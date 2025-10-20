@@ -86,7 +86,7 @@
       "title": "Newly Created Task",
       "description": "Description Description Description Description Description",
       "status": "todo",
-      "priority": "low",
+      "priority": "medium",
       "createdAt": "2025-10-16T20:03:35.967Z",
       "deadline": "2025-10-17T00:00:00.000Z"
     }
