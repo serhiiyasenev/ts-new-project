@@ -403,20 +403,21 @@ async function init() {
         await loadTasks();
       };
 
+      // Overlay click handler to close modal when clicking outside
+      function overlayClickHandler(e: Event) {
+        if (e.target === modalOverlay) handleCancel();
+      }
+
       // Handle cancel
       const handleCancel = () => {
         modalOverlay?.classList.remove('active');
         form.classList.remove('active');
         form.removeEventListener('submit', handleSubmit);
+        modalOverlay?.removeEventListener('click', overlayClickHandler as EventListener);
       };
 
       form.addEventListener('submit', handleSubmit, { once: true });
       form.querySelector('.cancel')?.addEventListener('click', handleCancel, { once: true });
-
-      // Overlay click handler to close modal when clicking outside
-      function overlayClickHandler(e: Event) {
-        if (e.target === modalOverlay) handleCancel();
-      }
       modalOverlay?.addEventListener('click', overlayClickHandler, { once: true });
     } catch (error) {
       console.error('Error editing task:', error);
