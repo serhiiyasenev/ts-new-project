@@ -214,43 +214,114 @@ async function init() {
       taskEl.setAttribute('draggable', 'true');
       taskEl.dataset.id = task.id;
       
-      taskEl.innerHTML = `
-          <div class="task-header">
-            <h3>${task.title}</h3>
-            <div class="task-badges">
-              <span class="badge priority-${task.priority}">${task.priority.toLowerCase()}</span>
-            </div>
-          </div>
-          <p>${task.description}</p>
-          <div class="task-meta">
-            <span>Created: ${new Date(task.createdAt).toLocaleDateString()}</span>
-            ${task.deadline ? `<span>Deadline: ${new Date(task.deadline).toLocaleDateString()}</span>` : ''}
-          </div>
-          <div class="task-actions">
-            <button class="edit" onclick="editTask('${task.id}')">Edit</button>
-            <button class="delete" onclick="deleteTask('${task.id}')">Delete</button>
-          </div>
-          <form class="task-edit-form">
-            <input type="text" name="title" value="${task.title}" required>
-            <textarea name="description" required>${task.description}</textarea>
-            <select name="status" required>
-              <option value="todo" ${task.status === 'todo' ? 'selected' : ''}>Todo</option>
-              <option value="in_progress" ${task.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
-              <option value="done" ${task.status === 'done' ? 'selected' : ''}>Done</option>
-            </select>
-            <select name="priority" required>
-              <option value="low" ${task.priority === 'low' ? 'selected' : ''}>Low</option>
-              <option value="medium" ${task.priority === 'medium' ? 'selected' : ''}>Medium</option>
-              <option value="high" ${task.priority === 'high' ? 'selected' : ''}>High</option>
-            </select>
-            <input type="date" name="deadline" value="${task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : ''}">
-            <div class="form-actions">
-              <button type="submit">Save</button>
-              <button type="button" class="cancel">Cancel</button>
-            </div>
-          </form>
-      `;
+      // Build task header
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'task-header';
+      const h3 = document.createElement('h3');
+      h3.textContent = task.title;
+      headerDiv.appendChild(h3);
+      const badgesDiv = document.createElement('div');
+      badgesDiv.className = 'task-badges';
+      const prioritySpan = document.createElement('span');
+      prioritySpan.className = `badge priority-${task.priority}`;
+      prioritySpan.textContent = task.priority.toLowerCase();
+      badgesDiv.appendChild(prioritySpan);
+      headerDiv.appendChild(badgesDiv);
+      taskEl.appendChild(headerDiv);
 
+      // Description
+      const descP = document.createElement('p');
+      descP.textContent = task.description;
+      taskEl.appendChild(descP);
+
+      // Task meta
+      const metaDiv = document.createElement('div');
+      metaDiv.className = 'task-meta';
+      const createdSpan = document.createElement('span');
+      createdSpan.textContent = `Created: ${new Date(task.createdAt).toLocaleDateString()}`;
+      metaDiv.appendChild(createdSpan);
+      if (task.deadline) {
+        const deadlineSpan = document.createElement('span');
+        deadlineSpan.textContent = `Deadline: ${new Date(task.deadline).toLocaleDateString()}`;
+        metaDiv.appendChild(deadlineSpan);
+      }
+      taskEl.appendChild(metaDiv);
+
+      // Task actions
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'task-actions';
+      const editBtn = document.createElement('button');
+      editBtn.className = 'edit';
+      editBtn.textContent = 'Edit';
+      editBtn.addEventListener('click', () => editTask(task.id));
+      actionsDiv.appendChild(editBtn);
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete';
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.addEventListener('click', () => deleteTask(task.id));
+      actionsDiv.appendChild(deleteBtn);
+      taskEl.appendChild(actionsDiv);
+
+      // Task edit form
+      const form = document.createElement('form');
+      form.className = 'task-edit-form';
+      // Title input
+      const titleInput = document.createElement('input');
+      titleInput.type = 'text';
+      titleInput.name = 'title';
+      titleInput.required = true;
+      titleInput.value = task.title;
+      form.appendChild(titleInput);
+      // Description textarea
+      const descTextarea = document.createElement('textarea');
+      descTextarea.name = 'description';
+      descTextarea.required = true;
+      descTextarea.value = task.description;
+      form.appendChild(descTextarea);
+      // Status select
+      const statusSelect = document.createElement('select');
+      statusSelect.name = 'status';
+      statusSelect.required = true;
+      ['todo', 'in_progress', 'done'].forEach(status => {
+        const opt = document.createElement('option');
+        opt.value = status;
+        opt.textContent = status === 'in_progress' ? 'In Progress' : status.charAt(0).toUpperCase() + status.slice(1);
+        if (task.status === status) opt.selected = true;
+        statusSelect.appendChild(opt);
+      });
+      form.appendChild(statusSelect);
+      // Priority select
+      const prioritySelect = document.createElement('select');
+      prioritySelect.name = 'priority';
+      prioritySelect.required = true;
+      ['low', 'medium', 'high'].forEach(priority => {
+        const opt = document.createElement('option');
+        opt.value = priority;
+        opt.textContent = priority.charAt(0).toUpperCase() + priority.slice(1);
+        if (task.priority === priority) opt.selected = true;
+        prioritySelect.appendChild(opt);
+      });
+      form.appendChild(prioritySelect);
+      // Deadline input
+      const deadlineInput = document.createElement('input');
+      deadlineInput.type = 'date';
+      deadlineInput.name = 'deadline';
+      deadlineInput.value = task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : '';
+      form.appendChild(deadlineInput);
+      // Form actions
+      const formActionsDiv = document.createElement('div');
+      formActionsDiv.className = 'form-actions';
+      const saveBtn = document.createElement('button');
+      saveBtn.type = 'submit';
+      saveBtn.textContent = 'Save';
+      formActionsDiv.appendChild(saveBtn);
+      const cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.className = 'cancel';
+      cancelBtn.textContent = 'Cancel';
+      formActionsDiv.appendChild(cancelBtn);
+      form.appendChild(formActionsDiv);
+      taskEl.appendChild(form);
       // Add drag events
       taskEl.addEventListener('dragstart', (e) => {
         taskEl.classList.add('dragging');
