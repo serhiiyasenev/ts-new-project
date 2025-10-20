@@ -425,13 +425,15 @@ async function init() {
 
       // Overlay click handler to close modal when clicking outside
       function overlayClickHandler(e: Event) {
-        if (e.currentTarget === modalOverlay && e.target === modalOverlay) handleCancel();
+        if (e.target === modalOverlay) handleCancel();
       }
 
       // Handle cancel
       const handleCancel = () => {
         modalOverlay?.classList.remove('active');
         form.classList.remove('active');
+        // Remove submit listener if user cancels before submitting
+        // (once: true only removes after firing, not on cancel)
         form.removeEventListener('submit', handleSubmit);
       };
 
