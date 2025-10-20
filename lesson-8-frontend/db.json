@@ -77,7 +77,7 @@
       "title": "Deploy Updates1",
       "description": "Deploy latest updates to production1",
       "createdAt": "2025-09-29T17:00:00Z",
-      "status": "in_progress",
+      "status": "done",
       "priority": "low",
       "deadline": "2025-10-01T00:00:00.000Z"
     },
@@ -86,7 +86,7 @@
       "title": "Newly Created Task",
       "description": "Description Description Description Description Description",
       "status": "todo",
-      "priority": "medium",
+      "priority": "low",
       "createdAt": "2025-10-16T20:03:35.967Z",
       "deadline": "2025-10-17T00:00:00.000Z"
     }

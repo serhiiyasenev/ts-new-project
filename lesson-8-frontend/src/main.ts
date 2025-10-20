@@ -2,6 +2,11 @@ import './style.css';
 import { TaskAPI } from './api';
 import type { Priority, Status, Task } from './types';
 
+// Utility: sort tasks by creation date (newest first)
+function sortTasksByCreatedDate(tasks: Task[]): Task[] {
+  return [...tasks].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+}
+
 // Initialize the app
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="edit-task-title">
@@ -232,7 +237,7 @@ async function init() {
     doneList.innerHTML = '';
 
   // Sort tasks by creation date (newest first) and render them in appropriate columns
-  const sortedTasks = [...tasks].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const sortedTasks = sortTasksByCreatedDate(tasks);
   sortedTasks.forEach(task => {
       const taskEl = document.createElement('div');
       taskEl.className = 'task-item';
