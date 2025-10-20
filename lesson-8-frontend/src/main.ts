@@ -491,6 +491,8 @@ async function init() {
         form.classList.remove('active');
         await loadTasks();
         form.removeEventListener('submit', handleSubmit);
+        // Clean up overlay click handler if still attached
+        modalOverlay?.removeEventListener('click', overlayClickHandler as EventListener);
       };
 
       // Handle cancel
@@ -498,13 +500,18 @@ async function init() {
         modalOverlay?.classList.remove('active');
         form.classList.remove('active');
         form.removeEventListener('submit', handleSubmit);
+        // Clean up overlay click handler
+        modalOverlay?.removeEventListener('click', overlayClickHandler as EventListener);
       };
 
       form.addEventListener('submit', handleSubmit);
-      form.querySelector('.cancel')?.addEventListener('click', handleCancel);
-      modalOverlay?.addEventListener('click', (e) => {
+      form.querySelector('.cancel')?.addEventListener('click', handleCancel, { once: true });
+
+      // Named overlay click handler so we can remove it on cleanup
+      function overlayClickHandler(e: Event) {
         if (e.target === modalOverlay) handleCancel();
-      });
+      }
+      modalOverlay?.addEventListener('click', overlayClickHandler, { once: true });
     } catch (error) {
       console.error('Error editing task:', error);
     }

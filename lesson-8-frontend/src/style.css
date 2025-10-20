@@ -131,11 +131,6 @@ form input[type="text"] {
   height: 24px;
 }
 
-input, textarea, select {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.9rem;
-}
-
 form input[type="date"],
 form select {
   min-width: 120px;

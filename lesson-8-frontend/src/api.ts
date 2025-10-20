@@ -1,6 +1,6 @@
 import type { Task } from './types';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Helper to safely read response text without throwing
 async function readErrorText(response: Response): Promise<string> {
