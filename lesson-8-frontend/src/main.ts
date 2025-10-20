@@ -399,9 +399,13 @@ async function init() {
       (form.querySelector('[name="deadline"]') as HTMLInputElement).value = 
         task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : '';
 
-      // Show modal
-      modalOverlay?.classList.add('active');
-      form.classList.add('active');
+  // Show modal
+  modalOverlay?.classList.add('active');
+  form.classList.add('active');
+
+  // Controller to auto-clean listeners on cancel/submit
+  const controller = new AbortController();
+  const { signal } = controller;
 
       // Handle form submission
       const handleSubmit = async (e: Event) => {
@@ -432,14 +436,13 @@ async function init() {
       const handleCancel = () => {
         modalOverlay?.classList.remove('active');
         form.classList.remove('active');
-        // Remove submit listener if user cancels before submitting
-        // (once: true only removes after firing, not on cancel)
-        form.removeEventListener('submit', handleSubmit);
+        // Abort all listeners associated with this modal interaction
+        controller.abort();
       };
 
-      form.addEventListener('submit', handleSubmit, { once: true });
-      form.querySelector('.cancel')?.addEventListener('click', handleCancel, { once: true });
-      modalOverlay?.addEventListener('click', overlayClickHandler, { once: true });
+      form.addEventListener('submit', handleSubmit, { once: true, signal });
+      form.querySelector('.cancel')?.addEventListener('click', handleCancel, { once: true, signal });
+      modalOverlay?.addEventListener('click', overlayClickHandler, { once: true, signal });
     } catch (error) {
       console.error('Error editing task:', error);
     }
