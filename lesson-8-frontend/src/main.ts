@@ -405,13 +405,13 @@ async function init() {
       (form.querySelector('[name="deadline"]') as HTMLInputElement).value = 
         task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : '';
 
-  // Show modal
-  modalOverlay?.classList.add('active');
-  form?.classList.add('active');
+    // Show modal
+    modalOverlay?.classList.add('active');
+    form?.classList.add('active');
 
-  // Controller to auto-clean listeners on cancel/submit
-  const controller = new AbortController();
-  const { signal } = controller;
+    // Controller to auto-clean listeners on cancel/submit
+    const controller = new AbortController();
+    const { signal } = controller;
 
       // Handle form submission
       const handleSubmit = async (e: Event) => {
