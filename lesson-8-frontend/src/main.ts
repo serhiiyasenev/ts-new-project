@@ -187,14 +187,34 @@ async function init() {
       .sort((a, b) => new Date(a.deadline!).getTime() - new Date(b.deadline!).getTime())
       .slice(0, 3);
 
-    document.querySelector('#upcomingDeadlines')!.innerHTML = upcomingDeadlines.length
-      ? upcomingDeadlines.map(task => `
-          <div class="stat-item">
-            <span class="stat-label">${task.title.slice(0, 20)}${task.title.length > 20 ? '...' : ''}</span>
-            <span>${new Date(task.deadline!).toLocaleDateString()}</span>
-          </div>
-        `).join('')
-      : '<div class="stat-item">No upcoming deadlines</div>';
+    const upcomingDeadlinesContainer = document.querySelector('#upcomingDeadlines')!;
+    upcomingDeadlinesContainer.innerHTML = '';
+    
+    if (upcomingDeadlines.length) {
+      upcomingDeadlines.forEach(task => {
+        const statItem = document.createElement('div');
+        statItem.className = 'stat-item';
+        
+        const label = document.createElement('span');
+        label.className = 'stat-label';
+        const truncatedTitle = task.title.length > 20 
+          ? task.title.slice(0, 20) + '...' 
+          : task.title;
+        label.textContent = truncatedTitle;
+        
+        const date = document.createElement('span');
+        date.textContent = new Date(task.deadline!).toLocaleDateString();
+        
+        statItem.appendChild(label);
+        statItem.appendChild(date);
+        upcomingDeadlinesContainer.appendChild(statItem);
+      });
+    } else {
+      const noDeadlines = document.createElement('div');
+      noDeadlines.className = 'stat-item';
+      noDeadlines.textContent = 'No upcoming deadlines';
+      upcomingDeadlinesContainer.appendChild(noDeadlines);
+    }
   }
 
   // Render tasks in the UI

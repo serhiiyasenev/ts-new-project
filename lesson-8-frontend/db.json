@@ -95,7 +95,7 @@
       "title": "Create New Task",
       "description": "Create New TaskCreate New Task",
       "status": "todo",
-      "priority": "medium",
+      "priority": "high",
       "createdAt": "2025-10-20T20:41:14.328Z",
       "deadline": null
     }
