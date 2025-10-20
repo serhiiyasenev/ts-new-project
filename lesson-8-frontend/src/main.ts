@@ -148,7 +148,7 @@ async function init() {
   async function loadTasks() {
     try {
       const tasks = await TaskAPI.getAllTasks();
-      renderTasks(tasks.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+      renderTasks(tasks);
     } catch (error) {
       console.error('Error loading tasks:', error);
     }
@@ -231,8 +231,9 @@ async function init() {
     inProgressList.innerHTML = '';
     doneList.innerHTML = '';
 
-    // Sort tasks by creation date (newest first) and render them in appropriate columns
-    tasks.forEach(task => {
+  // Sort tasks by creation date (newest first) and render them in appropriate columns
+  const sortedTasks = [...tasks].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  sortedTasks.forEach(task => {
       const taskEl = document.createElement('div');
       taskEl.className = 'task-item';
       taskEl.setAttribute('draggable', 'true');
