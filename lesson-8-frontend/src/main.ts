@@ -266,66 +266,6 @@ async function init() {
       actionsDiv.appendChild(deleteBtn);
       taskEl.appendChild(actionsDiv);
 
-      // Task edit form
-      const editForm = document.createElement('form');
-      editForm.className = 'task-edit-form';
-      // Title input
-      const titleInput = document.createElement('input');
-      titleInput.type = 'text';
-      titleInput.name = 'title';
-      titleInput.required = true;
-      titleInput.value = task.title;
-      editForm.appendChild(titleInput);
-      // Description textarea
-      const descTextarea = document.createElement('textarea');
-      descTextarea.name = 'description';
-      descTextarea.required = true;
-      descTextarea.value = task.description;
-      editForm.appendChild(descTextarea);
-      // Status select
-      const statusSelect = document.createElement('select');
-      statusSelect.name = 'status';
-      statusSelect.required = true;
-      ['todo', 'in_progress', 'done'].forEach(status => {
-        const opt = document.createElement('option');
-        opt.value = status;
-        opt.textContent = status === 'in_progress' ? 'In Progress' : status.charAt(0).toUpperCase() + status.slice(1);
-        if (task.status === status) opt.selected = true;
-        statusSelect.appendChild(opt);
-      });
-      editForm.appendChild(statusSelect);
-      // Priority select
-      const prioritySelect = document.createElement('select');
-      prioritySelect.name = 'priority';
-      prioritySelect.required = true;
-      ['low', 'medium', 'high'].forEach(priority => {
-        const opt = document.createElement('option');
-        opt.value = priority;
-        opt.textContent = priority.charAt(0).toUpperCase() + priority.slice(1);
-        if (task.priority === priority) opt.selected = true;
-        prioritySelect.appendChild(opt);
-      });
-      editForm.appendChild(prioritySelect);
-      // Deadline input
-      const deadlineInput = document.createElement('input');
-      deadlineInput.type = 'date';
-      deadlineInput.name = 'deadline';
-      deadlineInput.value = task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : '';
-      editForm.appendChild(deadlineInput);
-      // Form actions
-      const formActionsDiv = document.createElement('div');
-      formActionsDiv.className = 'form-actions';
-      const saveBtn = document.createElement('button');
-      saveBtn.type = 'submit';
-      saveBtn.textContent = 'Save';
-      formActionsDiv.appendChild(saveBtn);
-      const cancelBtn = document.createElement('button');
-      cancelBtn.type = 'button';
-      cancelBtn.className = 'cancel';
-      cancelBtn.textContent = 'Cancel';
-      formActionsDiv.appendChild(cancelBtn);
-      editForm.appendChild(formActionsDiv);
-      taskEl.appendChild(editForm);
       // Add drag events
       taskEl.addEventListener('dragstart', (e) => {
         taskEl.classList.add('dragging');
@@ -334,32 +274,6 @@ async function init() {
 
       taskEl.addEventListener('dragend', () => {
         taskEl.classList.remove('dragging');
-      });
-
-      // Add form submit handler
-      const inlineForm = taskEl.querySelector('.task-edit-form') as HTMLFormElement;
-      inlineForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(inlineForm);
-        const updatedTask = {
-          ...task,
-          title: formData.get('title') as string,
-          description: formData.get('description') as string,
-          status: formData.get('status') as Status,
-          priority: formData.get('priority') as Priority,
-          deadline: formData.get('deadline')
-            ? new Date(formData.get('deadline') as string)
-            : null
-        };
-        await TaskAPI.updateTask(task.id, updatedTask);
-        inlineForm.classList.remove('active');
-        await loadTasks();
-      });
-
-      // Add cancel button handler
-      const inlineCancelBtn = inlineForm.querySelector('.cancel') as HTMLButtonElement;
-      inlineCancelBtn.addEventListener('click', () => {
-        inlineForm.classList.remove('active');
       });
 
       // Add task to appropriate column
@@ -413,9 +327,6 @@ async function init() {
       }
     }
   };
-  (window as any).deleteTask = deleteTask;
-
-  // Edit task handler
 
   // Setup drag and drop for columns
   const columns = document.querySelectorAll('.task-column');
@@ -491,8 +402,6 @@ async function init() {
         form.classList.remove('active');
         await loadTasks();
         form.removeEventListener('submit', handleSubmit);
-        // Clean up overlay click handler if still attached
-        modalOverlay?.removeEventListener('click', overlayClickHandler as EventListener);
       };
 
       // Handle cancel
@@ -500,14 +409,12 @@ async function init() {
         modalOverlay?.classList.remove('active');
         form.classList.remove('active');
         form.removeEventListener('submit', handleSubmit);
-        // Clean up overlay click handler
-        modalOverlay?.removeEventListener('click', overlayClickHandler as EventListener);
       };
 
       form.addEventListener('submit', handleSubmit);
       form.querySelector('.cancel')?.addEventListener('click', handleCancel, { once: true });
 
-      // Named overlay click handler so we can remove it on cleanup
+      // Overlay click handler to close modal when clicking outside
       function overlayClickHandler(e: Event) {
         if (e.target === modalOverlay) handleCancel();
       }
@@ -516,7 +423,6 @@ async function init() {
       console.error('Error editing task:', error);
     }
   };
-  (window as any).editTask = editTask;
 
   // Initial load
   await loadTasks();

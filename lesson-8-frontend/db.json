@@ -43,7 +43,7 @@
       "status": "in_progress",
       "priority": "medium",
       "deadline": "2025-10-01T00:00:00.000Z",
-      "description": "undefined"
+      "description": "Setup Testing Environment"
     },
     {
       "id": "6",
@@ -82,7 +82,7 @@
       "deadline": "2025-10-01T00:00:00.000Z"
     },
     {
-      "id": "1489",
+      "id": "11",
       "title": "Newly Created Task",
       "description": "Description Description Description Description Description",
       "status": "todo",
@@ -91,22 +91,13 @@
       "deadline": "2025-10-17T00:00:00.000Z"
     },
     {
-      "id": "cd25",
+      "id": "12",
       "title": "Create New Task",
       "description": "Create New TaskCreate New Task",
       "status": "todo",
       "priority": "medium",
       "createdAt": "2025-10-20T20:41:14.328Z",
       "deadline": "2025-10-31T00:00:00.000Z"
-    },
-    {
-      "id": "ce50",
-      "title": "ч",
-      "description": "ч",
-      "status": "todo",
-      "priority": "low",
-      "createdAt": "2025-10-20T20:58:18.237Z",
-      "deadline": null
     }
   ]
 }
