@@ -4,11 +4,16 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "concurrently \"npm run dev\" \"npm run api\"",
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "api": "json-server --watch db.json --port 3000"
   },
   "devDependencies": {
+    "@types/json-server": "^0.14.8",
+    "concurrently": "^9.2.1",
+    "json-server": "^1.0.0-beta.3",
     "typescript": "~5.9.3",
     "vite": "^7.1.7"
   }
