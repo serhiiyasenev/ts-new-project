@@ -553,20 +553,18 @@ describe('TaskService full test suite', () => {
     });
 
     // ---------- DATE FILTER TESTS ----------
-    it('should filter tasks created after specific date', () => {
+    it('should filter tasks created after specific date', async () => {
         const now = new Date();
         const task1 = service.create({ title: 'Old task' });
         
-        // Wait a bit to ensure different timestamp
-        const start = Date.now();
-        while (Date.now() - start < 10) { /* wait */ }
-        
+        // Wait a bit to ensure different timestamp (use async delay instead of busy-wait)
+        await new Promise(res => setTimeout(res, 10));
+
         const cutoffDate = new Date();
-        
+
         // Wait again
-        const start2 = Date.now();
-        while (Date.now() - start2 < 10) { /* wait */ }
-        
+        await new Promise(res => setTimeout(res, 10));
+
         const task2 = service.create({ title: 'New task' });
         
         const filtered = service.filter({ createdAfter: cutoffDate });
@@ -574,18 +572,16 @@ describe('TaskService full test suite', () => {
         expect(filtered.some(t => t.id === task1.id)).toBe(false);
     });
 
-    it('should filter tasks created before specific date', () => {
+    it('should filter tasks created before specific date', async () => {
         const task1 = service.create({ title: 'First task' });
         
-        // Wait a bit
-        const start = Date.now();
-        while (Date.now() - start < 10) { /* wait */ }
+        // Wait a bit (use async delay)
+        await new Promise(res => setTimeout(res, 10));
         
         const cutoffDate = new Date();
         
         // Wait again
-        const start2 = Date.now();
-        while (Date.now() - start2 < 10) { /* wait */ }
+        await new Promise(res => setTimeout(res, 10));
         
         const task2 = service.create({ title: 'Second task' });
         
@@ -696,7 +692,7 @@ describe('TaskService full test suite', () => {
         expect(filtered[0].getTitle()).toBe('Available TODO');
     });
 
-    it('should filter by all criteria simultaneously', () => {
+    it('should filter by all criteria simultaneously', async () => {
         const task1 = service.create({
             title: 'Perfect match',
             status: Status.IN_PROGRESS,
@@ -705,9 +701,8 @@ describe('TaskService full test suite', () => {
         });
         
         // Wait
-        const start = Date.now();
-        while (Date.now() - start < 10) { /* wait */ }
-        
+        await new Promise(res => setTimeout(res, 10));
+
         const afterDate = new Date();
         
         service.create({
