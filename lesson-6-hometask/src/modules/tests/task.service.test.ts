@@ -594,30 +594,26 @@ describe('TaskService full test suite', () => {
         expect(filtered.some(t => t.id === task2.id)).toBe(false);
     });
 
-    it('should filter tasks created within date range', () => {
+    it('should filter tasks created within date range', async () => {
         const task1 = service.create({ title: 'Before range' });
         
         // Wait
-        const start1 = Date.now();
-        while (Date.now() - start1 < 10) { /* wait */ }
+        await new Promise(resolve => setTimeout(resolve, 10));
         
         const startDate = new Date();
         
         // Wait
-        const start2 = Date.now();
-        while (Date.now() - start2 < 10) { /* wait */ }
+        await new Promise(resolve => setTimeout(resolve, 10));
         
         const task2 = service.create({ title: 'In range' });
         
         // Wait
-        const start3 = Date.now();
-        while (Date.now() - start3 < 10) { /* wait */ }
+        await new Promise(resolve => setTimeout(resolve, 10));
         
         const endDate = new Date();
         
         // Wait
-        const start4 = Date.now();
-        while (Date.now() - start4 < 10) { /* wait */ }
+        await new Promise(resolve => setTimeout(resolve, 10));
         
         const task3 = service.create({ title: 'After range' });
         
