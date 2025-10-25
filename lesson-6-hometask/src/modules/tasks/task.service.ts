@@ -60,9 +60,9 @@ export class TaskService {
         return this.tasks.filter(task => {
             if (filters.status && task.getStatus() !== filters.status) return false;
             if (filters.priority && task.getPriority() !== filters.priority) return false;
-            if (filters.isAvailable !== undefined && task.getIsAvailable() !== filters.isAvailable) return false;
             if (filters.createdAfter && task.getCreatedAt() < filters.createdAfter) return false;
             if (filters.createdBefore && task.getCreatedAt() > filters.createdBefore) return false;
+            if (filters.isAvailable !== undefined && task.getIsAvailable() !== filters.isAvailable) return false;
             return true;
         });
     }
