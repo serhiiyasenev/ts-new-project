@@ -40,9 +40,7 @@ export class TaskService {
         if (dto.status !== undefined) task.setStatus(dto.status);
         if (dto.priority !== undefined) task.setPriority(dto.priority);
         if (dto.isAvailable !== undefined) task.setAvailability(dto.isAvailable);
-        if (dto.deadline !== undefined) {
-            task.setDeadline(dto.deadline);
-        }
+        if (dto.deadline !== undefined) task.setDeadline(dto.deadline);
 
         return task;
     }
