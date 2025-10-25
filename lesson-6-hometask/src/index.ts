@@ -26,7 +26,7 @@ const task3 = controller.createTask({
     description: 'Just a test task',
     status: Status.DONE,
     priority: Priority.LOW,
-    deadline: new Date(Date.now() + 100000) // 100 seconds from now to avoid past deadline error
+    deadline: new Date(Date.now())
 });
 
 
