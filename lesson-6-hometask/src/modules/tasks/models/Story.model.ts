@@ -5,7 +5,7 @@ export class Story extends Task {
 
     constructor(storyPoints: number, ...args: ConstructorParameters<typeof Task>) {
         super(...args);
-        if (storyPoints < 0) throw new Error('Story points cannot be negative.');
+        if (storyPoints < 0) throw new Error('Story points cannot be negative');
         this.storyPoints = storyPoints;
     }
 
