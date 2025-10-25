@@ -1,10 +1,11 @@
 import { Task } from './Task.model';
 
 export class Epic extends Task {
-    private readonly children: string[];
+    private children: string[];
 
     constructor(children: string[], ...args: ConstructorParameters<typeof Task>) {
         super(...args);
+        // store a shallow copy to avoid external mutation
         this.children = [...children];
     }
 
@@ -12,18 +13,18 @@ export class Epic extends Task {
         return [...this.children];
     }
 
+    // Use immutable reassignment instead of mutating the array so callers
+    // cannot observe in-place mutations and the implementation is clearer.
     addChild(child: string): void {
-        this.children.push(child);
+        this.children = [...this.children, child];
     }
 
     removeChild(child: string): boolean {
-        const index = this.children.indexOf(child);
-        if (index !== -1) {
-            this.children.splice(index, 1);
-            return true;
-        }
-        return false;
+        const before = this.children.length;
+        this.children = this.children.filter(c => c !== child);
+        return this.children.length !== before;
     }
+
     override getTaskInfo(): string {
         return `Epic [${this.id}] — ${this.getTitle()}, contains ${this.children.length} tasks`;
     }
