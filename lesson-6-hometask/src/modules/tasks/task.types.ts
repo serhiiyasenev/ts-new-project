@@ -50,4 +50,6 @@ export interface TaskFilterDto {
     status?: Status;
     priority?: Priority;
     isAvailable?: boolean;
+    createdAfter?: Date;
+    createdBefore?: Date;
 }

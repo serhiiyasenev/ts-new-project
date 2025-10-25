@@ -217,15 +217,53 @@ describe('TaskService full test suite', () => {
         expect(updated.getTitle()).toBe('Test task');
     });
 
-    it('should update task deadline to undefined', () => {
+    it('should update task with new deadline', () => {
         const task = service.create({
             title: 'Task with deadline',
             deadline: new Date(Date.now() + 86400000)
         });
-        expect(task.getDeadline()).toBeDefined();
+        const originalDeadline = task.getDeadline();
+        expect(originalDeadline).toBeDefined();
         
-        const updated = service.update(task.id, { deadline: undefined });
+        const newDeadline = new Date(Date.now() + 172800000); // 2 days from now
+        const updated = service.update(task.id, { deadline: newDeadline });
+        expect(updated.getDeadline()).toEqual(newDeadline);
+        expect(updated.getDeadline()).not.toEqual(originalDeadline);
+    });
+
+    it('should create task without deadline and deadline remains undefined', () => {
+        const task = service.create({
+            title: 'Task without deadline',
+            description: 'No deadline set'
+        });
+        expect(task.getDeadline()).toBeUndefined();
+        
+        // Update other fields but don't touch deadline
+        const updated = service.update(task.id, { description: 'Updated description' });
         expect(updated.getDeadline()).toBeUndefined();
+    });
+
+    it('should add deadline to task that was created without one', () => {
+        const task = service.create({
+            title: 'Task without deadline initially'
+        });
+        expect(task.getDeadline()).toBeUndefined();
+        
+        const futureDeadline = new Date(Date.now() + 86400000);
+        const updated = service.update(task.id, { deadline: futureDeadline });
+        expect(updated.getDeadline()).toEqual(futureDeadline);
+        expect(updated.getDeadline()).toBeDefined();
+    });
+
+    it('should throw error when trying to update deadline to past date', () => {
+        const task = service.create({
+            title: 'Task with valid deadline',
+            deadline: new Date(Date.now() + 86400000)
+        });
+        
+        const pastDate = new Date(Date.now() - 1000);
+        expect(() => service.update(task.id, { deadline: pastDate }))
+            .toThrow('Deadline cannot be in the past');
     });
 
     it('should handle filter with no matches', () => {
@@ -513,5 +551,213 @@ describe('TaskService full test suite', () => {
         service.delete(task1.id);
         service.delete(task3.id);
         expect(service.getAll().length).toBe(initial);
+    });
+
+    // ---------- DATE FILTER TESTS ----------
+    it('should filter tasks created after specific date', () => {
+        const now = new Date();
+        const task1 = service.create({ title: 'Old task' });
+        
+        // Wait a bit to ensure different timestamp
+        const start = Date.now();
+        while (Date.now() - start < 10) { /* wait */ }
+        
+        const cutoffDate = new Date();
+        
+        // Wait again
+        const start2 = Date.now();
+        while (Date.now() - start2 < 10) { /* wait */ }
+        
+        const task2 = service.create({ title: 'New task' });
+        
+        const filtered = service.filter({ createdAfter: cutoffDate });
+        expect(filtered.some(t => t.id === task2.id)).toBe(true);
+        expect(filtered.some(t => t.id === task1.id)).toBe(false);
+    });
+
+    it('should filter tasks created before specific date', () => {
+        const task1 = service.create({ title: 'First task' });
+        
+        // Wait a bit
+        const start = Date.now();
+        while (Date.now() - start < 10) { /* wait */ }
+        
+        const cutoffDate = new Date();
+        
+        // Wait again
+        const start2 = Date.now();
+        while (Date.now() - start2 < 10) { /* wait */ }
+        
+        const task2 = service.create({ title: 'Second task' });
+        
+        const filtered = service.filter({ createdBefore: cutoffDate });
+        expect(filtered.some(t => t.id === task1.id)).toBe(true);
+        expect(filtered.some(t => t.id === task2.id)).toBe(false);
+    });
+
+    it('should filter tasks created within date range', () => {
+        const task1 = service.create({ title: 'Before range' });
+        
+        // Wait
+        const start1 = Date.now();
+        while (Date.now() - start1 < 10) { /* wait */ }
+        
+        const startDate = new Date();
+        
+        // Wait
+        const start2 = Date.now();
+        while (Date.now() - start2 < 10) { /* wait */ }
+        
+        const task2 = service.create({ title: 'In range' });
+        
+        // Wait
+        const start3 = Date.now();
+        while (Date.now() - start3 < 10) { /* wait */ }
+        
+        const endDate = new Date();
+        
+        // Wait
+        const start4 = Date.now();
+        while (Date.now() - start4 < 10) { /* wait */ }
+        
+        const task3 = service.create({ title: 'After range' });
+        
+        const filtered = service.filter({ 
+            createdAfter: startDate, 
+            createdBefore: endDate 
+        });
+        
+        expect(filtered.some(t => t.id === task2.id)).toBe(true);
+        expect(filtered.some(t => t.id === task1.id)).toBe(false);
+        expect(filtered.some(t => t.id === task3.id)).toBe(false);
+    });
+
+    it('should combine date filters with other filters', () => {
+        const task1 = service.create({ 
+            title: 'Old high priority', 
+            priority: Priority.HIGH 
+        });
+        
+        // Wait
+        const start = Date.now();
+        while (Date.now() - start < 10) { /* wait */ }
+        
+        const cutoffDate = new Date();
+        
+        // Wait
+        const start2 = Date.now();
+        while (Date.now() - start2 < 10) { /* wait */ }
+        
+        const task2 = service.create({ 
+            title: 'New high priority', 
+            priority: Priority.HIGH 
+        });
+        
+        const task3 = service.create({ 
+            title: 'New low priority', 
+            priority: Priority.LOW 
+        });
+        
+        const filtered = service.filter({ 
+            createdAfter: cutoffDate,
+            priority: Priority.HIGH
+        });
+        
+        expect(filtered.length).toBe(1);
+        expect(filtered[0].id).toBe(task2.id);
+    });
+
+    it('should return empty array when no tasks match date filter', () => {
+        service.create({ title: 'Task 1' });
+        service.create({ title: 'Task 2' });
+        
+        const futureDate = new Date(Date.now() + 100000);
+        const filtered = service.filter({ createdAfter: futureDate });
+        
+        expect(filtered.length).toBe(0);
+    });
+
+    it('should filter by status and availability combination', () => {
+        service.create({ 
+            title: 'Available TODO', 
+            status: Status.TODO, 
+            isAvailable: true 
+        });
+        service.create({ 
+            title: 'Unavailable TODO', 
+            status: Status.TODO, 
+            isAvailable: false 
+        });
+        service.create({ 
+            title: 'Available IN_PROGRESS', 
+            status: Status.IN_PROGRESS, 
+            isAvailable: true 
+        });
+        
+        const filtered = service.filter({ 
+            status: Status.TODO, 
+            isAvailable: true 
+        });
+        
+        expect(filtered.length).toBe(1);
+        expect(filtered[0].getTitle()).toBe('Available TODO');
+    });
+
+    it('should filter by all criteria simultaneously', () => {
+        const task1 = service.create({
+            title: 'Perfect match',
+            status: Status.IN_PROGRESS,
+            priority: Priority.HIGH,
+            isAvailable: true
+        });
+        
+        // Wait
+        const start = Date.now();
+        while (Date.now() - start < 10) { /* wait */ }
+        
+        const afterDate = new Date();
+        
+        service.create({
+            title: 'Wrong status',
+            status: Status.TODO,
+            priority: Priority.HIGH,
+            isAvailable: true
+        });
+        
+        service.create({
+            title: 'Wrong priority',
+            status: Status.IN_PROGRESS,
+            priority: Priority.LOW,
+            isAvailable: true
+        });
+        
+        service.create({
+            title: 'Wrong availability',
+            status: Status.IN_PROGRESS,
+            priority: Priority.HIGH,
+            isAvailable: false
+        });
+        
+        const filtered = service.filter({
+            status: Status.IN_PROGRESS,
+            priority: Priority.HIGH,
+            isAvailable: true,
+            createdBefore: afterDate
+        });
+        
+        expect(filtered.length).toBe(1);
+        expect(filtered[0].id).toBe(task1.id);
+    });
+
+    it('should return all tasks when filter object is empty', () => {
+        service.create({ title: 'Task A', status: Status.TODO });
+        service.create({ title: 'Task B', status: Status.IN_PROGRESS });
+        service.create({ title: 'Task C', status: Status.DONE });
+        
+        const allTasks = service.getAll();
+        const filtered = service.filter({});
+        
+        expect(filtered.length).toBe(allTasks.length);
+        expect(filtered).toEqual(allTasks);
     });
 });
