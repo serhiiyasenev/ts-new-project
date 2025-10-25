@@ -14,7 +14,7 @@ export class Task implements BaseTask {
     constructor(
         id: string,
         title: string,
-        description: string = '',
+        description: string = 'No description provided',
         status: Status = Status.TODO,
         priority: Priority = Priority.MEDIUM,
         isAvailable: boolean = true
