@@ -15,8 +15,8 @@ export class TaskService {
             dto.isAvailable ?? true
         );
 
-        if (dto.deadline) {
-            task.deadline = dto.deadline;
+        if (dto.deadline !== undefined) {
+            task.setDeadline(dto.deadline);
         }
 
         this.tasks.push(task);
@@ -35,12 +35,12 @@ export class TaskService {
         const task = this.getById(id);
         if (!task) throw new Error(`Task with id "${id}" not found.`);
 
-        if (dto.title !== undefined) task.title = dto.title;
-        if (dto.description !== undefined) task.description = dto.description;
-        if (dto.status !== undefined) task.status = dto.status;
-        if (dto.priority !== undefined) task.priority = dto.priority;
-        if (dto.isAvailable !== undefined) task.availability = dto.isAvailable;
-        if (dto.deadline !== undefined) task.deadline = dto.deadline;
+        if (dto.title !== undefined) task.setTitle(dto.title);
+        if (dto.description !== undefined) task.setDescription(dto.description);
+        if (dto.status !== undefined) task.setStatus(dto.status);
+        if (dto.priority !== undefined) task.setPriority(dto.priority);
+        if (dto.isAvailable !== undefined) task.setAvailability(dto.isAvailable);
+        if ('deadline' in dto) task.setDeadline(dto.deadline);
 
         return task;
     }
@@ -58,9 +58,9 @@ export class TaskService {
 
     filter(filters: TaskFilterDto): Task[] {
         return this.tasks.filter(task => {
-            if (filters.status && task.status !== filters.status) return false;
-            if (filters.priority && task.priority !== filters.priority) return false;
-            if (filters.isAvailable !== undefined && task.isAvailable !== filters.isAvailable) return false;
+            if (filters.status && task.getStatus() !== filters.status) return false;
+            if (filters.priority && task.getPriority() !== filters.priority) return false;
+            if (filters.isAvailable !== undefined && task.getIsAvailable() !== filters.isAvailable) return false;
             return true;
         });
     }

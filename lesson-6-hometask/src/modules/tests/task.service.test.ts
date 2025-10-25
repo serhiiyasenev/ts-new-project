@@ -1,10 +1,17 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { TaskService } from '../tasks/task.service';
-import { Status, Priority } from '../tasks/task.types';
-
+import { Status, Priority, Severity } from '../tasks/task.types';
+import { Bug } from '../tasks/models/Bug.model';
+import { Story } from '../tasks/models/Story.model';
+import { Epic } from '../tasks/models/Epic.model';
+import { Subtask } from '../tasks/models/Subtask.model';
 
 describe('TaskService full test suite', () => {
-    const service = new TaskService();
+    let service: TaskService;
+
+    beforeEach(() => {
+        service = new TaskService();
+    });
 
     // ---------- CREATE ----------
     it('should create a task successfully', () => {
@@ -15,7 +22,7 @@ describe('TaskService full test suite', () => {
             priority: Priority.HIGH,
             deadline: new Date(Date.now() + 86400000)
         });
-        expect(task.title).toBe('Create API endpoint');
+        expect(task.getTitle()).toBe('Create API endpoint');
     });
 
     it('should throw error when creating task with empty title', () => {
@@ -38,20 +45,22 @@ describe('TaskService full test suite', () => {
 
     // ---------- GET ALL ----------
     it('should return all tasks', () => {
+        service.create({ title: 'Test task 1' });
         const all = service.getAll();
         expect(all.length).toBeGreaterThan(0);
     });
 
     it('should return array of Task objects', () => {
+        service.create({ title: 'Test task 2' });
         const all = service.getAll();
         expect(all.every(t => typeof t.getTaskInfo === 'function')).toBe(true);
     });
 
     // ---------- GET BY ID ----------
     it('should get a task by id', () => {
-        const first = service.getAll()[0];
-        const found = service.getById(first.id);
-        expect(found?.id).toBe(first.id);
+        const task = service.create({ title: 'Get by ID test' });
+        const found = service.getById(task.id);
+        expect(found?.id).toBe(task.id);
     });
 
     it('should return undefined for non-existent id', () => {
@@ -61,31 +70,31 @@ describe('TaskService full test suite', () => {
 
     // ---------- UPDATE ----------
     it('should update title of existing task', () => {
-        const first = service.getAll()[0];
-        const updated = service.update(first.id, { title: 'Updated Title' });
-        expect(updated.title).toBe('Updated Title');
+        const task = service.create({ title: 'Original title' });
+        const updated = service.update(task.id, { title: 'Updated Title' });
+        expect(updated.getTitle()).toBe('Updated Title');
     });
 
     it('should update multiple fields (status, priority)', () => {
-        const first = service.getAll()[0];
-        const updated = service.update(first.id, {
+        const task = service.create({ title: 'Multi-update test' });
+        const updated = service.update(task.id, {
             status: Status.IN_PROGRESS,
             priority: Priority.LOW
         });
-        expect(updated.status).toBe(Status.IN_PROGRESS);
-        expect(updated.priority).toBe(Priority.LOW);
+        expect(updated.getStatus()).toBe(Status.IN_PROGRESS);
+        expect(updated.getPriority()).toBe(Priority.LOW);
     });
 
     it('should throw error when updating with empty title', () => {
-        const first = service.getAll()[0];
-        expect(() => service.update(first.id, { title: ' ' }))
+        const task = service.create({ title: 'Valid title' });
+        expect(() => service.update(task.id, { title: ' ' }))
             .toThrow('Title cannot be empty');
     });
 
     it('should throw error when updating with past deadline', () => {
-        const first = service.getAll()[0];
+        const task = service.create({ title: 'Deadline test' });
         expect(() =>
-            service.update(first.id, { deadline: new Date(Date.now() - 1000) })
+            service.update(task.id, { deadline: new Date(Date.now() - 1000) })
         ).toThrow('Deadline cannot be in the past');
     });
 
@@ -108,17 +117,17 @@ describe('TaskService full test suite', () => {
     // ---------- FILTER ----------
     it('should filter tasks by status', () => {
         const filtered = service.filter({ status: Status.IN_PROGRESS });
-        expect(filtered.every(t => t.status === Status.IN_PROGRESS)).toBe(true);
+        expect(filtered.every(t => t.getStatus() === Status.IN_PROGRESS)).toBe(true);
     });
 
     it('should filter tasks by priority', () => {
         const filtered = service.filter({ priority: Priority.LOW });
-        expect(filtered.every(t => t.priority === Priority.LOW)).toBe(true);
+        expect(filtered.every(t => t.getPriority() === Priority.LOW)).toBe(true);
     });
 
     it('should filter tasks by availability', () => {
         const filtered = service.filter({ isAvailable: true });
-        expect(filtered.every(t => t.isAvailable === true)).toBe(true);
+        expect(filtered.every(t => t.getIsAvailable() === true)).toBe(true);
     });
 
     // ---------- COMBINATIONS ----------
@@ -178,5 +187,331 @@ describe('TaskService full test suite', () => {
         service.update(task.id, { title: 'Updated lifecycle' });
         service.delete(task.id);
         expect(service.getById(task.id)).toBeUndefined();
+    });
+
+    // ---------- EDGE CASES ----------
+    it('should create task with default values when optional fields are omitted', () => {
+        const task = service.create({ title: 'Minimal task' });
+        expect(task.getTitle()).toBe('Minimal task');
+        expect(task.getDescription()).toBe('No description provided');
+        expect(task.getStatus()).toBe(Status.TODO);
+        expect(task.getPriority()).toBe(Priority.MEDIUM);
+        expect(task.getIsAvailable()).toBe(true);
+        expect(task.getDeadline()).toBeUndefined();
+    });
+
+    it('should throw error when creating task with title less than 3 characters', () => {
+        expect(() => service.create({ title: 'AB' }))
+            .toThrow('Title must be at least 3 characters long');
+    });
+
+    it('should handle task creation with exact 3 character title', () => {
+        const task = service.create({ title: 'ABC' });
+        expect(task.getTitle()).toBe('ABC');
+    });
+
+    it('should update task description only', () => {
+        const task = service.create({ title: 'Test task' });
+        const updated = service.update(task.id, { description: 'New description' });
+        expect(updated.getDescription()).toBe('New description');
+        expect(updated.getTitle()).toBe('Test task');
+    });
+
+    it('should update task deadline to undefined', () => {
+        const task = service.create({
+            title: 'Task with deadline',
+            deadline: new Date(Date.now() + 86400000)
+        });
+        expect(task.getDeadline()).toBeDefined();
+        
+        const updated = service.update(task.id, { deadline: undefined });
+        expect(updated.getDeadline()).toBeUndefined();
+    });
+
+    it('should handle filter with no matches', () => {
+        service.create({ title: 'Task 1', status: Status.TODO });
+        const filtered = service.filter({ status: Status.DONE });
+        expect(filtered.length).toBe(0);
+    });
+
+    it('should filter with multiple criteria', () => {
+        service.create({
+            title: 'Match task',
+            status: Status.IN_PROGRESS,
+            priority: Priority.HIGH,
+            isAvailable: true
+        });
+        service.create({
+            title: 'No match',
+            status: Status.IN_PROGRESS,
+            priority: Priority.LOW,
+            isAvailable: true
+        });
+
+        const filtered = service.filter({
+            status: Status.IN_PROGRESS,
+            priority: Priority.HIGH,
+            isAvailable: true
+        });
+        expect(filtered.length).toBe(1);
+        expect(filtered[0].getTitle()).toBe('Match task');
+    });
+
+    it('should maintain updatedAt timestamp after updates', () => {
+        const task = service.create({ title: 'Timestamp test' });
+        const initialUpdatedAt = task.getUpdatedAt().getTime();
+        
+        // Small delay to ensure different timestamp
+        const start = Date.now();
+        while (Date.now() - start < 5) { /* wait */ }
+        
+        service.update(task.id, { title: 'Updated title' });
+        expect(task.getUpdatedAt().getTime()).toBeGreaterThan(initialUpdatedAt);
+    });
+
+    it('should handle empty filter (return all tasks)', () => {
+        service.create({ title: 'Task 1' });
+        service.create({ title: 'Task 2' });
+        const filtered = service.filter({});
+        expect(filtered.length).toBe(2);
+    });
+
+    it('should preserve task availability when not updated', () => {
+        const task = service.create({ title: 'Available task', isAvailable: false });
+        expect(task.getIsAvailable()).toBe(false);
+        
+        const updated = service.update(task.id, { title: 'Updated title' });
+        expect(updated.getIsAvailable()).toBe(false);
+    });
+
+    it('should update isAvailable field correctly', () => {
+        const task = service.create({ title: 'Task', isAvailable: true });
+        expect(task.getIsAvailable()).toBe(true);
+        
+        const updated = service.update(task.id, { isAvailable: false });
+        expect(updated.getIsAvailable()).toBe(false);
+    });
+
+    // ---------- VALIDATION TESTS ----------
+    it('should throw error when updating non-existent task', () => {
+        expect(() => service.update('fake-id-999', { title: 'New title' }))
+            .toThrow('Task with id "fake-id-999" not found');
+    });
+
+    it('should throw error when updating with title less than 3 characters', () => {
+        const task = service.create({ title: 'Valid task' });
+        expect(() => service.update(task.id, { title: 'AB' }))
+            .toThrow('Title must be at least 3 characters long');
+    });
+
+    it('should allow future deadline', () => {
+        const futureDate = new Date(Date.now() + 1000000);
+        const task = service.create({ title: 'Future task', deadline: futureDate });
+        expect(task.getDeadline()).toEqual(futureDate);
+    });
+
+    it('should throw error when setting deadline to past date on creation', () => {
+        const pastDate = new Date(Date.now() - 1000);
+        expect(() => service.create({ title: 'Past task', deadline: pastDate }))
+            .toThrow('Deadline cannot be in the past');
+    });
+
+    // ---------- SPECIALIZED TASK TYPES ----------
+    it('should create and verify Bug task with severity', () => {
+        const bug = new Bug(
+            Severity.CRITICAL,
+            'bug-1',
+            'Critical bug',
+            'System crash on login',
+            Status.TODO,
+            Priority.HIGH,
+            true
+        );
+        expect(bug.severity).toBe(Severity.CRITICAL);
+        expect(bug.getTaskInfo()).toContain('CRITICAL');
+        expect(bug.getTaskInfo()).toContain('Critical bug');
+    });
+
+    it('should create Bug with all severity levels', () => {
+        const minorBug = new Bug(
+            Severity.MINOR,
+            'bug-minor',
+            'Minor bug',
+            'Typo in text',
+            Status.TODO,
+            Priority.LOW,
+            true
+        );
+        expect(minorBug.severity).toBe(Severity.MINOR);
+
+        const majorBug = new Bug(
+            Severity.MAJOR,
+            'bug-major',
+            'Major bug',
+            'Performance issue',
+            Status.IN_PROGRESS,
+            Priority.MEDIUM,
+            true
+        );
+        expect(majorBug.severity).toBe(Severity.MAJOR);
+
+        const criticalBug = new Bug(
+            Severity.CRITICAL,
+            'bug-critical',
+            'Critical bug',
+            'Data loss',
+            Status.TODO,
+            Priority.HIGH,
+            true
+        );
+        expect(criticalBug.severity).toBe(Severity.CRITICAL);
+    });
+
+    it('should create and verify Story task with story points', () => {
+        const story = new Story(
+            5,
+            'story-1',
+            'User story',
+            'As a user, I want to login',
+            Status.TODO,
+            Priority.HIGH,
+            true
+        );
+        expect(story.storyPoints).toBe(5);
+        expect(story.getTaskInfo()).toContain('5 points');
+    });
+
+    it('should throw error when creating Story with negative points', () => {
+        expect(() => new Story(
+            -5,
+            'story-invalid',
+            'Invalid story',
+            'Should fail',
+            Status.TODO,
+            Priority.LOW,
+            true
+        )).toThrow('Story points cannot be negative');
+    });
+
+    it('should create Story with zero points', () => {
+        const story = new Story(
+            0,
+            'story-zero',
+            'Zero point story',
+            'Quick task',
+            Status.TODO,
+            Priority.LOW,
+            true
+        );
+        expect(story.storyPoints).toBe(0);
+    });
+
+    it('should create and verify Epic task with children', () => {
+        const epic = new Epic(
+            ['task-1', 'task-2', 'task-3'],
+            'epic-1',
+            'Feature epic',
+            'Complete authentication feature',
+            Status.IN_PROGRESS,
+            Priority.HIGH,
+            true
+        );
+        expect(epic.children.length).toBe(3);
+        expect(epic.getTaskInfo()).toContain('contains 3 tasks');
+    });
+
+    it('should create Epic with no children', () => {
+        const epic = new Epic(
+            [],
+            'epic-empty',
+            'Empty epic',
+            'No tasks yet',
+            Status.TODO,
+            Priority.LOW,
+            true
+        );
+        expect(epic.children.length).toBe(0);
+        expect(epic.getTaskInfo()).toContain('contains 0 tasks');
+    });
+
+    it('should create and verify Subtask with parent reference', () => {
+        const subtask = new Subtask(
+            'parent-task-id',
+            'subtask-1',
+            'Subtask title',
+            'Subtask description',
+            Status.TODO,
+            Priority.MEDIUM,
+            true
+        );
+        expect(subtask.parentId).toBe('parent-task-id');
+        expect(subtask.getTaskInfo()).toContain('Subtask of parent-task-id');
+    });
+
+    // ---------- TASK INFO TESTS ----------
+    it('should generate correct task info string', () => {
+        const task = service.create({
+            title: 'Info test',
+            description: 'Testing info method',
+            status: Status.IN_PROGRESS,
+            priority: Priority.HIGH
+        });
+        const info = task.getTaskInfo();
+        expect(info).toContain('Info test');
+        expect(info).toContain('Testing info method');
+        expect(info).toContain('in_progress');
+        expect(info).toContain('high');
+    });
+
+    // ---------- BOUNDARY TESTS ----------
+    it('should handle very long title', () => {
+        const longTitle = 'A'.repeat(1000);
+        const task = service.create({ title: longTitle });
+        expect(task.getTitle()).toBe(longTitle);
+    });
+
+    it('should handle very long description', () => {
+        const longDesc = 'D'.repeat(10000);
+        const task = service.create({ title: 'Test', description: longDesc });
+        expect(task.getDescription()).toBe(longDesc);
+    });
+
+    it('should handle task with all enum values', () => {
+        // Test all status values
+        const todoTask = service.create({ title: 'TODO task', status: Status.TODO });
+        expect(todoTask.getStatus()).toBe(Status.TODO);
+
+        const inProgressTask = service.create({ title: 'In Progress task', status: Status.IN_PROGRESS });
+        expect(inProgressTask.getStatus()).toBe(Status.IN_PROGRESS);
+
+        const doneTask = service.create({ title: 'Done task', status: Status.DONE });
+        expect(doneTask.getStatus()).toBe(Status.DONE);
+
+        // Test all priority values
+        const lowPriorityTask = service.create({ title: 'Low priority', priority: Priority.LOW });
+        expect(lowPriorityTask.getPriority()).toBe(Priority.LOW);
+
+        const mediumPriorityTask = service.create({ title: 'Medium priority', priority: Priority.MEDIUM });
+        expect(mediumPriorityTask.getPriority()).toBe(Priority.MEDIUM);
+
+        const highPriorityTask = service.create({ title: 'High priority', priority: Priority.HIGH });
+        expect(highPriorityTask.getPriority()).toBe(Priority.HIGH);
+    });
+
+    it('should maintain task count correctly after multiple operations', () => {
+        const initial = service.getAll().length;
+        
+        const task1 = service.create({ title: 'Task 1' });
+        const task2 = service.create({ title: 'Task 2' });
+        const task3 = service.create({ title: 'Task 3' });
+        
+        expect(service.getAll().length).toBe(initial + 3);
+        
+        service.delete(task2.id);
+        expect(service.getAll().length).toBe(initial + 2);
+        
+        service.delete(task1.id);
+        service.delete(task3.id);
+        expect(service.getAll().length).toBe(initial);
     });
 });

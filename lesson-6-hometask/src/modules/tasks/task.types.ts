@@ -11,18 +11,26 @@ export enum Priority {
     HIGH = 'high'
 }
 
-// Type aliases
-export type Severity = 'minor' | 'major' | 'critical';
+export enum Severity {
+    MINOR = 'minor',
+    MAJOR = 'major',
+    CRITICAL = 'critical'
+}
 
 // Base interface
 export interface BaseTask {
     id: string;
-    title: string;
-    description?: string;
     createdAt: Date;
-    status: Status;
-    priority: Priority;
-    deadline?: Date | undefined;
+    getTitle(): string;
+    getDescription(): string;
+    getStatus(): Status;
+    getPriority(): Priority;
+    getDeadline(): Date | undefined;
+    setTitle(title: string): void;
+    setDescription(description: string): void;
+    setStatus(status: Status): void;
+    setPriority(priority: Priority): void;
+    setDeadline(deadline: Date | undefined): void;
     getTaskInfo(): string;
 }
 

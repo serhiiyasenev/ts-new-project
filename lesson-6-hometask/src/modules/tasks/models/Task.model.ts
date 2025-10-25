@@ -39,37 +39,41 @@ export class Task implements BaseTask {
         }
     }
 
-    // Getters using get syntax
-    get title(): string {
+    // Method-style Getters
+    getTitle(): string {
         return this._title;
     }
 
-    get description(): string {
+    getDescription(): string {
         return this._description;
     }
 
-    get status(): Status {
+    getStatus(): Status {
         return this._status;
     }
 
-    get priority(): Priority {
+    getPriority(): Priority {
         return this._priority;
     }
 
-    get isAvailable(): boolean {
+    getIsAvailable(): boolean {
         return this._isAvailable;
     }
 
-    get updatedAt(): Date {
+    getUpdatedAt(): Date {
         return this._updatedAt;
     }
 
-    get deadline(): Date | undefined {
+    getCreatedAt(): Date {
+        return this.createdAt;
+    }
+
+    getDeadline(): Date | undefined {
         return this._deadline;
     }
 
-    // Setters using set syntax with validation
-    set title(title: string) {
+    // Method-style Setters with validation
+    setTitle(title: string): void {
         if (!title.trim()) {
             throw new Error('Title cannot be empty');
         }
@@ -80,27 +84,27 @@ export class Task implements BaseTask {
         this._updatedAt = new Date();
     }
 
-    set description(description: string) {
+    setDescription(description: string): void {
         this._description = description;
         this._updatedAt = new Date();
     }
 
-    set status(status: Status) {
+    setStatus(status: Status): void {
         this._status = status;
         this._updatedAt = new Date();
     }
 
-    set priority(priority: Priority) {
+    setPriority(priority: Priority): void {
         this._priority = priority;
         this._updatedAt = new Date();
     }
 
-    set availability(isAvailable: boolean) {
+    setAvailability(isAvailable: boolean): void {
         this._isAvailable = isAvailable;
         this._updatedAt = new Date();
     }
 
-    set deadline(deadline: Date | undefined) {
+    setDeadline(deadline: Date | undefined): void {
         if (deadline && deadline < new Date()) {
             throw new Error('Deadline cannot be in the past');
         }
@@ -112,14 +116,14 @@ export class Task implements BaseTask {
     getTaskInfo(): string {
         return `
             Task ID: ${this.id}
-            Title: ${this._title}
-            Description: ${this._description}
-            Status: ${this._status}
-            Priority: ${this._priority}
-            Available: ${this._isAvailable}
-            Created At: ${this.createdAt.toLocaleString()}
-            Updated At: ${this._updatedAt.toLocaleString()}
-            ${this._deadline ? `Deadline: ${this._deadline.toLocaleString()}` : 'No deadline set'}
+            Title: ${this.getTitle()}
+            Description: ${this.getDescription()}
+            Status: ${this.getStatus()}
+            Priority: ${this.getPriority()}
+            Available: ${this.getIsAvailable()}
+            Created At: ${this.getCreatedAt().toLocaleString()}
+            Updated At: ${this.getUpdatedAt().toLocaleString()}
+            ${this.getDeadline() ? `Deadline: ${this.getDeadline()!.toLocaleString()}` : 'No deadline set'}
         `;
     }
 }

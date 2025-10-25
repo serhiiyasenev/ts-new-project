@@ -10,6 +10,6 @@ export class Bug extends Task {
     }
 
     override getTaskInfo(): string {
-        return `Bug [${this.id}] Severity: ${this.severity.toUpperCase()} — ${this.title}`;
+        return `Bug [${this.id}] Severity: ${this.severity.toUpperCase()} — ${this.getTitle()}`;
     }
 }

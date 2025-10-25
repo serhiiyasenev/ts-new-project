@@ -9,6 +9,6 @@ export class Subtask extends Task {
     }
 
     override getTaskInfo(): string {
-        return `Subtask of ${this.parentId}: ${this.title}`;
+        return `Subtask of ${this.parentId}: ${this.getTitle()}`;
     }
 }

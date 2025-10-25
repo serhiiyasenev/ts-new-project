@@ -10,6 +10,6 @@ export class Story extends Task {
     }
 
     override getTaskInfo(): string {
-        return `Story [${this.id}] — ${this.title} (${this.storyPoints} points)`;
+        return `Story [${this.id}] — ${this.getTitle()} (${this.storyPoints} points)`;
     }
 }
