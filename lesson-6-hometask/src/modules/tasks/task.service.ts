@@ -15,7 +15,7 @@ export class TaskService {
             dto.isAvailable ?? true
         );
 
-        if (dto.deadline !== undefined) {
+        if (dto.deadline !== undefined && dto.deadline !== null) {
             task.setDeadline(dto.deadline);
         }
 
@@ -40,7 +40,11 @@ export class TaskService {
         if (dto.status !== undefined) task.setStatus(dto.status);
         if (dto.priority !== undefined) task.setPriority(dto.priority);
         if (dto.isAvailable !== undefined) task.setAvailability(dto.isAvailable);
-        if (dto.deadline !== undefined) task.setDeadline(dto.deadline);
+        if (dto.deadline !== undefined) {
+            // If caller passes null explicitly, treat it as clearing the deadline
+            // (setDeadline accepts Date | undefined)
+            task.setDeadline(dto.deadline === null ? undefined : dto.deadline);
+        }
 
         return task;
     }
