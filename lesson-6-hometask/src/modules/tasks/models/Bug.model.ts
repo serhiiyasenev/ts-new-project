@@ -2,7 +2,7 @@ import { Task } from './Task.model';
 import { Severity } from '../task.types';
 
 export class Bug extends Task {
-    severity: Severity;
+    readonly severity: Severity;
 
     constructor(severity: Severity, ...args: ConstructorParameters<typeof Task>) {
         super(...args);

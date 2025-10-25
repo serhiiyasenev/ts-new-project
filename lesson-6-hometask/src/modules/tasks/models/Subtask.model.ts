@@ -1,7 +1,7 @@
 import { Task } from './Task.model';
 
 export class Subtask extends Task {
-    parentId: string;
+    readonly parentId: string;
 
     constructor(parentId: string, ...args: ConstructorParameters<typeof Task>) {
         super(...args);
