@@ -554,7 +554,6 @@ describe('TaskService full test suite', () => {
 
     // ---------- DATE FILTER TESTS ----------
     it('should filter tasks created after specific date', async () => {
-        const now = new Date();
         const task1 = service.create({ title: 'Old task' });
         
         // Wait a bit to ensure different timestamp (use async delay instead of busy-wait)
