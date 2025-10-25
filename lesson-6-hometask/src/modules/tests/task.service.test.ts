@@ -295,13 +295,12 @@ describe('TaskService full test suite', () => {
         expect(filtered[0].getTitle()).toBe('Match task');
     });
 
-    it('should maintain updatedAt timestamp after updates', () => {
+    it('should maintain updatedAt timestamp after updates', async () => {
         const task = service.create({ title: 'Timestamp test' });
         const initialUpdatedAt = task.getUpdatedAt().getTime();
         
         // Small delay to ensure different timestamp
-        const start = Date.now();
-        while (Date.now() - start < 5) { /* wait */ }
+        await new Promise(res => setTimeout(res, 5));
         
         service.update(task.id, { title: 'Updated title' });
         expect(task.getUpdatedAt().getTime()).toBeGreaterThan(initialUpdatedAt);
