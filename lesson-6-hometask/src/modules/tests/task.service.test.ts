@@ -627,21 +627,19 @@ describe('TaskService full test suite', () => {
         expect(filtered.some(t => t.id === task3.id)).toBe(false);
     });
 
-    it('should combine date filters with other filters', () => {
+    it('should combine date filters with other filters', async () => {
         const task1 = service.create({ 
             title: 'Old high priority', 
             priority: Priority.HIGH 
         });
         
         // Wait
-        const start = Date.now();
-        while (Date.now() - start < 10) { /* wait */ }
+        await new Promise(resolve => setTimeout(resolve, 10));
         
         const cutoffDate = new Date();
         
         // Wait
-        const start2 = Date.now();
-        while (Date.now() - start2 < 10) { /* wait */ }
+        await new Promise(resolve => setTimeout(resolve, 10));
         
         const task2 = service.create({ 
             title: 'New high priority', 
