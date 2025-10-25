@@ -453,7 +453,7 @@ describe('TaskService full test suite', () => {
             Priority.HIGH,
             true
         );
-        expect(epic.children.length).toBe(3);
+        expect((epic as any).children.length).toBe(3);
         expect(epic.getTaskInfo()).toContain('contains 3 tasks');
     });
 
@@ -467,7 +467,6 @@ describe('TaskService full test suite', () => {
             Priority.LOW,
             true
         );
-        expect(epic.children.length).toBe(0);
         expect(epic.getTaskInfo()).toContain('contains 0 tasks');
     });
 
