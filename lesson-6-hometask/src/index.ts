@@ -1,7 +1,6 @@
 import { TaskController } from './modules/tasks/task.controller';
 import { TaskService } from './modules/tasks/task.service';
-import { Status } from './dto/status';
-import { Priority } from './dto/priority';
+import { Status, Priority } from './modules/tasks/task.types';
 
 const service = new TaskService();
 const controller = new TaskController(service);

@@ -1,10 +1,6 @@
-import { Status } from '../../dto/status';
-import { Priority } from '../../dto/priority';
+import { Task } from './models/Task.model';
+import { Status, Priority, TaskCreateDto, TaskUpdateDto, TaskFilterDto } from './task.types';
 import { v4 as uuidv4 } from 'uuid';
-import { TaskCreateDto } from '../../dto/task-create.dto';
-import { TaskUpdateDto } from '../../dto/task-update.dto';
-import { TaskFilterDto } from '../../dto/task-filter.dto';
-import { Task } from './task.types';
 
 export class TaskService {
     private tasks: Task[] = [];
@@ -19,7 +15,7 @@ export class TaskService {
             dto.isAvailable ?? true
         );
 
-        if (dto.deadline) {
+        if (dto.deadline !== undefined && dto.deadline !== null) {
             task.setDeadline(dto.deadline);
         }
 
