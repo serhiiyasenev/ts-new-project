@@ -5,7 +5,7 @@ export class Epic extends Task {
 
     constructor(children: string[], ...args: ConstructorParameters<typeof Task>) {
         super(...args);
-        this.children = children;
+        this.children = [...children];
     }
 
     override getTaskInfo(): string {
