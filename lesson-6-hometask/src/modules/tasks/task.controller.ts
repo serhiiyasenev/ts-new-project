@@ -2,7 +2,6 @@ import { Task } from './models/Task.model';
 import { TaskService } from './task.service';
 import { TaskCreateDto, TaskUpdateDto, TaskFilterDto } from './task.types';
 
-
 export class TaskController {
     private readonly service: TaskService;
 
