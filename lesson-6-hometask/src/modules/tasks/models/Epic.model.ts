@@ -13,8 +13,6 @@ export class Epic extends Task {
         return [...this.children];
     }
 
-    // Use immutable reassignment instead of mutating the array so callers
-    // cannot observe in-place mutations and the implementation is clearer
     addChild(child: string): void {
         this.children = [...this.children, child];
     }
