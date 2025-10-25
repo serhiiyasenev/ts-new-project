@@ -10,7 +10,7 @@ const task1 = controller.createTask({
     description: 'Create login and register endpoints',
     status: Status.TODO,
     priority: Priority.HIGH,
-    deadline: new Date(Date.now() + 3 * 86400000) // 3 days from now
+    deadline: new Date(Date.now() + 3 * 86400000)
 });
 
 const task2 = controller.createTask({
@@ -18,7 +18,7 @@ const task2 = controller.createTask({
     description: 'Cover authentication module with tests',
     status: Status.IN_PROGRESS,
     priority: Priority.MEDIUM,
-    deadline: new Date(Date.now() + 7 * 86400000) // 7 days from now
+    deadline: new Date(Date.now() + 7 * 86400000)
 });
 
 const task3 = controller.createTask({
