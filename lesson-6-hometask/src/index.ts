@@ -1,7 +1,6 @@
 import { TaskController } from './modules/tasks/task.controller';
 import { TaskService } from './modules/tasks/task.service';
-import { Status } from './dto/status';
-import { Priority } from './dto/priority';
+import { Status, Priority } from './modules/tasks/task.types';
 
 const service = new TaskService();
 const controller = new TaskController(service);
@@ -11,7 +10,7 @@ const task1 = controller.createTask({
     description: 'Create login and register endpoints',
     status: Status.TODO,
     priority: Priority.HIGH,
-    deadline: new Date(Date.now() + 3 * 86400000)
+    deadline: new Date(Date.now() + 3 * 86400000) // 3 days from now
 });
 
 const task2 = controller.createTask({
@@ -19,7 +18,7 @@ const task2 = controller.createTask({
     description: 'Cover authentication module with tests',
     status: Status.IN_PROGRESS,
     priority: Priority.MEDIUM,
-    deadline: new Date(Date.now() + 7 * 86400000)
+    deadline: new Date(Date.now() + 7 * 86400000) // 7 days from now
 });
 
 const task3 = controller.createTask({
@@ -27,7 +26,7 @@ const task3 = controller.createTask({
     description: 'Just a test task',
     status: Status.DONE,
     priority: Priority.LOW,
-    deadline: new Date(Date.now())
+    deadline: new Date(Date.now() + 10000) // 10 seconds from now to avoid past deadline error
 });
 
 

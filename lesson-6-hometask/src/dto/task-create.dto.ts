@@ -1,11 +1,2 @@
-import { Status } from './status';
-import { Priority } from './priority';
-
-export interface TaskCreateDto {
-    title: string;
-    description?: string;
-    status?: Status;
-    priority?: Priority;
-    isAvailable?: boolean;
-    deadline?: Date;
-}
+// Re-export from centralized types
+export type { TaskCreateDto } from '../modules/tasks/task.types';

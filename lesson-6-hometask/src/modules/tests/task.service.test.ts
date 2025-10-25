@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { TaskService } from '../tasks/task.service';
-import { Status } from '../../dto/status';
-import { Priority } from '../../dto/priority';
+import { Status, Priority } from '../tasks/task.types';
 
 
 describe('TaskService full test suite', () => {
@@ -16,7 +15,7 @@ describe('TaskService full test suite', () => {
             priority: Priority.HIGH,
             deadline: new Date(Date.now() + 86400000)
         });
-        expect(task.getTitle()).toBe('Create API endpoint');
+        expect(task.title).toBe('Create API endpoint');
     });
 
     it('should throw error when creating task with empty title', () => {
@@ -64,7 +63,7 @@ describe('TaskService full test suite', () => {
     it('should update title of existing task', () => {
         const first = service.getAll()[0];
         const updated = service.update(first.id, { title: 'Updated Title' });
-        expect(updated.getTitle()).toBe('Updated Title');
+        expect(updated.title).toBe('Updated Title');
     });
 
     it('should update multiple fields (status, priority)', () => {
@@ -73,8 +72,8 @@ describe('TaskService full test suite', () => {
             status: Status.IN_PROGRESS,
             priority: Priority.LOW
         });
-        expect(updated.getStatus()).toBe(Status.IN_PROGRESS);
-        expect(updated.getPriority()).toBe(Priority.LOW);
+        expect(updated.status).toBe(Status.IN_PROGRESS);
+        expect(updated.priority).toBe(Priority.LOW);
     });
 
     it('should throw error when updating with empty title', () => {
@@ -109,24 +108,17 @@ describe('TaskService full test suite', () => {
     // ---------- FILTER ----------
     it('should filter tasks by status', () => {
         const filtered = service.filter({ status: Status.IN_PROGRESS });
-        expect(filtered.every(t => t.getStatus() === Status.IN_PROGRESS)).toBe(true);
+        expect(filtered.every(t => t.status === Status.IN_PROGRESS)).toBe(true);
     });
 
     it('should filter tasks by priority', () => {
         const filtered = service.filter({ priority: Priority.LOW });
-        expect(filtered.every(t => t.getPriority() === Priority.LOW)).toBe(true);
+        expect(filtered.every(t => t.priority === Priority.LOW)).toBe(true);
     });
 
-    it('should return tasks created after specific date', () => {
-        const yesterday = new Date(Date.now() - 86400000);
-        const filtered = service.filter({ createdAfter: yesterday });
-        expect(filtered.length).toBeGreaterThan(0);
-    });
-
-    it('should return tasks created before future date', () => {
-        const tomorrow = new Date(Date.now() + 86400000);
-        const filtered = service.filter({ createdBefore: tomorrow });
-        expect(filtered.length).toBeGreaterThan(0);
+    it('should filter tasks by availability', () => {
+        const filtered = service.filter({ isAvailable: true });
+        expect(filtered.every(t => t.isAvailable === true)).toBe(true);
     });
 
     // ---------- COMBINATIONS ----------

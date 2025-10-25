@@ -1,10 +1,6 @@
-import { Status } from '../../dto/status';
-import { Priority } from '../../dto/priority';
+import { Task } from './models/Task.model';
+import { Status, Priority, TaskCreateDto, TaskUpdateDto, TaskFilterDto } from './task.types';
 import { v4 as uuidv4 } from 'uuid';
-import { TaskCreateDto } from '../../dto/task-create.dto';
-import { TaskUpdateDto } from '../../dto/task-update.dto';
-import { TaskFilterDto } from '../../dto/task-filter.dto';
-import { Task } from './task.types';
 
 export class TaskService {
     private tasks: Task[] = [];
@@ -20,7 +16,7 @@ export class TaskService {
         );
 
         if (dto.deadline) {
-            task.setDeadline(dto.deadline);
+            task.deadline = dto.deadline;
         }
 
         this.tasks.push(task);
@@ -39,12 +35,12 @@ export class TaskService {
         const task = this.getById(id);
         if (!task) throw new Error(`Task with id "${id}" not found.`);
 
-        if (dto.title !== undefined) task.setTitle(dto.title);
-        if (dto.description !== undefined) task.setDescription(dto.description);
-        if (dto.status !== undefined) task.setStatus(dto.status);
-        if (dto.priority !== undefined) task.setPriority(dto.priority);
-        if (dto.isAvailable !== undefined) task.setAvailability(dto.isAvailable);
-        if (dto.deadline !== undefined) task.setDeadline(dto.deadline);
+        if (dto.title !== undefined) task.title = dto.title;
+        if (dto.description !== undefined) task.description = dto.description;
+        if (dto.status !== undefined) task.status = dto.status;
+        if (dto.priority !== undefined) task.priority = dto.priority;
+        if (dto.isAvailable !== undefined) task.availability = dto.isAvailable;
+        if (dto.deadline !== undefined) task.deadline = dto.deadline;
 
         return task;
     }
@@ -62,11 +58,9 @@ export class TaskService {
 
     filter(filters: TaskFilterDto): Task[] {
         return this.tasks.filter(task => {
-            if (filters.status && task.getStatus() !== filters.status) return false;
-            if (filters.priority && task.getPriority() !== filters.priority) return false;
-            if (filters.createdAfter && task.getCreatedAt() < filters.createdAfter) return false;
-            if (filters.createdBefore && task.getCreatedAt() > filters.createdBefore) return false;
-            if (filters.isAvailable !== undefined && task.getIsAvailable() !== filters.isAvailable) return false;
+            if (filters.status && task.status !== filters.status) return false;
+            if (filters.priority && task.priority !== filters.priority) return false;
+            if (filters.isAvailable !== undefined && task.isAvailable !== filters.isAvailable) return false;
             return true;
         });
     }
