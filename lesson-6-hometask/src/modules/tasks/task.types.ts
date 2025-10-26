@@ -21,16 +21,14 @@ export enum Severity {
 export interface BaseTask {
     id: string;
     createdAt: Date;
-    getTitle(): string;
-    getDescription(): string;
-    getStatus(): Status;
-    getPriority(): Priority;
-    getDeadline(): Date | undefined;
-    setTitle(title: string): void;
-    setDescription(description: string): void;
-    setStatus(status: Status): void;
-    setPriority(priority: Priority): void;
-    setDeadline(deadline: Date | undefined): void;
+    // prefer property access via accessors
+    title: string;
+    description: string;
+    status: Status;
+    priority: Priority;
+    isAvailable: boolean;
+    updatedAt: Date;
+    deadline?: Date;
     getTaskInfo(): string;
 }
 

@@ -27,99 +27,90 @@ export class Task implements BaseTask {
         this._status = status;
         this._priority = priority;
         this._isAvailable = isAvailable;
-        this.validate();
     }
 
-    private validate(): void {
-        if (!this._title.trim()) {
+    private validate(value: string): void {
+        if (!value.trim()) {
             throw new Error('Title cannot be empty');
         }
-        if (this._title.length < 3) {
+        if (value.length < 3) {
             throw new Error('Title must be at least 3 characters long');
         }
     }
 
-    // Method-style Getters
-    // Keep a `getTitle()` method for backwards compatibility; also expose a `title` accessor.
     get title(): string {
         return this._title;
     }
 
-    getTitle(): string {
-        return this._title;
+    set title(value: string) {
+        this.validate(value);
+        this._title = value;
+        this._updatedAt = new Date();
     }
 
-    getDescription(): string {
+    get description(): string {
         return this._description;
     }
 
-    getStatus(): Status {
+    set description(value: string) {
+        this._description = value;
+        this._updatedAt = new Date();
+    }
+
+    get status(): Status {
         return this._status;
     }
 
-    getPriority(): Priority {
+    set status(value: Status) {
+        this._status = value;
+        this._updatedAt = new Date();
+    }
+
+    get priority(): Priority {
         return this._priority;
     }
 
-    getIsAvailable(): boolean {
+    set priority(value: Priority) {
+        this._priority = value;
+        this._updatedAt = new Date();
+    }
+
+    get isAvailable(): boolean {
         return this._isAvailable;
     }
 
-    getUpdatedAt(): Date {
+    set isAvailable(value: boolean) {
+        this._isAvailable = value;
+        this._updatedAt = new Date();
+    }
+
+    get updatedAt(): Date {
         return this._updatedAt;
     }
 
-    getDeadline(): Date | undefined {
+    get deadline(): Date | undefined {
         return this._deadline;
     }
 
-    // Method-style Setters with validation
-    setTitle(title: string): void {
-        this._title = title;
-        this.validate();
-        this._updatedAt = new Date();
-    }
-
-    setDescription(description: string): void {
-        this._description = description;
-        this._updatedAt = new Date();
-    }
-
-    setStatus(status: Status): void {
-        this._status = status;
-        this._updatedAt = new Date();
-    }
-
-    setPriority(priority: Priority): void {
-        this._priority = priority;
-        this._updatedAt = new Date();
-    }
-
-    setAvailability(isAvailable: boolean): void {
-        this._isAvailable = isAvailable;
-        this._updatedAt = new Date();
-    }
-
-    setDeadline(deadline: Date | undefined): void {
-        if (deadline && deadline < new Date()) {
+    set deadline(value: Date | undefined) {
+        if (value && value < new Date()) {
             throw new Error('Deadline cannot be in the past');
         }
-        this._deadline = deadline;
+        this._deadline = value;
         this._updatedAt = new Date();
     }
 
-    // Info method
     getTaskInfo(): string {
         return `
             Task ID: ${this.id}
-            Title: ${this.getTitle()}
-            Description: ${this.getDescription()}
-            Status: ${this.getStatus()}
-            Priority: ${this.getPriority()}
-            Available: ${this.getIsAvailable()}
+            Title: ${this.title}
+            Description: ${this.description}
+            Status: ${this.status}
+            Priority: ${this.priority}
+            Available: ${this.isAvailable}
             Created At: ${this.createdAt.toLocaleString()}
-            Updated At: ${this.getUpdatedAt().toLocaleString()}
-            ${this.getDeadline() ? `Deadline: ${this.getDeadline()!.toLocaleString()}` : 'No deadline set'}
+            Updated At: ${this.updatedAt.toLocaleString()}
+            ${this.deadline ? `Deadline: ${this.deadline!.toLocaleString()}` : 'No deadline set'}
         `;
     }
 }

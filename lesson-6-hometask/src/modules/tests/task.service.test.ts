@@ -22,7 +22,7 @@ describe('TaskService full test suite', () => {
             priority: Priority.HIGH,
             deadline: new Date(Date.now() + 86400000)
         });
-        expect(task.getTitle()).toBe('Create API endpoint');
+        expect(task.title).toBe('Create API endpoint');
     });
 
     it('should throw error when creating task with empty title', () => {
@@ -71,8 +71,8 @@ describe('TaskService full test suite', () => {
     // ---------- UPDATE ----------
     it('should update title of existing task', () => {
         const task = service.create({ title: 'Original title' });
-        const updated = service.update(task.id, { title: 'Updated Title' });
-        expect(updated.getTitle()).toBe('Updated Title');
+    const updated = service.update(task.id, { title: 'Updated Title' });
+    expect(updated.title).toBe('Updated Title');
     });
 
     it('should update multiple fields (status, priority)', () => {
@@ -81,8 +81,8 @@ describe('TaskService full test suite', () => {
             status: Status.IN_PROGRESS,
             priority: Priority.LOW
         });
-        expect(updated.getStatus()).toBe(Status.IN_PROGRESS);
-        expect(updated.getPriority()).toBe(Priority.LOW);
+        expect(updated.status).toBe(Status.IN_PROGRESS);
+        expect(updated.priority).toBe(Priority.LOW);
     });
 
     it('should throw error when updating with empty title', () => {
@@ -117,17 +117,17 @@ describe('TaskService full test suite', () => {
     // ---------- FILTER ----------
     it('should filter tasks by status', () => {
         const filtered = service.filter({ status: Status.IN_PROGRESS });
-        expect(filtered.every(t => t.getStatus() === Status.IN_PROGRESS)).toBe(true);
+    expect(filtered.every(t => t.status === Status.IN_PROGRESS)).toBe(true);
     });
 
     it('should filter tasks by priority', () => {
         const filtered = service.filter({ priority: Priority.LOW });
-        expect(filtered.every(t => t.getPriority() === Priority.LOW)).toBe(true);
+    expect(filtered.every(t => t.priority === Priority.LOW)).toBe(true);
     });
 
     it('should filter tasks by availability', () => {
         const filtered = service.filter({ isAvailable: true });
-        expect(filtered.every(t => t.getIsAvailable() === true)).toBe(true);
+    expect(filtered.every(t => t.isAvailable === true)).toBe(true);
     });
 
     // ---------- COMBINATIONS ----------
@@ -192,12 +192,12 @@ describe('TaskService full test suite', () => {
     // ---------- EDGE CASES ----------
     it('should create task with default values when optional fields are omitted', () => {
         const task = service.create({ title: 'Minimal task' });
-        expect(task.getTitle()).toBe('Minimal task');
-        expect(task.getDescription()).toBe('No description provided');
-        expect(task.getStatus()).toBe(Status.TODO);
-        expect(task.getPriority()).toBe(Priority.MEDIUM);
-        expect(task.getIsAvailable()).toBe(true);
-        expect(task.getDeadline()).toBeUndefined();
+    expect(task.title).toBe('Minimal task');
+    expect(task.description).toBe('No description provided');
+    expect(task.status).toBe(Status.TODO);
+    expect(task.priority).toBe(Priority.MEDIUM);
+    expect(task.isAvailable).toBe(true);
+    expect(task.deadline).toBeUndefined();
     });
 
     it('should throw error when creating task with title less than 3 characters', () => {
@@ -207,14 +207,14 @@ describe('TaskService full test suite', () => {
 
     it('should handle task creation with exact 3 character title', () => {
         const task = service.create({ title: 'ABC' });
-        expect(task.getTitle()).toBe('ABC');
+    expect(task.title).toBe('ABC');
     });
 
     it('should update task description only', () => {
         const task = service.create({ title: 'Test task' });
         const updated = service.update(task.id, { description: 'New description' });
-        expect(updated.getDescription()).toBe('New description');
-        expect(updated.getTitle()).toBe('Test task');
+    expect(updated.description).toBe('New description');
+    expect(updated.title).toBe('Test task');
     });
 
     it('should update task with new deadline', () => {
@@ -222,13 +222,13 @@ describe('TaskService full test suite', () => {
             title: 'Task with deadline',
             deadline: new Date(Date.now() + 86400000)
         });
-        const originalDeadline = task.getDeadline();
-        expect(originalDeadline).toBeDefined();
+    const originalDeadline = task.deadline;
+    expect(originalDeadline).toBeDefined();
         
         const newDeadline = new Date(Date.now() + 172800000); // 2 days from now
-        const updated = service.update(task.id, { deadline: newDeadline });
-        expect(updated.getDeadline()).toEqual(newDeadline);
-        expect(updated.getDeadline()).not.toEqual(originalDeadline);
+    const updated = service.update(task.id, { deadline: newDeadline });
+    expect(updated.deadline).toEqual(newDeadline);
+    expect(updated.deadline).not.toEqual(originalDeadline);
     });
 
     it('should create task without deadline and deadline remains undefined', () => {
@@ -236,23 +236,23 @@ describe('TaskService full test suite', () => {
             title: 'Task without deadline',
             description: 'No deadline set'
         });
-        expect(task.getDeadline()).toBeUndefined();
+    expect(task.deadline).toBeUndefined();
         
         // Update other fields but don't touch deadline
-        const updated = service.update(task.id, { description: 'Updated description' });
-        expect(updated.getDeadline()).toBeUndefined();
+    const updated = service.update(task.id, { description: 'Updated description' });
+    expect(updated.deadline).toBeUndefined();
     });
 
     it('should add deadline to task that was created without one', () => {
         const task = service.create({
             title: 'Task without deadline initially'
         });
-        expect(task.getDeadline()).toBeUndefined();
+    expect(task.deadline).toBeUndefined();
         
         const futureDeadline = new Date(Date.now() + 86400000);
-        const updated = service.update(task.id, { deadline: futureDeadline });
-        expect(updated.getDeadline()).toEqual(futureDeadline);
-        expect(updated.getDeadline()).toBeDefined();
+    const updated = service.update(task.id, { deadline: futureDeadline });
+    expect(updated.deadline).toEqual(futureDeadline);
+    expect(updated.deadline).toBeDefined();
     });
 
     it('should throw error when trying to update deadline to past date', () => {
@@ -291,19 +291,19 @@ describe('TaskService full test suite', () => {
             priority: Priority.HIGH,
             isAvailable: true
         });
-        expect(filtered.length).toBe(1);
-        expect(filtered[0].getTitle()).toBe('Match task');
+    expect(filtered.length).toBe(1);
+    expect(filtered[0].title).toBe('Match task');
     });
 
     it('should maintain updatedAt timestamp after updates', async () => {
         const task = service.create({ title: 'Timestamp test' });
-        const initialUpdatedAt = task.getUpdatedAt().getTime();
+    const initialUpdatedAt = task.updatedAt.getTime();
         
         // Small delay to ensure different timestamp
         await new Promise(res => setTimeout(res, 5));
         
         service.update(task.id, { title: 'Updated title' });
-        expect(task.getUpdatedAt().getTime()).toBeGreaterThan(initialUpdatedAt);
+    expect(task.updatedAt.getTime()).toBeGreaterThan(initialUpdatedAt);
     });
 
     it('should handle empty filter (return all tasks)', () => {
@@ -315,18 +315,18 @@ describe('TaskService full test suite', () => {
 
     it('should preserve task availability when not updated', () => {
         const task = service.create({ title: 'Available task', isAvailable: false });
-        expect(task.getIsAvailable()).toBe(false);
+    expect(task.isAvailable).toBe(false);
         
         const updated = service.update(task.id, { title: 'Updated title' });
-        expect(updated.getIsAvailable()).toBe(false);
+    expect(updated.isAvailable).toBe(false);
     });
 
     it('should update isAvailable field correctly', () => {
         const task = service.create({ title: 'Task', isAvailable: true });
-        expect(task.getIsAvailable()).toBe(true);
+    expect(task.isAvailable).toBe(true);
         
         const updated = service.update(task.id, { isAvailable: false });
-        expect(updated.getIsAvailable()).toBe(false);
+    expect(updated.isAvailable).toBe(false);
     });
 
     // ---------- VALIDATION TESTS ----------
@@ -343,8 +343,8 @@ describe('TaskService full test suite', () => {
 
     it('should allow future deadline', () => {
         const futureDate = new Date(Date.now() + 1000000);
-        const task = service.create({ title: 'Future task', deadline: futureDate });
-        expect(task.getDeadline()).toEqual(futureDate);
+    const task = service.create({ title: 'Future task', deadline: futureDate });
+    expect(task.deadline).toEqual(futureDate);
     });
 
     it('should throw error when setting deadline to past date on creation', () => {
@@ -453,7 +453,7 @@ describe('TaskService full test suite', () => {
             Priority.HIGH,
             true
         );
-        expect(epic.getChildren().length).toBe(3);
+    expect(epic.getChildren().length).toBe(3);
         expect(epic.getTaskInfo()).toContain('contains 3 tasks');
     });
 
@@ -480,8 +480,8 @@ describe('TaskService full test suite', () => {
             Priority.MEDIUM,
             true
         );
-        expect(subtask.parentId).toBe('parent-task-id');
-        expect(subtask.getTaskInfo()).toContain('Subtask of parent-task-id');
+    expect(subtask.parentId).toBe('parent-task-id');
+    expect(subtask.getTaskInfo()).toContain('Subtask of parent-task-id');
     });
 
     // ---------- TASK INFO TESTS ----------
@@ -493,8 +493,8 @@ describe('TaskService full test suite', () => {
             priority: Priority.HIGH
         });
         const info = task.getTaskInfo();
-        expect(info).toContain('Info test');
-        expect(info).toContain('Testing info method');
+    expect(info).toContain('Info test');
+    expect(info).toContain('Testing info method');
         expect(info).toContain('in_progress');
         expect(info).toContain('high');
     });
@@ -502,36 +502,36 @@ describe('TaskService full test suite', () => {
     // ---------- BOUNDARY TESTS ----------
     it('should handle very long title', () => {
         const longTitle = 'A'.repeat(1000);
-        const task = service.create({ title: longTitle });
-        expect(task.getTitle()).toBe(longTitle);
+    const task = service.create({ title: longTitle });
+    expect(task.title).toBe(longTitle);
     });
 
     it('should handle very long description', () => {
         const longDesc = 'D'.repeat(10000);
-        const task = service.create({ title: 'Test', description: longDesc });
-        expect(task.getDescription()).toBe(longDesc);
+    const task = service.create({ title: 'Test', description: longDesc });
+    expect(task.description).toBe(longDesc);
     });
 
     it('should handle task with all enum values', () => {
         // Test all status values
         const todoTask = service.create({ title: 'TODO task', status: Status.TODO });
-        expect(todoTask.getStatus()).toBe(Status.TODO);
+    expect(todoTask.status).toBe(Status.TODO);
 
         const inProgressTask = service.create({ title: 'In Progress task', status: Status.IN_PROGRESS });
-        expect(inProgressTask.getStatus()).toBe(Status.IN_PROGRESS);
+    expect(inProgressTask.status).toBe(Status.IN_PROGRESS);
 
         const doneTask = service.create({ title: 'Done task', status: Status.DONE });
-        expect(doneTask.getStatus()).toBe(Status.DONE);
+    expect(doneTask.status).toBe(Status.DONE);
 
         // Test all priority values
         const lowPriorityTask = service.create({ title: 'Low priority', priority: Priority.LOW });
-        expect(lowPriorityTask.getPriority()).toBe(Priority.LOW);
+    expect(lowPriorityTask.priority).toBe(Priority.LOW);
 
         const mediumPriorityTask = service.create({ title: 'Medium priority', priority: Priority.MEDIUM });
-        expect(mediumPriorityTask.getPriority()).toBe(Priority.MEDIUM);
+    expect(mediumPriorityTask.priority).toBe(Priority.MEDIUM);
 
         const highPriorityTask = service.create({ title: 'High priority', priority: Priority.HIGH });
-        expect(highPriorityTask.getPriority()).toBe(Priority.HIGH);
+    expect(highPriorityTask.priority).toBe(Priority.HIGH);
     });
 
     it('should maintain task count correctly after multiple operations', () => {
@@ -686,8 +686,8 @@ describe('TaskService full test suite', () => {
             isAvailable: true 
         });
         
-        expect(filtered.length).toBe(1);
-        expect(filtered[0].getTitle()).toBe('Available TODO');
+    expect(filtered.length).toBe(1);
+    expect(filtered[0].title).toBe('Available TODO');
     });
 
     it('should filter by all criteria simultaneously', async () => {
