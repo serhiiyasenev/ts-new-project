@@ -19,6 +19,7 @@ export class Task implements BaseTask {
         priority: Priority = Priority.MEDIUM,
         isAvailable: boolean = true
     ) {
+        this.validate(title);
         this.id = id;
         this.createdAt = new Date();
         this._updatedAt = new Date();
