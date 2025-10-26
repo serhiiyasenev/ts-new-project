@@ -15,7 +15,7 @@ export class TaskService {
             dto.isAvailable ?? true
         );
 
-        if (dto.deadline !== undefined && dto.deadline !== null) {
+        if (!dto.deadline) {
             task.setDeadline(dto.deadline);
         }
 
