@@ -2,13 +2,19 @@ import { Task } from './models/Task.model';
 import { Status, Priority, TaskCreateDto, TaskUpdateDto, TaskFilterDto } from './task.types';
 import { v4 as uuidv4 } from 'uuid';
 
+type Writable<T> = { -readonly [P in keyof T]: T[P] };
+
 export class TaskService {
     private tasks: Task[] = [];
 
     create(dto: TaskCreateDto): Task {
+        if (!dto.title?.trim()) {
+            throw new Error('Title cannot be empty');
+        }
+
         const task = new Task(
             uuidv4(),
-            dto.title,
+            dto.title.trim(),
             dto.description || 'No description provided',
             dto.status || Status.TODO,
             dto.priority || Priority.MEDIUM,
@@ -39,7 +45,7 @@ export class TaskService {
             Object.entries(dto).filter(([_, v]) => v !== undefined)
         );
 
-        Object.assign(task, cleanDto);
+        Object.assign(task as Writable<Task>, cleanDto);
 
         if (dto.deadline === null) task.deadline = undefined;
 
@@ -48,7 +54,6 @@ export class TaskService {
 
     delete(id: string): string {
         const index = this.tasks.findIndex(task => task.id === id);
-
         if (index === -1) {
             throw new Error(`Task with id "${id}" not found.`);
         }
@@ -58,13 +63,14 @@ export class TaskService {
     }
 
     filter(filters: TaskFilterDto): Task[] {
-        return this.tasks.filter(task => {
-            if (filters.status && task.status !== filters.status) return false;
-            if (filters.priority && task.priority !== filters.priority) return false;
-            if (filters.createdAfter && task.createdAt < filters.createdAfter) return false;
-            if (filters.createdBefore && task.createdAt > filters.createdBefore) return false;
-            if (filters.isAvailable !== undefined && task.isAvailable !== filters.isAvailable) return false;
-            return true;
-        });
+        const { status, priority, createdAfter, createdBefore, isAvailable } = filters;
+
+        return this.tasks.filter(task => (
+            (!status || task.status === status) &&
+            (!priority || task.priority === priority) &&
+            (!createdAfter || task.createdAt >= createdAfter) &&
+            (!createdBefore || task.createdAt <= createdBefore) &&
+            (isAvailable === undefined || task.isAvailable === isAvailable)
+        ));
     }
 }

@@ -306,6 +306,78 @@ describe('TaskService full test suite', () => {
     expect(task.updatedAt.getTime()).toBeGreaterThan(initialUpdatedAt);
     });
 
+    it('should update updatedAt when updating description', async () => {
+        const task = service.create({ title: 'Test', description: 'Original' });
+        const initialUpdatedAt = task.updatedAt.getTime();
+        
+        await new Promise(res => setTimeout(res, 5));
+        
+        service.update(task.id, { description: 'Updated description' });
+        expect(task.updatedAt.getTime()).toBeGreaterThan(initialUpdatedAt);
+    });
+
+    it('should update updatedAt when updating status', async () => {
+        const task = service.create({ title: 'Test', status: Status.TODO });
+        const initialUpdatedAt = task.updatedAt.getTime();
+        
+        await new Promise(res => setTimeout(res, 5));
+        
+        service.update(task.id, { status: Status.IN_PROGRESS });
+        expect(task.updatedAt.getTime()).toBeGreaterThan(initialUpdatedAt);
+    });
+
+    it('should update updatedAt when updating priority', async () => {
+        const task = service.create({ title: 'Test', priority: Priority.LOW });
+        const initialUpdatedAt = task.updatedAt.getTime();
+        
+        await new Promise(res => setTimeout(res, 5));
+        
+        service.update(task.id, { priority: Priority.HIGH });
+        expect(task.updatedAt.getTime()).toBeGreaterThan(initialUpdatedAt);
+    });
+
+    it('should update updatedAt when updating isAvailable', async () => {
+        const task = service.create({ title: 'Test', isAvailable: true });
+        const initialUpdatedAt = task.updatedAt.getTime();
+        
+        await new Promise(res => setTimeout(res, 5));
+        
+        service.update(task.id, { isAvailable: false });
+        expect(task.updatedAt.getTime()).toBeGreaterThan(initialUpdatedAt);
+    });
+
+    it('should update updatedAt when updating deadline', async () => {
+        const task = service.create({ title: 'Test', deadline: new Date(Date.now() + 86400000) });
+        const initialUpdatedAt = task.updatedAt.getTime();
+        
+        await new Promise(res => setTimeout(res, 5));
+        
+        const newDeadline = new Date(Date.now() + 172800000);
+        service.update(task.id, { deadline: newDeadline });
+        expect(task.updatedAt.getTime()).toBeGreaterThan(initialUpdatedAt);
+    });
+
+    it('should update updatedAt when updating multiple fields', async () => {
+        const task = service.create({ title: 'Test', status: Status.TODO, priority: Priority.LOW });
+        const initialUpdatedAt = task.updatedAt.getTime();
+        
+        await new Promise(res => setTimeout(res, 5));
+        
+        service.update(task.id, { status: Status.DONE, priority: Priority.HIGH, description: 'Multi-update' });
+        expect(task.updatedAt.getTime()).toBeGreaterThan(initialUpdatedAt);
+    });
+
+    it('should not update updatedAt when no fields are actually updated', async () => {
+        const task = service.create({ title: 'Test' });
+        const initialUpdatedAt = task.updatedAt.getTime();
+        
+        await new Promise(res => setTimeout(res, 5));
+        
+        // Update with empty dto
+        service.update(task.id, {});
+        expect(task.updatedAt.getTime()).toBe(initialUpdatedAt);
+    });
+
     it('should handle empty filter (return all tasks)', () => {
         service.create({ title: 'Task 1' });
         service.create({ title: 'Task 2' });
