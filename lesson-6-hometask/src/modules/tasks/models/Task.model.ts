@@ -39,6 +39,10 @@ export class Task implements BaseTask {
         }
     }
 
+    private updateTimestamp(): void {
+        this._updatedAt = new Date();
+    }
+
     get title(): string {
         return this._title;
     }
@@ -46,7 +50,7 @@ export class Task implements BaseTask {
     set title(value: string) {
         this.validate(value);
         this._title = value;
-        this._updatedAt = new Date();
+        this.updateTimestamp();
     }
 
     get description(): string {
@@ -55,7 +59,7 @@ export class Task implements BaseTask {
 
     set description(value: string) {
         this._description = value;
-        this._updatedAt = new Date();
+        this.updateTimestamp();
     }
 
     get status(): Status {
@@ -64,7 +68,7 @@ export class Task implements BaseTask {
 
     set status(value: Status) {
         this._status = value;
-        this._updatedAt = new Date();
+        this.updateTimestamp();
     }
 
     get priority(): Priority {
@@ -73,7 +77,7 @@ export class Task implements BaseTask {
 
     set priority(value: Priority) {
         this._priority = value;
-        this._updatedAt = new Date();
+        this.updateTimestamp();
     }
 
     get isAvailable(): boolean {
@@ -82,7 +86,7 @@ export class Task implements BaseTask {
 
     set isAvailable(value: boolean) {
         this._isAvailable = value;
-        this._updatedAt = new Date();
+        this.updateTimestamp();
     }
 
     get updatedAt(): Date {
@@ -98,7 +102,7 @@ export class Task implements BaseTask {
             throw new Error('Deadline cannot be in the past');
         }
         this._deadline = value;
-        this._updatedAt = new Date();
+        this.updateTimestamp();
     }
 
     getTaskInfo(): string {

@@ -6,19 +6,6 @@ export class TaskService {
     private tasks: Task[] = [];
 
     create(dto: TaskCreateDto): Task {
-        // Validate title early to avoid depending on runtime class implementation
-        if (!dto.title || !dto.title.trim()) {
-            throw new Error('Title cannot be empty');
-        }
-        if (dto.title.length < 3) {
-            throw new Error('Title must be at least 3 characters long');
-        }
-
-        // Validate deadline if provided
-        if (dto.deadline !== undefined && dto.deadline !== null && dto.deadline < new Date()) {
-            throw new Error('Deadline cannot be in the past');
-        }
-
         const task = new Task(
             uuidv4(),
             dto.title,
@@ -28,8 +15,7 @@ export class TaskService {
             dto.isAvailable ?? true
         );
 
-        // Only set a deadline when a non-null Date is provided
-        if (dto.deadline !== undefined && dto.deadline !== null) {
+        if (dto.deadline) {
             task.deadline = dto.deadline;
         }
 
@@ -49,61 +35,24 @@ export class TaskService {
         const task = this.getById(id);
         if (!task) throw new Error(`Task with id "${id}" not found.`);
 
-        if (dto.title !== undefined) {
-            // support both new accessor API and older method-style API
-            if (typeof (task as any).setTitle === 'function') {
-                (task as any).setTitle(dto.title);
-            }
-            else {
-                (task as any).title = dto.title;
-            }
-        }
+        // Update properties only if they are provided
+        const updates: Array<{ key: keyof Task; value: any }> = [
+            { key: 'title', value: dto.title },
+            { key: 'description', value: dto.description },
+            { key: 'status', value: dto.status },
+            { key: 'priority', value: dto.priority },
+            { key: 'isAvailable', value: dto.isAvailable }
+        ];
 
-        if (dto.description !== undefined) {
-            if (typeof (task as any).setDescription === 'function') {
-                (task as any).setDescription(dto.description);
+        updates.forEach(({ key, value }) => {
+            if (value !== undefined) {
+                (task as any)[key] = value;
             }
-            else {
-                (task as any).description = dto.description;
-            }
-        }
-
-        if (dto.status !== undefined) {
-            if (typeof (task as any).setStatus === 'function') {
-                (task as any).setStatus(dto.status);
-            }
-            else {
-                (task as any).status = dto.status;
-            }
-        }
-
-        if (dto.priority !== undefined) {
-            if (typeof (task as any).setPriority === 'function') {
-                (task as any).setPriority(dto.priority);
-            }
-            else {
-                (task as any).priority = dto.priority;
-            }
-        }
-
-        if (dto.isAvailable !== undefined) {
-            if (typeof (task as any).setAvailability === 'function') {
-                (task as any).setAvailability(dto.isAvailable);
-            }
-            else {
-                (task as any).isAvailable = dto.isAvailable;
-            }
-        }
+        });
 
         if (dto.deadline !== undefined) {
             // treat explicit null as clearing the deadline
-            const value = dto.deadline === null ? undefined : dto.deadline;
-            if (typeof (task as any).setDeadline === 'function') {
-                (task as any).setDeadline(value);
-            }
-            else {
-                (task as any).deadline = value;
-            }
+            task.deadline = dto.deadline === null ? undefined : dto.deadline;
         }
 
         return task;
