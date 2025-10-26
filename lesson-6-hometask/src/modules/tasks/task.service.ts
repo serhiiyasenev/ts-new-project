@@ -35,25 +35,13 @@ export class TaskService {
         const task = this.getById(id);
         if (!task) throw new Error(`Task with id "${id}" not found.`);
 
-        // Update properties only if they are provided
-        const updates: Array<{ key: keyof Task; value: any }> = [
-            { key: 'title', value: dto.title },
-            { key: 'description', value: dto.description },
-            { key: 'status', value: dto.status },
-            { key: 'priority', value: dto.priority },
-            { key: 'isAvailable', value: dto.isAvailable }
-        ];
+        const cleanDto = Object.fromEntries(
+            Object.entries(dto).filter(([_, v]) => v !== undefined)
+        );
 
-        updates.forEach(({ key, value }) => {
-            if (value !== undefined) {
-                (task as any)[key] = value;
-            }
-        });
+        Object.assign(task, cleanDto);
 
-        if (dto.deadline !== undefined) {
-            // treat explicit null as clearing the deadline
-            task.deadline = dto.deadline === null ? undefined : dto.deadline;
-        }
+        if (dto.deadline === null) task.deadline = undefined;
 
         return task;
     }
