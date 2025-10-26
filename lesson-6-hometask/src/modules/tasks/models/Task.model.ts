@@ -121,7 +121,7 @@ export class Task implements BaseTask {
             Status: ${this.getStatus()}
             Priority: ${this.getPriority()}
             Available: ${this.getIsAvailable()}
-            Created At: ${this.getCreatedAt().toLocaleString()}
+            Created At: ${this.createdAt.toLocaleString()}
             Updated At: ${this.getUpdatedAt().toLocaleString()}
             ${this.getDeadline() ? `Deadline: ${this.deadline.toLocaleString()}` : 'No deadline set'}
         `;
