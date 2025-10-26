@@ -16,7 +16,7 @@ export class TaskService {
         );
 
         // Only set a deadline when a non-null Date is provided
-        if (dto.deadline !== undefined && dto.deadline !== null) {
+        if (!dto.deadline) {
             task.setDeadline(dto.deadline);
         }
 
