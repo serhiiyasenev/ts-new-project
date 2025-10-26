@@ -40,7 +40,7 @@ export class Task implements BaseTask {
     }
 
     // Method-style Getters
-    getTitle(): string {
+    get title(): string {
         return this._title;
     }
 
