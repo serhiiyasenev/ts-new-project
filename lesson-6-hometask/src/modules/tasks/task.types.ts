@@ -21,7 +21,6 @@ export enum Severity {
 export interface BaseTask {
     id: string;
     createdAt: Date;
-    // prefer property access via accessors
     title: string;
     description: string;
     status: Status;
