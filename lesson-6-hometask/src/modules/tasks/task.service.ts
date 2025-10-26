@@ -15,7 +15,8 @@ export class TaskService {
             dto.isAvailable ?? true
         );
 
-        if (!dto.deadline) {
+        // Only set a deadline when a non-null Date is provided
+        if (dto.deadline !== undefined && dto.deadline !== null) {
             task.setDeadline(dto.deadline);
         }
 
@@ -40,7 +41,10 @@ export class TaskService {
         if (dto.status !== undefined) task.setStatus(dto.status);
         if (dto.priority !== undefined) task.setPriority(dto.priority);
         if (dto.isAvailable !== undefined) task.setAvailability(dto.isAvailable);
-        if (dto.deadline !== undefined) task.setDeadline(dto.deadline);
+        if (dto.deadline !== undefined) {
+            // treat explicit null as clearing the deadline
+            task.setDeadline(dto.deadline === null ? undefined : dto.deadline);
+        }
 
         return task;
     }
@@ -60,8 +64,8 @@ export class TaskService {
         return this.tasks.filter(task => {
             if (filters.status && task.getStatus() !== filters.status) return false;
             if (filters.priority && task.getPriority() !== filters.priority) return false;
-            if (filters.createdAfter && task.getCreatedAt() < filters.createdAfter) return false;
-            if (filters.createdBefore && task.getCreatedAt() > filters.createdBefore) return false;
+            if (filters.createdAfter && task.createdAt < filters.createdAfter) return false;
+            if (filters.createdBefore && task.createdAt > filters.createdBefore) return false;
             if (filters.isAvailable !== undefined && task.getIsAvailable() !== filters.isAvailable) return false;
             return true;
         });

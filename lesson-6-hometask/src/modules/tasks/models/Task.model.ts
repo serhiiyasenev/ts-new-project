@@ -40,7 +40,12 @@ export class Task implements BaseTask {
     }
 
     // Method-style Getters
+    // Keep a `getTitle()` method for backwards compatibility; also expose a `title` accessor.
     get title(): string {
+        return this._title;
+    }
+
+    getTitle(): string {
         return this._title;
     }
 
@@ -64,23 +69,14 @@ export class Task implements BaseTask {
         return this._updatedAt;
     }
 
-    getCreatedAt(): Date {
-        return this.createdAt;
-    }
-
     getDeadline(): Date | undefined {
         return this._deadline;
     }
 
     // Method-style Setters with validation
     setTitle(title: string): void {
-        if (!title.trim()) {
-            throw new Error('Title cannot be empty');
-        }
-        if (title.length < 3) {
-            throw new Error('Title must be at least 3 characters long');
-        }
         this._title = title;
+        this.validate();
         this._updatedAt = new Date();
     }
 
@@ -123,7 +119,7 @@ export class Task implements BaseTask {
             Available: ${this.getIsAvailable()}
             Created At: ${this.createdAt.toLocaleString()}
             Updated At: ${this.getUpdatedAt().toLocaleString()}
-            ${this.getDeadline() ? `Deadline: ${this.deadline.toLocaleString()}` : 'No deadline set'}
+            ${this.getDeadline() ? `Deadline: ${this.getDeadline()!.toLocaleString()}` : 'No deadline set'}
         `;
     }
 }
