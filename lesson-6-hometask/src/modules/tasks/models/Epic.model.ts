@@ -6,7 +6,7 @@ export class Epic extends Task {
     constructor(children: string[], ...args: ConstructorParameters<typeof Task>) {
         super(...args);
         // store a shallow copy to avoid external mutation
-        this.children = [...children];
+        this.children = children;
     }
 
     getChildren(): string[] {
