@@ -1,18 +1,20 @@
-import { Status } from '../../dto/status';
-import { Priority } from '../../dto/priority';
+import { Task } from './models/Task.model';
+import { Status, Priority, TaskCreateDto, TaskUpdateDto, TaskFilterDto } from './task.types';
 import { v4 as uuidv4 } from 'uuid';
-import { TaskCreateDto } from '../../dto/task-create.dto';
-import { TaskUpdateDto } from '../../dto/task-update.dto';
-import { TaskFilterDto } from '../../dto/task-filter.dto';
-import { Task } from './task.types';
+
+type Writable<T> = { -readonly [P in keyof T]: T[P] };
 
 export class TaskService {
     private tasks: Task[] = [];
 
     create(dto: TaskCreateDto): Task {
+        if (!dto.title?.trim()) {
+            throw new Error('Title cannot be empty');
+        }
+
         const task = new Task(
             uuidv4(),
-            dto.title,
+            dto.title.trim(),
             dto.description || 'No description provided',
             dto.status || Status.TODO,
             dto.priority || Priority.MEDIUM,
@@ -20,7 +22,7 @@ export class TaskService {
         );
 
         if (dto.deadline) {
-            task.setDeadline(dto.deadline);
+            task.deadline = dto.deadline;
         }
 
         this.tasks.push(task);
@@ -39,19 +41,19 @@ export class TaskService {
         const task = this.getById(id);
         if (!task) throw new Error(`Task with id "${id}" not found.`);
 
-        if (dto.title !== undefined) task.setTitle(dto.title);
-        if (dto.description !== undefined) task.setDescription(dto.description);
-        if (dto.status !== undefined) task.setStatus(dto.status);
-        if (dto.priority !== undefined) task.setPriority(dto.priority);
-        if (dto.isAvailable !== undefined) task.setAvailability(dto.isAvailable);
-        if (dto.deadline !== undefined) task.setDeadline(dto.deadline);
+        const cleanDto = Object.fromEntries(
+            Object.entries(dto).filter(([_, v]) => v !== undefined)
+        );
+
+        Object.assign(task as Writable<Task>, cleanDto);
+
+        if (dto.deadline === null) task.deadline = undefined;
 
         return task;
     }
 
     delete(id: string): string {
         const index = this.tasks.findIndex(task => task.id === id);
-
         if (index === -1) {
             throw new Error(`Task with id "${id}" not found.`);
         }
@@ -61,13 +63,14 @@ export class TaskService {
     }
 
     filter(filters: TaskFilterDto): Task[] {
-        return this.tasks.filter(task => {
-            if (filters.status && task.getStatus() !== filters.status) return false;
-            if (filters.priority && task.getPriority() !== filters.priority) return false;
-            if (filters.createdAfter && task.getCreatedAt() < filters.createdAfter) return false;
-            if (filters.createdBefore && task.getCreatedAt() > filters.createdBefore) return false;
-            if (filters.isAvailable !== undefined && task.getIsAvailable() !== filters.isAvailable) return false;
-            return true;
-        });
+        const { status, priority, createdAfter, createdBefore, isAvailable } = filters;
+
+        return this.tasks.filter(task => (
+            (!status || task.status === status) &&
+            (!priority || task.priority === priority) &&
+            (!createdAfter || task.createdAt >= createdAfter) &&
+            (!createdBefore || task.createdAt <= createdBefore) &&
+            (isAvailable === undefined || task.isAvailable === isAvailable)
+        ));
     }
 }

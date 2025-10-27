@@ -1,8 +1,6 @@
+import { Task } from './models/Task.model';
 import { TaskService } from './task.service';
-import { TaskCreateDto } from '../../dto/task-create.dto';
-import { TaskUpdateDto } from '../../dto/task-update.dto';
-import { TaskFilterDto } from '../../dto/task-filter.dto';
-import { Task } from './task.types';
+import { TaskCreateDto, TaskUpdateDto, TaskFilterDto } from './task.types';
 
 export class TaskController {
     private readonly service: TaskService;
@@ -17,13 +15,8 @@ export class TaskController {
             console.log('✅ Task created successfully:', task.getTaskInfo());
             return task;
         } catch (error) {
-            if (error instanceof Error) {
-                console.error('❌ Failed to create task:', error.message);
-                throw error;
-            } else {
-                console.error('❌ Failed to create task:', error);
-                throw error;
-            }
+            console.error('❌ Failed to create task:', error instanceof Error ? error.message : error);
+            throw error;
         } 
     }
 
@@ -36,14 +29,9 @@ export class TaskController {
             const task = this.service.getById(id);
             if (!task) throw new Error(`Task with id "${id}" not found.`);
             return task;
-        } catch (error: any) {
-            if (error instanceof Error) {
-                console.error('❌ Failed to create task:', error.message);
-                throw error;
-            } else {
-                console.error('❌ Failed to create task:', error);
-                throw error;
-            }
+        } catch (error) {
+            console.error('❌ Failed to get task:', error instanceof Error ? error.message : error);
+            throw error;
         }
     }
 
@@ -52,14 +40,9 @@ export class TaskController {
             const updated = this.service.update(id, dto);
             console.log(`✅ Task ${id} updated successfully.`);
             return updated;
-        } catch (error: any) {
-            if (error instanceof Error) {
-                console.error('❌ Failed to create task:', error.message);
-                throw error;
-            } else {
-                console.error('❌ Failed to create task:', error);
-                throw error;
-            }
+        } catch (error) {
+            console.error('❌ Failed to update task:', error instanceof Error ? error.message : error);
+            throw error;
         }
     }
 
@@ -68,14 +51,9 @@ export class TaskController {
             const result = this.service.delete(id);
             console.log('🗑️', result);
             return result;
-        } catch (error: any) {
-            if (error instanceof Error) {
-                console.error('❌ Failed to create task:', error.message);
-                throw error;
-            } else {
-                console.error('❌ Failed to create task:', error);
-                throw error;
-            }
+        } catch (error) {
+            console.error('❌ Failed to delete task:', error instanceof Error ? error.message : error);
+            throw error;
         }
     }
 
