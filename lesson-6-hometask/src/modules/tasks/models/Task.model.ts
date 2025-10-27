@@ -115,7 +115,7 @@ export class Task implements BaseTask {
             Available: ${this.isAvailable}
             Created At: ${this.createdAt.toLocaleString()}
             Updated At: ${this.updatedAt.toLocaleString()}
-            ${this.deadline ? `Deadline: ${this.deadline!.toLocaleString()}` : 'No deadline set'}
+            ${this.deadline ? `Deadline: ${this.deadline.toLocaleString()}` : 'No deadline set'}
         `;
     }
 }
