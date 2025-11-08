@@ -125,7 +125,7 @@ function updateUpcomingDeadlines(tasks: Task[]): void {
     return aTime - bTime;
   });
 
-  const upcomingTasks = sortedByDeadline.slice(0, 5);
+  const upcomingTasks = sortedByDeadline.slice(0, 3);
 
   if (upcomingTasks.length === 0) {
     const emptyMessage = document.createElement('p');
