@@ -8,13 +8,20 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "api": "json-server --watch db.json --port 3000"
+    "api": "json-server --watch db.json --port 3000",
+    "test": "vitest",
+    "test:ui": "vitest --ui"
   },
   "devDependencies": {
+    "@types/jsdom": "^27.0.0",
     "@types/json-server": "^0.14.8",
+    "@vitest/ui": "^4.0.8",
     "concurrently": "^9.2.1",
+    "happy-dom": "^20.0.10",
+    "jsdom": "^27.1.0",
     "json-server": "^1.0.0-beta.3",
     "typescript": "~5.9.3",
-    "vite": "^7.1.7"
+    "vite": "^7.1.7",
+    "vitest": "^4.0.8"
   }
 }
