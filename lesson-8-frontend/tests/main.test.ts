@@ -204,14 +204,14 @@ beforeEach(() => {
       <select name="priority"></select>
       <input name="deadline" />
     </form>
-    <span id="total-tasks">0</span>
-    <span id="todo-count">0</span>
-    <span id="in-progress-count">0</span>
-    <span id="done-count">0</span>
-    <span id="low-priority-count">0</span>
-    <span id="medium-priority-count">0</span>
-    <span id="high-priority-count">0</span>
-    <div id="upcoming-deadlines-list"></div>
+    <span id="totalTasks">0</span>
+    <span id="todoCount">0</span>
+    <span id="inProgressCount">0</span>
+    <span id="doneCount">0</span>
+    <span id="lowPriorityCount">0</span>
+    <span id="mediumPriorityCount">0</span>
+    <span id="highPriorityCount">0</span>
+    <div id="upcomingDeadlines"></div>
     <div id="todo-tasks" data-status="todo"></div>
     <div id="in-progress-tasks" data-status="in_progress"></div>
     <div id="done-tasks" data-status="done"></div>
