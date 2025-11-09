@@ -51,8 +51,7 @@ function createTaskElement(task: Task, editTask: (id: string) => void, deleteTas
   taskEl.appendChild(createTaskMeta(task));
   taskEl.appendChild(createTaskActions(task, editTask, deleteTask));
   
-  // Note: Drag events now handled via event delegation on parent container
-  
+  // Drag events handled via event delegation on parent container
   return taskEl;
 }
 

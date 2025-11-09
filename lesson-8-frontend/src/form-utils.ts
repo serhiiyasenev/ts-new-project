@@ -4,16 +4,12 @@ import type { Priority, Status, Task } from './types';
 export const VALID_STATUSES: Status[] = ['todo', 'in_progress', 'done'];
 export const VALID_PRIORITIES: Priority[] = ['low', 'medium', 'high'];
 
-/**
- * Validates if a string is a valid Status value
- */
+// Validates if a string is a valid Status value
 function isValidStatus(value: unknown): value is Status {
   return typeof value === 'string' && VALID_STATUSES.includes(value as Status);
 }
 
-/**
- * Validates if a string is a valid Priority value
- */
+// Validates if a string is a valid Priority value
 function isValidPriority(value: unknown): value is Priority {
   return typeof value === 'string' && VALID_PRIORITIES.includes(value as Priority);
 }
