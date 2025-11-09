@@ -1,8 +1,6 @@
 import type { Task } from '../src/types';
 
-/**
- * Helper function to create a sample task for testing
- */
+// Helper function to create a sample task for testing
 export function createSampleTask(overrides: Partial<Task> = {}): Task {
   return {
     id: '1',
