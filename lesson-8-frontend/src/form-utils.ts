@@ -108,10 +108,16 @@ export function formDataToPartialTask(formData: FormData): Omit<Task, 'id' | 'cr
  * @param task - The Task object containing data to populate the form
  */
 export function fillEditForm(form: HTMLFormElement, task: Task): void {
-  (form.elements.namedItem('title') as HTMLInputElement).value = task.title;
-  (form.elements.namedItem('description') as HTMLTextAreaElement).value = task.description;
-  (form.elements.namedItem('status') as HTMLSelectElement).value = task.status;
-  (form.elements.namedItem('priority') as HTMLSelectElement).value = task.priority;
-  (form.elements.namedItem('deadline') as HTMLInputElement).value = 
-    task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : '';
+  const titleEl = form.elements.namedItem('title') as HTMLInputElement | null;
+  if (titleEl) titleEl.value = task.title;
+  const descEl = form.elements.namedItem('description') as HTMLTextAreaElement | null;
+  if (descEl) descEl.value = task.description;
+  const statusEl = form.elements.namedItem('status') as HTMLSelectElement | null;
+  if (statusEl) statusEl.value = task.status;
+  const priorityEl = form.elements.namedItem('priority') as HTMLSelectElement | null;
+  if (priorityEl) priorityEl.value = task.priority;
+  const deadlineEl = form.elements.namedItem('deadline') as HTMLInputElement | null;
+  if (deadlineEl) {
+    deadlineEl.value = task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : '';
+  }
 }
