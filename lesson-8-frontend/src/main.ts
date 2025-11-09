@@ -97,20 +97,6 @@ async function init() {
   const editFormErrorEl = getOrCreateErrorElement(editForm, 'modal-error');
   const createFormErrorEl = getOrCreateErrorElement(taskForm, 'form-error');
 
-  // Load and render tasks
-  async function loadTasks() {
-    try {
-      const tasks = await TaskAPI.getAllTasks();
-      renderTasks(tasks, editTask, deleteTask);
-      // Hide backend error on successful load
-      backendStatus.style.display = 'none';
-    } catch (error) {
-      console.error('Error loading tasks:', error);
-      // Show backend error message
-      backendStatus.style.display = 'block';
-    }
-  }
-
   // Delete task handler
   const deleteTask = async (id: string) => {
     if (confirm('Are you sure you want to delete this task?')) {
@@ -192,6 +178,20 @@ async function init() {
       console.error('Error editing task:', error);
     }
   };
+
+  // Load and render tasks (defined after editTask and deleteTask to avoid temporal dead zone)
+  async function loadTasks() {
+    try {
+      const tasks = await TaskAPI.getAllTasks();
+      renderTasks(tasks, editTask, deleteTask);
+      // Hide backend error on successful load
+      backendStatus.style.display = 'none';
+    } catch (error) {
+      console.error('Error loading tasks:', error);
+      // Show backend error message
+      backendStatus.style.display = 'block';
+    }
+  }
 
   // Handle form submission
   taskForm.addEventListener('submit', async (e) => {
