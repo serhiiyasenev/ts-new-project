@@ -121,12 +121,14 @@ async function init() {
     }
   };
 
+  // Track current edit session controller for cleanup
+
   // Edit task handler
   const editTask = async (id: string) => {
     try {
-      // Abort any existing edit session to prevent listener accumulation
+      // Abort any existing edit session before starting a new one
       currentEditController?.abort();
-      
+
       const task = await TaskAPI.getTaskById(id);
       const modalOverlay = document.querySelector('.modal-overlay');
       
