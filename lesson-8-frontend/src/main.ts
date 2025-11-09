@@ -36,6 +36,7 @@ function getOrCreateErrorElement(form: HTMLElement, className: string): HTMLElem
   return errorEl;
 }
 
+// Creates a task DOM element
 function createTaskElement(task: Task, editTask: (id: string) => void, deleteTask: (id: string) => void): HTMLDivElement {
   const taskEl = document.createElement('div');
   taskEl.className = 'task-item';
@@ -56,12 +57,14 @@ function createTaskElement(task: Task, editTask: (id: string) => void, deleteTas
   return taskEl;
 }
 
+// Clears all task lists
 function clearTaskLists(): void {
   document.querySelector('#todoList')!.replaceChildren();
   document.querySelector('#inProgressList')!.replaceChildren();
   document.querySelector('#doneList')!.replaceChildren();
 }
 
+// Attaches a task element to the appropriate column based on status
 function attachTaskToColumn(taskEl: HTMLElement, status: Status): void {
   const columnMap = {
     todo: '#todoList',
@@ -72,6 +75,7 @@ function attachTaskToColumn(taskEl: HTMLElement, status: Status): void {
   document.querySelector(columnMap[status])!.appendChild(taskEl);
 }
 
+// Renders tasks to the DOM
 function renderTasks(tasks: Task[], editTask: (id: string) => void, deleteTask: (id: string) => void): void {
   updateStatistics(tasks);
   clearTaskLists();
@@ -83,6 +87,7 @@ function renderTasks(tasks: Task[], editTask: (id: string) => void, deleteTask: 
   });
 }
 
+// Main initialization function
 async function init() {
   const taskForm = document.querySelector<HTMLFormElement>('#taskForm')!;
   const backendStatus = document.querySelector<HTMLDivElement>('#backendStatus')!;
@@ -91,9 +96,6 @@ async function init() {
   // Create error message elements once using helper function
   const editFormErrorEl = getOrCreateErrorElement(editForm, 'modal-error');
   const createFormErrorEl = getOrCreateErrorElement(taskForm, 'form-error');
-
-  // Store current edit controller to prevent listener accumulation
-  let currentEditController: AbortController | null = null;
 
   // Load and render tasks
   async function loadTasks() {
@@ -121,12 +123,13 @@ async function init() {
     }
   };
 
-  // Track current edit session controller for cleanup
+  // Store the controller at a higher scope to allow cleanup between edit sessions
+  let currentEditController: AbortController | null = null;
 
   // Edit task handler
   const editTask = async (id: string) => {
     try {
-      // Abort any existing edit session before starting a new one
+      // Abort any existing edit session to prevent multiple listeners
       currentEditController?.abort();
 
       const task = await TaskAPI.getTaskById(id);
@@ -181,6 +184,7 @@ async function init() {
         }
       };
 
+      // Attach event listeners with the current signal for cleanup
       editForm.addEventListener('submit', handleSubmit, { signal });
       editForm.querySelector('.cancel')?.addEventListener('click', handleCancel, { signal });
       modalOverlay?.addEventListener('click', overlayClickHandler, { signal });
