@@ -22,7 +22,7 @@ export function setupTestDom(): void {
   document.body.innerHTML = `
     <div id="modal-overlay"></div>
     <form id="taskForm"></form>
-    <form id="edit-task-form"></form>
+    <form class="task-edit-form"></form>
     <span id="totalTasks">0</span>
     <span id="todoCount">0</span>
     <span id="inProgressCount">0</span>
