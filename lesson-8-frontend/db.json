@@ -84,11 +84,11 @@
     {
       "id": "11",
       "title": "Newly Created Task",
-      "description": "TEST",
+      "description": "Description Description Description Description Description",
       "status": "todo",
-      "priority": "high",
+      "priority": "medium",
       "createdAt": "2025-10-16T20:03:35.967Z",
-      "deadline": "2025-11-10T00:00:00.000Z"
+      "deadline": "2025-10-17T00:00:00.000Z"
     }
   ]
 }
