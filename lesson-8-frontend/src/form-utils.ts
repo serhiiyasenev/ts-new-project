@@ -52,7 +52,7 @@ function validateFormData(data: Record<string, FormDataEntryValue>) {
   }
   
   if (!isValidPriority(data.priority)) {
-    throw new Error('Please select a valid priority (Low, Medium, or High)');
+    throw new Error('Please select a valid priority');
   }
   
   return {
