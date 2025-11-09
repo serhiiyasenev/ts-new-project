@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import type { Mock } from 'vitest';
 import type { Task } from '../src/types';
-import { sortTasksByCreatedDate, setupTestDom } from '../src/main';
+import { sortTasksByCreatedDate } from '../src/main';
 import { capitalize, createTaskHeader, createTaskMeta } from '../src/dom-utils';
 import { updateTotalTasks, updateStatusCounts, updatePriorityCounts, updateUpcomingDeadlines } from '../src/stats';
 import { formDataToTask, formDataToPartialTask } from '../src/form-utils';
+import {setupTestDom } from '../src/setupTestDom';
 
 // Mock the API module
 vi.mock('../src/api', () => ({
