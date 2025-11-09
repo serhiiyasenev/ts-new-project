@@ -30,7 +30,7 @@ export function updateUpcomingDeadlines(tasks: Task[]): void {
   const upcomingDeadlines = tasks
     .filter(task => task.deadline && new Date(task.deadline) > new Date())
     .sort((a, b) => new Date(a.deadline!).getTime() - new Date(b.deadline!).getTime())
-    .slice(0, 3);
+    .slice(0, 5);
 
   const container = document.querySelector('#upcomingDeadlines')!;
   container.innerHTML = '';
