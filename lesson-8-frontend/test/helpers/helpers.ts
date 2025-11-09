@@ -20,7 +20,7 @@ export function setupTestDom(): void {
   // This is intentional: it prevents state leakage between tests by completely resetting
   // the DOM structure to a known, predictable state.
   document.body.innerHTML = `
-    <div id="modal-overlay"></div>
+    <div class="modal-overlay"></div>
     <form id="taskForm"></form>
     <form class="task-edit-form"></form>
     <span id="totalTasks">0</span>
