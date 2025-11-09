@@ -36,6 +36,7 @@ function getOrCreateErrorElement(form: HTMLElement, className: string): HTMLElem
   return errorEl;
 }
 
+// Creates a task DOM element
 function createTaskElement(task: Task, editTask: (id: string) => void, deleteTask: (id: string) => void): HTMLDivElement {
   const taskEl = document.createElement('div');
   taskEl.className = 'task-item';
@@ -56,12 +57,14 @@ function createTaskElement(task: Task, editTask: (id: string) => void, deleteTas
   return taskEl;
 }
 
+// Clears all task lists
 function clearTaskLists(): void {
   document.querySelector('#todoList')!.replaceChildren();
   document.querySelector('#inProgressList')!.replaceChildren();
   document.querySelector('#doneList')!.replaceChildren();
 }
 
+// Attaches a task element to the appropriate column based on status
 function attachTaskToColumn(taskEl: HTMLElement, status: Status): void {
   const columnMap = {
     todo: '#todoList',
@@ -72,6 +75,7 @@ function attachTaskToColumn(taskEl: HTMLElement, status: Status): void {
   document.querySelector(columnMap[status])!.appendChild(taskEl);
 }
 
+// Renders tasks to the DOM
 function renderTasks(tasks: Task[], editTask: (id: string) => void, deleteTask: (id: string) => void): void {
   updateStatistics(tasks);
   clearTaskLists();
@@ -83,6 +87,7 @@ function renderTasks(tasks: Task[], editTask: (id: string) => void, deleteTask: 
   });
 }
 
+// Main initialization function
 async function init() {
   const taskForm = document.querySelector<HTMLFormElement>('#taskForm')!;
   const backendStatus = document.querySelector<HTMLDivElement>('#backendStatus')!;
@@ -151,6 +156,7 @@ async function init() {
         editFormErrorEl.textContent = ''; // Clear error on cancel
         // Abort all listeners associated with this modal interaction
         currentEditController?.abort();
+        currentEditController = null;
       };
 
       // Overlay click handler to close modal when clicking outside
@@ -170,6 +176,7 @@ async function init() {
           modalOverlay?.classList.remove('active');
           editForm?.classList.remove('active');
           currentEditController?.abort(); // Clean up listeners on success
+          currentEditController = null;
           await loadTasks();
         } catch (err) {
           editFormErrorEl.textContent = err instanceof Error ? err.message : 'Failed to update task. Please try again.';
@@ -177,6 +184,7 @@ async function init() {
         }
       };
 
+      // Attach event listeners with the current signal for cleanup
       editForm.addEventListener('submit', handleSubmit, { signal });
       editForm.querySelector('.cancel')?.addEventListener('click', handleCancel, { signal });
       modalOverlay?.addEventListener('click', overlayClickHandler, { signal });
@@ -246,7 +254,7 @@ async function init() {
   // Setup drag event delegation on task-list container
   const taskList = document.querySelector('.task-list');
   if (taskList) {
-    // Delegated dragstart handler
+    // Delegated drag start handler
     taskList.addEventListener('dragstart', (e: Event) => {
       const target = e.target as HTMLElement;
       if (target.classList.contains('task-item')) {
@@ -259,7 +267,7 @@ async function init() {
       }
     });
 
-    // Delegated dragend handler
+    // Delegated drag and drop end handler
     taskList.addEventListener('dragend', (e: Event) => {
       const target = e.target as HTMLElement;
       if (target.classList.contains('task-item')) {
