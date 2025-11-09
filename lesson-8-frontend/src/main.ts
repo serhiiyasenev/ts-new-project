@@ -254,7 +254,7 @@ async function init() {
   // Setup drag event delegation on task-list container
   const taskList = document.querySelector('.task-list');
   if (taskList) {
-    // Delegated drag start handler
+    // Delegated dragstart handler
     taskList.addEventListener('dragstart', (e: Event) => {
       const target = e.target as HTMLElement;
       if (target.classList.contains('task-item')) {
