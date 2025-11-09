@@ -84,14 +84,14 @@ export function formDataToTask(formData: FormData): Omit<Task, 'id'> {
 
 /**
  * Converts FormData from task edit form to a task update object.
- * Returns a "partial" type (omits id and createdAt) but all user-editable fields 
- * (title, description, status, priority, deadline) are required and validated.
+ * Returns an object with all user-editable fields (title, description, status, priority, deadline)
+ * required and validated, omitting only id and createdAt.
  * 
  * @param formData - FormData object from the edit form
- * @returns Task update object without id and createdAt fields (but all other fields are required)
+ * @returns Task update object without id and createdAt fields (all other fields are required)
  * @throws Error if validation fails (empty title/description, invalid status/priority)
  */
-export function formDataToPartialTask(formData: FormData): Omit<Task, 'id' | 'createdAt'> {
+export function formDataToTaskUpdate(formData: FormData): Omit<Task, 'id' | 'createdAt'> {
   const data = Object.fromEntries(formData);
   return validateFormData(data);
 }
