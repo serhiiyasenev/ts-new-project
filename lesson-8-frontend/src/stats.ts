@@ -5,22 +5,6 @@ export const MAX_UPCOMING_DEADLINES = 5;
 export const MAX_DEADLINE_TITLE_LENGTH = 20;
 
 /**
- * Counts tasks by status and priority in a single pass for better performance.
- * @param tasks - Array of tasks to count
- * @returns Object with status and priority counts
- */
-function countTaskMetrics(tasks: Task[]) {
-  return tasks.reduce((acc, task) => {
-    acc.status[task.status]++;
-    acc.priority[task.priority]++;
-    return acc;
-  }, {
-    status: { todo: 0, in_progress: 0, done: 0 },
-    priority: { high: 0, medium: 0, low: 0 }
-  });
-}
-
-/**
  * Updates the total tasks count display in the DOM.
  * Modifies the #totalTasks element's text content.
  * 
@@ -84,7 +68,15 @@ export function updatePriorityCounts(tasks: Task[]): void {
  * @param tasks - Array of tasks to count
  */
 export function updateStatusAndPriorityCounts(tasks: Task[]): void {
-  const counts = countTaskMetrics(tasks);
+  // Count both status and priority in a single pass for better performance
+  const counts = tasks.reduce((acc, task) => {
+    acc.status[task.status]++;
+    acc.priority[task.priority]++;
+    return acc;
+  }, {
+    status: { todo: 0, in_progress: 0, done: 0 },
+    priority: { high: 0, medium: 0, low: 0 }
+  });
   
   // Update status counts
   const todoEl = document.querySelector('#todoCount');
