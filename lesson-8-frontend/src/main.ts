@@ -66,6 +66,19 @@ function renderTasks(tasks: Task[], editTask: (id: string) => void, deleteTask: 
 async function init() {
   const taskForm = document.querySelector<HTMLFormElement>('#taskForm')!;
   const backendStatus = document.querySelector<HTMLDivElement>('#backendStatus')!;
+  const editForm = document.querySelector('.task-edit-form') as HTMLFormElement;
+  
+  // Create error message element for edit form once
+  let editFormErrorEl = editForm.querySelector('.modal-error') as HTMLElement;
+  if (!editFormErrorEl) {
+    editFormErrorEl = document.createElement('div');
+    editFormErrorEl.className = 'modal-error';
+    editFormErrorEl.style.color = 'red';
+    editFormErrorEl.style.marginTop = '8px';
+    editFormErrorEl.setAttribute('role', 'alert');
+    editFormErrorEl.setAttribute('aria-live', 'assertive');
+    editForm.appendChild(editFormErrorEl);
+  }
 
   // Load and render tasks
   async function loadTasks() {
@@ -98,7 +111,7 @@ async function init() {
     try {
       const task = await TaskAPI.getTaskById(id);
       const modalOverlay = document.querySelector('.modal-overlay');
-      const form = document.querySelector('.task-edit-form') as HTMLFormElement;
+      const form = editForm;
       
       // Fill form with task data
       fillEditForm(form, task);
@@ -107,27 +120,31 @@ async function init() {
       modalOverlay?.classList.add('active');
       form?.classList.add('active');
 
-      // Find or create error message element (only once per form)
-      let errorEl = form.querySelector('.modal-error') as HTMLElement;
-      if (!errorEl) {
-        errorEl = document.createElement('div');
-        errorEl.className = 'modal-error';
-        errorEl.style.color = 'red';
-        errorEl.style.marginTop = '8px';
-        errorEl.setAttribute('role', 'alert');
-        errorEl.setAttribute('aria-live', 'assertive');
-        form.appendChild(errorEl);
-      }
-      errorEl.textContent = ''; // Clear previous error
+      // Clear previous error
+      editFormErrorEl.textContent = '';
 
       // Controller to auto-clean listeners on cancel/submit
       const controller = new AbortController();
       const { signal } = controller;
 
+      // Handle cancel
+      const handleCancel = () => {
+        modalOverlay?.classList.remove('active');
+        form?.classList.remove('active');
+        editFormErrorEl.textContent = ''; // Clear error on cancel
+        // Abort all listeners associated with this modal interaction
+        controller.abort();
+      };
+
+      // Overlay click handler to close modal when clicking outside
+      function overlayClickHandler(e: Event) {
+        if (e.target === modalOverlay) handleCancel();
+      }
+
       // Handle form submission
       const handleSubmit = async (e: Event) => {
         e.preventDefault();
-        errorEl.textContent = ''; // Clear error on new attempt
+        editFormErrorEl.textContent = ''; // Clear error on new attempt
         
         try {
           const formData = new FormData(form);
@@ -138,23 +155,9 @@ async function init() {
           controller.abort(); // Clean up listeners on success
           await loadTasks();
         } catch (err) {
-          errorEl.textContent = 'Failed to update task. Please try again.';
+          editFormErrorEl.textContent = 'Failed to update task. Please try again.';
           // Don't abort - allow retry
         }
-      };
-
-      // Overlay click handler to close modal when clicking outside
-      function overlayClickHandler(e: Event) {
-        if (e.target === modalOverlay) handleCancel();
-      }
-
-      // Handle cancel
-      const handleCancel = () => {
-        modalOverlay?.classList.remove('active');
-        form?.classList.remove('active');
-        errorEl.textContent = ''; // Clear error on cancel
-        // Abort all listeners associated with this modal interaction
-        controller.abort();
       };
 
       form.addEventListener('submit', handleSubmit, { signal });
