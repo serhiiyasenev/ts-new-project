@@ -72,6 +72,16 @@ function renderTasks(tasks: Task[], editTask: (id: string) => void, deleteTask: 
 
 async function init() {
   const taskForm = document.querySelector<HTMLFormElement>('#taskForm')!;
+  const backendOk = await checkBackendHealth();
+  const backendStatus = document.querySelector<HTMLDivElement>('#backendStatus')!;
+
+  if (!backendOk) {
+    backendStatus.style.display = 'block';
+    console.error('Backend is not available at http://localhost:3000');
+    return;
+  } else {
+    backendStatus.style.display = 'none';
+  }
 
   // Load and render tasks
   async function loadTasks() {
@@ -204,4 +214,13 @@ async function init() {
 // Only run init if not in test environment
 if (import.meta.env.MODE !== 'test') {
   init();
+}
+
+async function checkBackendHealth(): Promise<boolean> {
+  try {
+    const response = await fetch('http://localhost:3000/tasks', { method: 'GET' });
+    return response.ok;
+  } catch {
+    return false;
+  }
 }

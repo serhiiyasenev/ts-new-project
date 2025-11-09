@@ -381,3 +381,16 @@ button:hover {
 .form-actions button.cancel:hover {
   background-color: #cbd5e0;
 }
+
+#backendStatus {
+  display: none;
+  text-align: center;
+  background: #ffeaea;
+  color: #b00020;
+  padding: 12px;
+  font-weight: 500;
+  border: 1px solid #f5c2c7;
+  border-radius: 6px;
+  margin: 20px auto;
+  max-width: 600px;
+}
