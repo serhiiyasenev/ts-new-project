@@ -1,10 +1,26 @@
 import type { Task } from './types';
 
-// Capitalize first letter of a string
+/**
+ * Capitalizes the first letter of a string.
+ * Used for formatting priority and status values for display.
+ * 
+ * @param str - The string to capitalize
+ * @returns The string with the first letter capitalized
+ * @example capitalize('low') // returns 'Low'
+ */
 export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+/**
+ * Creates a task header DOM element containing the title and priority badge.
+ * The header includes:
+ * - An h3 element with the task title
+ * - A priority badge with appropriate CSS class
+ * 
+ * @param task - The task object to create a header for
+ * @returns A div element with class 'task-header'
+ */
 export function createTaskHeader(task: Task): HTMLDivElement {
   const headerDiv = document.createElement('div');
   headerDiv.className = 'task-header';
@@ -25,6 +41,15 @@ export function createTaskHeader(task: Task): HTMLDivElement {
   return headerDiv;
 }
 
+/**
+ * Creates a task metadata DOM element showing creation date and optional deadline.
+ * Displays:
+ * - Creation date (always shown)
+ * - Deadline date (only if task has a deadline)
+ * 
+ * @param task - The task object to create metadata for
+ * @returns A div element with class 'task-meta'
+ */
 export function createTaskMeta(task: Task): HTMLDivElement {
   const metaDiv = document.createElement('div');
   metaDiv.className = 'task-meta';
@@ -42,6 +67,15 @@ export function createTaskMeta(task: Task): HTMLDivElement {
   return metaDiv;
 }
 
+/**
+ * Creates a task actions DOM element with Edit and Delete buttons.
+ * Attaches click event handlers to the buttons that call the provided callbacks.
+ * 
+ * @param task - The task object these actions are for
+ * @param editTask - Callback function to execute when Edit button is clicked
+ * @param deleteTask - Callback function to execute when Delete button is clicked
+ * @returns A div element with class 'task-actions' containing the buttons
+ */
 export function createTaskActions(
   task: Task,
   editTask: (id: string) => void,

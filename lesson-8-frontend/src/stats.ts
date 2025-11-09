@@ -1,9 +1,22 @@
 import type { Task } from './types';
 
+/**
+ * Updates the total tasks count display in the DOM.
+ * Modifies the #totalTasks element's text content.
+ * 
+ * @param count - The total number of tasks
+ */
 export function updateTotalTasks(count: number): void {
   document.querySelector('#totalTasks')!.textContent = count.toString();
 }
 
+/**
+ * Updates the task counts by status in the DOM.
+ * Counts tasks in each status category (todo, in_progress, done) and updates
+ * the corresponding DOM elements (#todoCount, #inProgressCount, #doneCount).
+ * 
+ * @param tasks - Array of tasks to count
+ */
 export function updateStatusCounts(tasks: Task[]): void {
   const counts = tasks.reduce((acc, t) => {
     acc[t.status]++;
@@ -15,6 +28,13 @@ export function updateStatusCounts(tasks: Task[]): void {
   document.querySelector('#doneCount')!.textContent = counts.done.toString();
 }
 
+/**
+ * Updates the task counts by priority in the DOM.
+ * Counts tasks in each priority category (high, medium, low) and updates
+ * the corresponding DOM elements (#highPriorityCount, #mediumPriorityCount, #lowPriorityCount).
+ * 
+ * @param tasks - Array of tasks to count
+ */
 export function updatePriorityCounts(tasks: Task[]): void {
   const counts = tasks.reduce((acc, t) => {
     acc[t.priority]++;
@@ -26,6 +46,14 @@ export function updatePriorityCounts(tasks: Task[]): void {
   document.querySelector('#lowPriorityCount')!.textContent = counts.low.toString();
 }
 
+/**
+ * Updates the upcoming deadlines display in the DOM.
+ * Shows up to 5 tasks with future deadlines, sorted by date (earliest first).
+ * Titles longer than 20 characters are truncated with '...'.
+ * Modifies the #upcomingDeadlines element's content.
+ * 
+ * @param tasks - Array of tasks to check for upcoming deadlines
+ */
 export function updateUpcomingDeadlines(tasks: Task[]): void {
   const upcomingDeadlines = tasks
     .filter(task => task.deadline && new Date(task.deadline) > new Date())
@@ -62,6 +90,16 @@ export function updateUpcomingDeadlines(tasks: Task[]): void {
   }
 }
 
+/**
+ * Updates all statistics displays in the DOM.
+ * Calls all other update functions to refresh:
+ * - Total tasks count
+ * - Status counts (todo, in_progress, done)
+ * - Priority counts (high, medium, low)
+ * - Upcoming deadlines list
+ * 
+ * @param tasks - Array of tasks to analyze
+ */
 export function updateStatistics(tasks: Task[]): void {
   updateTotalTasks(tasks.length);
   updateStatusCounts(tasks);

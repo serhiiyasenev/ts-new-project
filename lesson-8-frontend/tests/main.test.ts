@@ -170,6 +170,59 @@ describe('Utility Functions', () => {
 
       expect(partial.deadline).toBeNull();
     });
+
+    it('should throw error for invalid status', () => {
+      const formData = new FormData();
+      formData.set('title', 'Test Task');
+      formData.set('description', 'Test Description');
+      formData.set('status', 'invalid_status');
+      formData.set('priority', 'high');
+
+      expect(() => formDataToPartialTask(formData)).toThrow('Invalid status');
+    });
+
+    it('should throw error for invalid priority', () => {
+      const formData = new FormData();
+      formData.set('title', 'Test Task');
+      formData.set('description', 'Test Description');
+      formData.set('status', 'todo');
+      formData.set('priority', 'invalid_priority');
+
+      expect(() => formDataToPartialTask(formData)).toThrow('Invalid priority');
+    });
+
+    it('should throw error for empty title', () => {
+      const formData = new FormData();
+      formData.set('title', '   ');
+      formData.set('description', 'Test Description');
+      formData.set('status', 'todo');
+      formData.set('priority', 'high');
+
+      expect(() => formDataToPartialTask(formData)).toThrow('Title is required');
+    });
+
+    it('should throw error for empty description', () => {
+      const formData = new FormData();
+      formData.set('title', 'Test Task');
+      formData.set('description', '   ');
+      formData.set('status', 'todo');
+      formData.set('priority', 'high');
+
+      expect(() => formDataToPartialTask(formData)).toThrow('Description is required');
+    });
+
+    it('should trim whitespace from title and description', () => {
+      const formData = new FormData();
+      formData.set('title', '  Test Task  ');
+      formData.set('description', '  Test Description  ');
+      formData.set('status', 'todo');
+      formData.set('priority', 'high');
+
+      const partial = formDataToPartialTask(formData);
+
+      expect(partial.title).toBe('Test Task');
+      expect(partial.description).toBe('Test Description');
+    });
   });
 });
 
