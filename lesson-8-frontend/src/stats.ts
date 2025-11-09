@@ -5,6 +5,22 @@ export const MAX_UPCOMING_DEADLINES = 5;
 export const MAX_DEADLINE_TITLE_LENGTH = 20;
 
 /**
+ * Counts tasks by status and priority in a single pass for better performance.
+ * @param tasks - Array of tasks to count
+ * @returns Object with status and priority counts
+ */
+function countTaskMetrics(tasks: Task[]) {
+  return tasks.reduce((acc, task) => {
+    acc.status[task.status]++;
+    acc.priority[task.priority]++;
+    return acc;
+  }, {
+    status: { todo: 0, in_progress: 0, done: 0 },
+    priority: { high: 0, medium: 0, low: 0 }
+  });
+}
+
+/**
  * Updates the total tasks count display in the DOM.
  * Modifies the #totalTasks element's text content.
  * 
@@ -59,6 +75,34 @@ export function updatePriorityCounts(tasks: Task[]): void {
   if (highEl) highEl.textContent = counts.high.toString();
   if (mediumEl) mediumEl.textContent = counts.medium.toString();
   if (lowEl) lowEl.textContent = counts.low.toString();
+}
+
+/**
+ * Updates both status and priority counts efficiently in a single pass.
+ * More performant than calling updateStatusCounts and updatePriorityCounts separately.
+ * 
+ * @param tasks - Array of tasks to count
+ */
+export function updateStatusAndPriorityCounts(tasks: Task[]): void {
+  const counts = countTaskMetrics(tasks);
+  
+  // Update status counts
+  const todoEl = document.querySelector('#todoCount');
+  const inProgressEl = document.querySelector('#inProgressCount');
+  const doneEl = document.querySelector('#doneCount');
+  
+  if (todoEl) todoEl.textContent = counts.status.todo.toString();
+  if (inProgressEl) inProgressEl.textContent = counts.status.in_progress.toString();
+  if (doneEl) doneEl.textContent = counts.status.done.toString();
+  
+  // Update priority counts
+  const highEl = document.querySelector('#highPriorityCount');
+  const mediumEl = document.querySelector('#mediumPriorityCount');
+  const lowEl = document.querySelector('#lowPriorityCount');
+  
+  if (highEl) highEl.textContent = counts.priority.high.toString();
+  if (mediumEl) mediumEl.textContent = counts.priority.medium.toString();
+  if (lowEl) lowEl.textContent = counts.priority.low.toString();
 }
 
 /**
@@ -120,7 +164,6 @@ export function updateUpcomingDeadlines(tasks: Task[]): void {
  */
 export function updateStatistics(tasks: Task[]): void {
   updateTotalTasks(tasks.length);
-  updateStatusCounts(tasks);
-  updatePriorityCounts(tasks);
+  updateStatusAndPriorityCounts(tasks); // Combined single-pass update for performance
   updateUpcomingDeadlines(tasks);
 }

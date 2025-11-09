@@ -15,17 +15,6 @@ export function sortTasksByCreatedDate(tasks: Task[]): Task[] {
   return [...tasks].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
-function attachDragEvents(taskEl: HTMLElement, taskId: string): void {
-  taskEl.addEventListener('dragstart', (e) => {
-    taskEl.classList.add('dragging');
-    e.dataTransfer?.setData('text/plain', taskId);
-  });
-
-  taskEl.addEventListener('dragend', () => {
-    taskEl.classList.remove('dragging');
-  });
-}
-
 function createTaskElement(task: Task, editTask: (id: string) => void, deleteTask: (id: string) => void): HTMLDivElement {
   const taskEl = document.createElement('div');
   taskEl.className = 'task-item';
@@ -42,8 +31,7 @@ function createTaskElement(task: Task, editTask: (id: string) => void, deleteTas
   taskEl.appendChild(createTaskMeta(task));
   taskEl.appendChild(createTaskActions(task, editTask, deleteTask));
   
-  // Attach drag events
-  attachDragEvents(taskEl, task.id);
+  // Note: Drag events now handled via event delegation on parent container
   
   return taskEl;
 }
@@ -119,6 +107,19 @@ async function init() {
       modalOverlay?.classList.add('active');
       form?.classList.add('active');
 
+      // Find or create error message element (only once per form)
+      let errorEl = form.querySelector('.modal-error') as HTMLElement;
+      if (!errorEl) {
+        errorEl = document.createElement('div');
+        errorEl.className = 'modal-error';
+        errorEl.style.color = 'red';
+        errorEl.style.marginTop = '8px';
+        errorEl.setAttribute('role', 'alert');
+        errorEl.setAttribute('aria-live', 'assertive');
+        form.appendChild(errorEl);
+      }
+      errorEl.textContent = ''; // Clear previous error
+
       // Controller to auto-clean listeners on cancel/submit
       const controller = new AbortController();
       const { signal } = controller;
@@ -126,28 +127,19 @@ async function init() {
       // Handle form submission
       const handleSubmit = async (e: Event) => {
         e.preventDefault();
-        // Find or create error message element
-        let errorEl = form.querySelector('.modal-error') as HTMLElement;
-        if (!errorEl) {
-          errorEl = document.createElement('div');
-          errorEl.className = 'modal-error';
-          errorEl.style.color = 'red';
-          errorEl.style.marginTop = '8px';
-          errorEl.setAttribute('role', 'alert');
-          errorEl.setAttribute('aria-live', 'assertive');
-          form.appendChild(errorEl);
-        }
-        errorEl.textContent = '';
+        errorEl.textContent = ''; // Clear error on new attempt
+        
         try {
           const formData = new FormData(form);
           const updates = formDataToPartialTask(formData);
           await TaskAPI.updateTask(task.id, { ...task, ...updates });
           modalOverlay?.classList.remove('active');
           form?.classList.remove('active');
+          controller.abort(); // Clean up listeners on success
           await loadTasks();
         } catch (err) {
           errorEl.textContent = 'Failed to update task. Please try again.';
-          controller.abort();
+          // Don't abort - allow retry
         }
       };
 
@@ -160,13 +152,14 @@ async function init() {
       const handleCancel = () => {
         modalOverlay?.classList.remove('active');
         form?.classList.remove('active');
+        errorEl.textContent = ''; // Clear error on cancel
         // Abort all listeners associated with this modal interaction
         controller.abort();
       };
 
-      form.addEventListener('submit', handleSubmit, { once: true, signal });
+      form.addEventListener('submit', handleSubmit, { signal });
       form.querySelector('.cancel')?.addEventListener('click', handleCancel, { once: true, signal });
-      modalOverlay?.addEventListener('click', overlayClickHandler, { once: true, signal });
+      modalOverlay?.addEventListener('click', overlayClickHandler, { signal });
     } catch (error) {
       console.error('Error editing task:', error);
     }
@@ -223,6 +216,31 @@ async function init() {
       }
     });
   });
+
+  // Setup drag event delegation on board container
+  const board = document.querySelector('.board');
+  if (board) {
+    // Delegated dragstart handler
+    board.addEventListener('dragstart', (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains('task-item')) {
+        target.classList.add('dragging');
+        const dragEvent = e as DragEvent;
+        const taskId = target.dataset.id;
+        if (taskId) {
+          dragEvent.dataTransfer?.setData('text/plain', taskId);
+        }
+      }
+    });
+
+    // Delegated dragend handler
+    board.addEventListener('dragend', (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains('task-item')) {
+        target.classList.remove('dragging');
+      }
+    });
+  }
 
   // Initial load
   await loadTasks();
