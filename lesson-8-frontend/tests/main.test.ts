@@ -448,8 +448,8 @@ describe('TaskAPI Integration', () => {
   });
 
   it('setupTestDom should render minimal DOM correctly', () => {
-  setupTestDom();
-  expect(document.querySelector('#taskForm')).not.toBeNull();
-  expect(document.querySelector('#upcomingDeadlines')).not.toBeNull();
+    setupTestDom();
+    expect(document.querySelector('#taskForm')).not.toBeNull();
+    expect(document.querySelector('#upcomingDeadlines')).not.toBeNull();
   });
 });
