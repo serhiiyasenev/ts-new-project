@@ -92,6 +92,9 @@ async function init() {
   const editFormErrorEl = getOrCreateErrorElement(editForm, 'modal-error');
   const createFormErrorEl = getOrCreateErrorElement(taskForm, 'form-error');
 
+  // Store current edit controller to prevent listener accumulation
+  let currentEditController: AbortController | null = null;
+
   // Load and render tasks
   async function loadTasks() {
     try {
@@ -151,6 +154,8 @@ async function init() {
         editFormErrorEl.textContent = ''; // Clear error on cancel
         // Abort all listeners associated with this modal interaction
         currentEditController?.abort();
+        currentEditController?.abort();
+        currentEditController = null;
       };
 
       // Overlay click handler to close modal when clicking outside
@@ -170,6 +175,7 @@ async function init() {
           modalOverlay?.classList.remove('active');
           editForm?.classList.remove('active');
           currentEditController?.abort(); // Clean up listeners on success
+          currentEditController = null;
           await loadTasks();
         } catch (err) {
           editFormErrorEl.textContent = err instanceof Error ? err.message : 'Failed to update task. Please try again.';
