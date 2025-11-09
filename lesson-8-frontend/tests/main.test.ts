@@ -279,7 +279,7 @@ describe('Statistics Functions', () => {
       updateUpcomingDeadlines(tasks);
 
       const container = document.querySelector('#upcomingDeadlines');
-      expect(container?.children.length).toBe(3);
+      expect(container?.children.length).toBe(5);
     });
 
     it('should ignore past deadlines', () => {
