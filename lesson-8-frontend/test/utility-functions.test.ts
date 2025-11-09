@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { sortTasksByCreatedDate } from '../src/main';
 import { capitalize } from '../src/dom-utils';
-import { formDataToTask, formDataToPartialTask } from '../src/form-utils';
+import { formDataToTask, formDataToTaskUpdate } from '../src/form-utils';
 import { setupTestDom } from './helpers/helpers';
 import { createSampleTask } from './helpers/helpers';
 import type { Task } from '../src/types';
@@ -105,7 +105,7 @@ describe('Utility Functions', () => {
     });
   });
 
-  describe('formDataToPartialTask', () => {
+  describe('formDataToTaskUpdate', () => {
     it('should convert FormData to partial Task object', () => {
       const formData = new FormData();
       formData.set('title', 'Updated Task');
@@ -114,7 +114,7 @@ describe('Utility Functions', () => {
       formData.set('priority', 'medium');
       formData.set('deadline', '2025-01-15');
 
-      const partial = formDataToPartialTask(formData);
+      const partial = formDataToTaskUpdate(formData);
 
       expect(partial.title).toBe('Updated Task');
       expect(partial.description).toBe('Updated Description');
@@ -133,7 +133,7 @@ describe('Utility Functions', () => {
       formData.set('priority', 'low');
       formData.set('deadline', '');
 
-      const partial = formDataToPartialTask(formData);
+      const partial = formDataToTaskUpdate(formData);
 
       expect(partial.deadline).toBeNull();
     });
@@ -145,7 +145,7 @@ describe('Utility Functions', () => {
       formData.set('status', 'invalid_status');
       formData.set('priority', 'high');
 
-      expect(() => formDataToPartialTask(formData)).toThrow('Please select a valid status');
+      expect(() => formDataToTaskUpdate(formData)).toThrow('Please select a valid status');
     });
 
     it('should throw error for invalid priority', () => {
@@ -155,7 +155,7 @@ describe('Utility Functions', () => {
       formData.set('status', 'todo');
       formData.set('priority', 'invalid_priority');
 
-      expect(() => formDataToPartialTask(formData)).toThrow('Please select a valid priority');
+      expect(() => formDataToTaskUpdate(formData)).toThrow('Please select a valid priority');
     });
 
     it('should throw error for empty title', () => {
@@ -165,7 +165,7 @@ describe('Utility Functions', () => {
       formData.set('status', 'todo');
       formData.set('priority', 'high');
 
-      expect(() => formDataToPartialTask(formData)).toThrow('Please enter a task title');
+      expect(() => formDataToTaskUpdate(formData)).toThrow('Please enter a task title');
     });
 
     it('should throw error for empty description', () => {
@@ -175,7 +175,7 @@ describe('Utility Functions', () => {
       formData.set('status', 'todo');
       formData.set('priority', 'high');
 
-      expect(() => formDataToPartialTask(formData)).toThrow('Please enter a task description');
+      expect(() => formDataToTaskUpdate(formData)).toThrow('Please enter a task description');
     });
 
     it('should trim whitespace from title and description', () => {
@@ -185,7 +185,7 @@ describe('Utility Functions', () => {
       formData.set('status', 'todo');
       formData.set('priority', 'high');
 
-      const partial = formDataToPartialTask(formData);
+      const partial = formDataToTaskUpdate(formData);
 
       expect(partial.title).toBe('Test Task');
       expect(partial.description).toBe('Test Description');

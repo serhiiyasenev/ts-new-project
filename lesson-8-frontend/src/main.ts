@@ -3,7 +3,7 @@ import { TaskAPI } from './api';
 import type { Status, Task } from './types';
 import { createTaskHeader, createTaskMeta, createTaskActions } from './dom-utils';
 import { updateStatistics } from './stats';
-import { formDataToTask, formDataToPartialTask, fillEditForm } from './form-utils';
+import { formDataToTask, formDataToTaskUpdate, fillEditForm } from './form-utils';
 
 /**
  * Sorts tasks by creation date in descending order (newest first).
@@ -157,7 +157,7 @@ async function init() {
         
         try {
           const formData = new FormData(editForm);
-          const updates = formDataToPartialTask(formData);
+          const updates = formDataToTaskUpdate(formData);
           await TaskAPI.updateTask(task.id, { ...task, ...updates });
           modalOverlay?.classList.remove('active');
           editForm?.classList.remove('active');
