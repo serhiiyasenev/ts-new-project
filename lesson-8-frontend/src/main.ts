@@ -133,6 +133,8 @@ async function init() {
           errorEl.className = 'modal-error';
           errorEl.style.color = 'red';
           errorEl.style.marginTop = '8px';
+          errorEl.setAttribute('role', 'alert');
+          errorEl.setAttribute('aria-live', 'assertive');
           form.appendChild(errorEl);
         }
         errorEl.textContent = '';
