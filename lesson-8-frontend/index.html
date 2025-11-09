@@ -67,35 +67,35 @@
           <div class="task-form">
             <h2>Create New Task</h2>
             <form id="taskForm">
-              <label for="taskTitle">Task Title</label>
+              <label for="task-form-title">Task Title</label>
               <input
                 type="text"
-                id="taskTitle"
+                id="task-form-title"
                 name="title"
                 placeholder="Task Title"
                 required
               />
-              <label for="taskDescription">Task Description</label>
+              <label for="task-form-description">Task Description</label>
               <textarea
-                id="taskDescription"
+                id="task-form-description"
                 name="description"
                 placeholder="Task Description"
                 required
               ></textarea>
-              <label for="taskStatus">Status</label>
-              <select id="taskStatus" name="status" required>
+              <label for="task-form-status">Status</label>
+              <select id="task-form-status" name="status" required>
                 <option value="todo">Todo</option>
                 <option value="in_progress">In Progress</option>
                 <option value="done">Done</option>
               </select>
-              <label for="taskPriority">Priority</label>
-              <select id="taskPriority" name="priority" required>
+              <label for="task-form-priority">Priority</label>
+              <select id="task-form-priority" name="priority" required>
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
               </select>
-              <label for="taskDeadline">Deadline</label>
-              <input type="date" id="taskDeadline" name="deadline" />
+              <label for="task-form-deadline">Deadline</label>
+              <input type="date" id="task-form-deadline" name="deadline" />
               <button type="submit">Create Task</button>
             </form>
           </div>
