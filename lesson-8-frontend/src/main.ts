@@ -165,18 +165,36 @@ async function init() {
     }
   };
 
+  // Find or create error message element for task creation form
+  let createFormErrorEl = taskForm.querySelector('.form-error') as HTMLElement;
+  if (!createFormErrorEl) {
+    createFormErrorEl = document.createElement('div');
+    createFormErrorEl.className = 'form-error';
+    createFormErrorEl.style.color = 'red';
+    createFormErrorEl.style.marginTop = '8px';
+    createFormErrorEl.setAttribute('role', 'alert');
+    createFormErrorEl.setAttribute('aria-live', 'assertive');
+    taskForm.appendChild(createFormErrorEl);
+  }
+
   // Handle form submission
   taskForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    createFormErrorEl.textContent = ''; // Clear previous error
     
-    const formData = new FormData(taskForm);
-    const newTask = formDataToTask(formData);
-
     try {
+      const formData = new FormData(taskForm);
+      const newTask = formDataToTask(formData);
       await TaskAPI.createTask(newTask);
       taskForm.reset();
       await loadTasks();
     } catch (error) {
+      // Display validation or API errors to the user
+      if (error instanceof Error) {
+        createFormErrorEl.textContent = error.message;
+      } else {
+        createFormErrorEl.textContent = 'Failed to create task. Please try again.';
+      }
       console.error('Error creating task:', error);
     }
   });
