@@ -154,7 +154,6 @@ async function init() {
         editFormErrorEl.textContent = ''; // Clear error on cancel
         // Abort all listeners associated with this modal interaction
         currentEditController?.abort();
-        currentEditController?.abort();
         currentEditController = null;
       };
 
