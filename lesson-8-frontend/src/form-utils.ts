@@ -13,8 +13,8 @@ export function formDataToTask(formData: FormData): Omit<Task, 'id'> {
   };
 }
 
-// Convert FormData to partial task update
-export function formDataToPartialTask(formData: FormData): Partial<Omit<Task, 'id' | 'createdAt'>> {
+// Convert FormData to task update object (all fields required for update)
+export function formDataToPartialTask(formData: FormData): Omit<Task, 'id' | 'createdAt'> {
   const data = Object.fromEntries(formData);
   return {
     title: data.title as string,
