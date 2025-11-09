@@ -217,11 +217,11 @@ async function init() {
     });
   });
 
-  // Setup drag event delegation on board container
-  const board = document.querySelector('.board');
-  if (board) {
+  // Setup drag event delegation on task-list container
+  const taskList = document.querySelector('.task-list');
+  if (taskList) {
     // Delegated dragstart handler
-    board.addEventListener('dragstart', (e: Event) => {
+    taskList.addEventListener('dragstart', (e: Event) => {
       const target = e.target as HTMLElement;
       if (target.classList.contains('task-item')) {
         target.classList.add('dragging');
@@ -234,7 +234,7 @@ async function init() {
     });
 
     // Delegated dragend handler
-    board.addEventListener('dragend', (e: Event) => {
+    taskList.addEventListener('dragend', (e: Event) => {
       const target = e.target as HTMLElement;
       if (target.classList.contains('task-item')) {
         target.classList.remove('dragging');
