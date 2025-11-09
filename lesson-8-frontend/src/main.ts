@@ -49,9 +49,9 @@ function createTaskElement(task: Task, editTask: (id: string) => void, deleteTas
 }
 
 function clearTaskLists(): void {
-  document.querySelector('#todoList')!.innerHTML = '';
-  document.querySelector('#inProgressList')!.innerHTML = '';
-  document.querySelector('#doneList')!.innerHTML = '';
+  document.querySelector('#todoList')!.replaceChildren();
+  document.querySelector('#inProgressList')!.replaceChildren();
+  document.querySelector('#doneList')!.replaceChildren();
 }
 
 function attachTaskToColumn(taskEl: HTMLElement, status: Status): void {
