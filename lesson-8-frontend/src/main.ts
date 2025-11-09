@@ -266,6 +266,8 @@ async function init() {
 }
 
 // Only run init if not in test environment
+// In test mode, we skip calling init() to avoid side effects (e.g., DOM manipulation, network requests)
+// during automated testing. This ensures tests run in a controlled environment without initializing the app.
 if (import.meta.env.MODE !== 'test') {
   init();
 }
