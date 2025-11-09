@@ -166,7 +166,7 @@ async function init() {
           controller.abort(); // Clean up listeners on success
           await loadTasks();
         } catch (err) {
-          editFormErrorEl.textContent = 'Failed to update task. Please try again.';
+          editFormErrorEl.textContent = err instanceof Error ? err.message : 'Failed to update task. Please try again.';
           // Don't abort - allow retry
         }
       };
