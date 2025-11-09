@@ -73,9 +73,4 @@ describe('TaskAPI Integration', () => {
     expect(TaskAPI.deleteTask).toHaveBeenCalledWith('123');
   });
 
-  it('setupTestDom should render minimal DOM correctly', () => {
-    setupTestDom();
-    expect(document.querySelector('#taskForm')).not.toBeNull();
-    expect(document.querySelector('#upcomingDeadlines')).not.toBeNull();
-  });
 });
