@@ -2,10 +2,6 @@ import './style.css';
 import { TaskAPI } from './api';
 import type { Priority, Status, Task } from './types';
 
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
 // Capitalize first letter of a string
 export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -40,10 +36,6 @@ export function formDataToPartialTask(formData: FormData): Partial<Omit<Task, 'i
     deadline: data.deadline ? new Date(data.deadline as string) : null
   };
 }
-
-// ============================================================================
-// STATISTICS FUNCTIONS
-// ============================================================================
 
 export function updateTotalTasks(count: number): void {
   document.querySelector('#totalTasks')!.textContent = count.toString();
@@ -115,10 +107,6 @@ function updateStatistics(tasks: Task[]): void {
   updatePriorityCounts(tasks);
   updateUpcomingDeadlines(tasks);
 }
-
-// ============================================================================
-// TASK ELEMENT CREATION FUNCTIONS
-// ============================================================================
 
 export function createTaskHeader(task: Task): HTMLDivElement {
   const headerDiv = document.createElement('div');
@@ -209,10 +197,6 @@ function createTaskElement(task: Task, editTask: (id: string) => void, deleteTas
   return taskEl;
 }
 
-// ============================================================================
-// TASK RENDERING FUNCTIONS
-// ============================================================================
-
 function clearTaskLists(): void {
   document.querySelector('#todoList')!.innerHTML = '';
   document.querySelector('#inProgressList')!.innerHTML = '';
@@ -240,10 +224,6 @@ function renderTasks(tasks: Task[], editTask: (id: string) => void, deleteTask: 
   });
 }
 
-// ============================================================================
-// FORM UTILITIES
-// ============================================================================
-
 function fillEditForm(form: HTMLFormElement, task: Task): void {
   (form.elements.namedItem('title') as HTMLInputElement).value = task.title;
   (form.elements.namedItem('description') as HTMLTextAreaElement).value = task.description;
@@ -252,10 +232,6 @@ function fillEditForm(form: HTMLFormElement, task: Task): void {
   (form.elements.namedItem('deadline') as HTMLInputElement).value = 
     task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : '';
 }
-
-// ============================================================================
-// MAIN INITIALIZATION
-// ============================================================================
 
 async function init() {
   const taskForm = document.querySelector<HTMLFormElement>('#taskForm')!;
@@ -391,4 +367,24 @@ async function init() {
 // Only run init if not in test environment
 if (import.meta.env.MODE !== 'test') {
   init();
+}
+
+// Helper to create minimal DOM for Vitest
+export function setupTestDom(): void {
+  document.body.innerHTML = `
+    <div id="modal-overlay"></div>
+    <form id="taskForm"></form>
+    <form id="edit-task-form"></form>
+    <span id="totalTasks">0</span>
+    <span id="todoCount">0</span>
+    <span id="inProgressCount">0</span>
+    <span id="doneCount">0</span>
+    <span id="lowPriorityCount">0</span>
+    <span id="mediumPriorityCount">0</span>
+    <span id="highPriorityCount">0</span>
+    <div id="upcomingDeadlines"></div>
+    <div id="todoList" data-status="todo"></div>
+    <div id="inProgressList" data-status="in_progress"></div>
+    <div id="doneList" data-status="done"></div>
+  `;
 }

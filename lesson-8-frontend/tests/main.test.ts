@@ -12,6 +12,7 @@ import {
   updateUpcomingDeadlines,
   createTaskHeader,
   createTaskMeta,
+  setupTestDom
 } from '../src/main';
 
 // Mock the API module
@@ -42,36 +43,8 @@ function createSampleTask(overrides: Partial<Task> = {}): Task {
   };
 }
 
-// Setup DOM environment for each test
 beforeEach(() => {
-  document.body.innerHTML = `
-    <div id="modal-overlay"></div>
-    <form id="task-form">
-      <input name="title" />
-      <input name="description" />
-      <select name="status"></select>
-      <select name="priority"></select>
-      <input name="deadline" />
-    </form>
-    <form id="edit-task-form">
-      <input name="title" />
-      <input name="description" />
-      <select name="status"></select>
-      <select name="priority"></select>
-      <input name="deadline" />
-    </form>
-    <span id="totalTasks">0</span>
-    <span id="todoCount">0</span>
-    <span id="inProgressCount">0</span>
-    <span id="doneCount">0</span>
-    <span id="lowPriorityCount">0</span>
-    <span id="mediumPriorityCount">0</span>
-    <span id="highPriorityCount">0</span>
-    <div id="upcomingDeadlines"></div>
-    <div id="todo-tasks" data-status="todo"></div>
-    <div id="in-progress-tasks" data-status="in_progress"></div>
-    <div id="done-tasks" data-status="done"></div>
-  `;
+  setupTestDom();
 });
 
 afterEach(() => {
