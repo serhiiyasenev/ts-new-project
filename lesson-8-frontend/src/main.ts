@@ -5,7 +5,12 @@ import { createTaskHeader, createTaskMeta, createTaskActions } from './dom-utils
 import { updateStatistics } from './stats';
 import { formDataToTask, formDataToPartialTask, fillEditForm } from './form-utils';
 
-// Sort tasks by creation date (newest first)
+/**
+ * Sorts tasks by creation date in descending order (newest first).
+ * Creates a new array and does not mutate the original.
+ * @param tasks - Array of tasks to sort
+ * @returns New array of tasks sorted by creation date (newest first)
+ */
 export function sortTasksByCreatedDate(tasks: Task[]): Task[] {
   return [...tasks].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
