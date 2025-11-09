@@ -116,6 +116,8 @@ export function updateUpcomingDeadlines(tasks: Task[]): void {
   if (!container) return;
   
   // Clear all children
+  // Using replaceChildren() is the preferred modern approach for clearing children.
+  // It is safer and more performant than setting innerHTML = '', as it avoids potential XSS risks and unnecessary HTML parsing.
   container.replaceChildren();
   
   if (upcomingDeadlines.length) {
