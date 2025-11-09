@@ -28,11 +28,11 @@ function getOrCreateErrorElement(form: HTMLElement, className: string): HTMLElem
   if (!errorEl) {
     errorEl = document.createElement('div');
     errorEl.className = className;
-    errorEl.setAttribute('role', 'alert');
-    errorEl.setAttribute('aria-live', 'assertive');
     form.appendChild(errorEl);
   }
-  // ARIA attributes are only set when creating new element (not on every call)
+  // Ensure ARIA attributes are set on every call for accessibility
+  errorEl.setAttribute('role', 'alert');
+  errorEl.setAttribute('aria-live', 'assertive');
   return errorEl;
 }
 
