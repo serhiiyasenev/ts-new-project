@@ -92,6 +92,9 @@ async function init() {
   const editFormErrorEl = getOrCreateErrorElement(editForm, 'modal-error');
   const createFormErrorEl = getOrCreateErrorElement(taskForm, 'form-error');
 
+  // Store current edit controller to prevent listener accumulation
+  let currentEditController: AbortController | null = null;
+
   // Load and render tasks
   async function loadTasks() {
     try {
@@ -121,6 +124,9 @@ async function init() {
   // Edit task handler
   const editTask = async (id: string) => {
     try {
+      // Abort any existing edit session to prevent listener accumulation
+      currentEditController?.abort();
+      
       const task = await TaskAPI.getTaskById(id);
       const modalOverlay = document.querySelector('.modal-overlay');
       
@@ -135,8 +141,8 @@ async function init() {
       editFormErrorEl.textContent = '';
 
       // Controller to auto-clean listeners on cancel/submit
-      const controller = new AbortController();
-      const { signal } = controller;
+      currentEditController = new AbortController();
+      const { signal } = currentEditController;
 
       // Handle cancel
       const handleCancel = () => {
@@ -144,7 +150,8 @@ async function init() {
         editForm?.classList.remove('active');
         editFormErrorEl.textContent = ''; // Clear error on cancel
         // Abort all listeners associated with this modal interaction
-        controller.abort();
+        currentEditController?.abort();
+        currentEditController = null;
       };
 
       // Overlay click handler to close modal when clicking outside
@@ -163,7 +170,8 @@ async function init() {
           await TaskAPI.updateTask(task.id, { ...task, ...updates });
           modalOverlay?.classList.remove('active');
           editForm?.classList.remove('active');
-          controller.abort(); // Clean up listeners on success
+          currentEditController?.abort(); // Clean up listeners on success
+          currentEditController = null;
           await loadTasks();
         } catch (err) {
           editFormErrorEl.textContent = err instanceof Error ? err.message : 'Failed to update task. Please try again.';
