@@ -216,6 +216,7 @@ if (import.meta.env.MODE !== 'test') {
   init();
 }
 
+// Health check for backend availability
 async function checkBackendHealth(): Promise<boolean> {
   try {
     const response = await fetch('http://localhost:3000/tasks', { method: 'GET' });
