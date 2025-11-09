@@ -48,7 +48,7 @@ function validateFormData(data: Record<string, FormDataEntryValue>) {
   }
   
   if (!isValidStatus(data.status)) {
-    throw new Error('Please select a valid status (To Do, In Progress, or Done)');
+    throw new Error('Please select a valid status');
   }
   
   if (!isValidPriority(data.priority)) {
