@@ -118,9 +118,15 @@ async function init() {
     }
   };
 
+  // Store the controller at a higher scope to allow cleanup between edit sessions
+  let currentEditController: AbortController | null = null;
+
   // Edit task handler
   const editTask = async (id: string) => {
     try {
+      // Abort any existing edit session to prevent multiple listeners
+      currentEditController?.abort();
+
       const task = await TaskAPI.getTaskById(id);
       const modalOverlay = document.querySelector('.modal-overlay');
       
@@ -135,8 +141,8 @@ async function init() {
       editFormErrorEl.textContent = '';
 
       // Controller to auto-clean listeners on cancel/submit
-      const controller = new AbortController();
-      const { signal } = controller;
+      currentEditController = new AbortController();
+      const { signal } = currentEditController;
 
       // Handle cancel
       const handleCancel = () => {
@@ -144,7 +150,7 @@ async function init() {
         editForm?.classList.remove('active');
         editFormErrorEl.textContent = ''; // Clear error on cancel
         // Abort all listeners associated with this modal interaction
-        controller.abort();
+        currentEditController?.abort();
       };
 
       // Overlay click handler to close modal when clicking outside
@@ -163,7 +169,7 @@ async function init() {
           await TaskAPI.updateTask(task.id, { ...task, ...updates });
           modalOverlay?.classList.remove('active');
           editForm?.classList.remove('active');
-          controller.abort(); // Clean up listeners on success
+          currentEditController?.abort(); // Clean up listeners on success
           await loadTasks();
         } catch (err) {
           editFormErrorEl.textContent = err instanceof Error ? err.message : 'Failed to update task. Please try again.';
