@@ -139,12 +139,26 @@ async function init() {
       // Handle form submission
       const handleSubmit = async (e: Event) => {
         e.preventDefault();
-        const formData = new FormData(form);
-        const updates = formDataToPartialTask(formData);
-        await TaskAPI.updateTask(task.id, { ...task, ...updates });
-        modalOverlay?.classList.remove('active');
-        form?.classList.remove('active');
-        await loadTasks();
+        // Find or create error message element
+        let errorEl = form.querySelector('.modal-error') as HTMLElement;
+        if (!errorEl) {
+          errorEl = document.createElement('div');
+          errorEl.className = 'modal-error';
+          errorEl.style.color = 'red';
+          errorEl.style.marginTop = '8px';
+          form.appendChild(errorEl);
+        }
+        errorEl.textContent = '';
+        try {
+          const formData = new FormData(form);
+          const updates = formDataToPartialTask(formData);
+          await TaskAPI.updateTask(task.id, { ...task, ...updates });
+          modalOverlay?.classList.remove('active');
+          form?.classList.remove('active');
+          await loadTasks();
+        } catch (err) {
+          errorEl.textContent = 'Failed to update task. Please try again.';
+        }
       };
 
       // Overlay click handler to close modal when clicking outside
