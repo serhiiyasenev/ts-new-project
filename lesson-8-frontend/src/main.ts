@@ -122,7 +122,6 @@ async function init() {
   };
 
   // Track current edit session controller for cleanup
-  let currentEditController: AbortController | null = null;
 
   // Edit task handler
   const editTask = async (id: string) => {
