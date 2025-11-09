@@ -33,7 +33,7 @@ export function updateUpcomingDeadlines(tasks: Task[]): void {
     .slice(0, 5);
 
   const container = document.querySelector('#upcomingDeadlines')!;
-  container.innerHTML = '';
+  container.replaceChildren();
   
   if (upcomingDeadlines.length) {
     upcomingDeadlines.forEach(task => {
