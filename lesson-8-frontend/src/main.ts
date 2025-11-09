@@ -140,6 +140,7 @@ async function init() {
           await loadTasks();
         } catch (err) {
           errorEl.textContent = 'Failed to update task. Please try again.';
+          controller.abort();
         }
       };
 
