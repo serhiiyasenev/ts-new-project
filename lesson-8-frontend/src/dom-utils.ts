@@ -19,7 +19,9 @@ export function capitalize(str: string): string {
  * - A priority badge with appropriate CSS class
  * 
  * @param task - The task object to create a header for
- * @param doc - Optional document object for dependency injection (defaults to global document)
+ * @param doc - Optional document object for dependency injection. Defaults to global document.
+ *              This parameter exists to support testing with happy-dom in Vitest without requiring
+ *              a full browser environment. Tests can pass a mock document to verify DOM creation.
  * @returns A div element with class 'task-header'
  */
 export function createTaskHeader(task: Task, doc: Document = document): HTMLDivElement {
@@ -49,7 +51,9 @@ export function createTaskHeader(task: Task, doc: Document = document): HTMLDivE
  * - Deadline date (only if task has a deadline)
  * 
  * @param task - The task object to create metadata for
- * @param doc - Optional document object for dependency injection (defaults to global document)
+ * @param doc - Optional document object for dependency injection. Defaults to global document.
+ *              This parameter exists to support testing with happy-dom in Vitest without requiring
+ *              a full browser environment. Tests can pass a mock document to verify DOM creation.
  * @returns A div element with class 'task-meta'
  */
 export function createTaskMeta(task: Task, doc: Document = document): HTMLDivElement {
@@ -76,7 +80,9 @@ export function createTaskMeta(task: Task, doc: Document = document): HTMLDivEle
  * @param task - The task object these actions are for
  * @param editTask - Callback function to execute when Edit button is clicked
  * @param deleteTask - Callback function to execute when Delete button is clicked
- * @param doc - Optional document object for dependency injection (defaults to global document)
+ * @param doc - Optional document object for dependency injection. Defaults to global document.
+ *              This parameter exists to support testing with happy-dom in Vitest without requiring
+ *              a full browser environment. Tests can pass a mock document to verify DOM creation.
  * @returns A div element with class 'task-actions' containing the buttons
  */
 export function createTaskActions(

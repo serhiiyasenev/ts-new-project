@@ -67,35 +67,35 @@
           <div class="task-form">
             <h2>Create New Task</h2>
             <form id="taskForm">
-              <label for="task-form-title">Task Title</label>
+              <label for="title">Task Title</label>
               <input
                 type="text"
-                id="task-form-title"
+                id="title"
                 name="title"
                 placeholder="e.g., Complete project documentation"
                 required
               />
-              <label for="task-form-description">Task Description</label>
+              <label for="description">Task Description</label>
               <textarea
-                id="task-form-description"
+                id="description"
                 name="description"
                 placeholder="e.g., List the steps required to finish the documentation"
                 required
               ></textarea>
-              <label for="task-form-status">Status</label>
-              <select id="task-form-status" name="status" required>
+              <label for="status">Status</label>
+              <select id="status" name="status" required>
                 <option value="todo">Todo</option>
                 <option value="in_progress">In Progress</option>
                 <option value="done">Done</option>
               </select>
-              <label for="task-form-priority">Priority</label>
-              <select id="task-form-priority" name="priority" required>
+              <label for="priority">Priority</label>
+              <select id="priority" name="priority" required>
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
               </select>
-              <label for="task-form-deadline">Deadline</label>
-              <input type="date" id="task-form-deadline" name="deadline" />
+              <label for="deadline">Deadline</label>
+              <input type="date" id="deadline" name="deadline" />
               <button type="submit">Create Task</button>
             </form>
           </div>
