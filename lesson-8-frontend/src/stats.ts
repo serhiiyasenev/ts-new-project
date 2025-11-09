@@ -5,11 +5,10 @@ export function updateTotalTasks(count: number): void {
 }
 
 export function updateStatusCounts(tasks: Task[]): void {
-  const counts = {
-    todo: tasks.filter(t => t.status === 'todo').length,
-    in_progress: tasks.filter(t => t.status === 'in_progress').length,
-    done: tasks.filter(t => t.status === 'done').length
-  };
+  const counts = tasks.reduce((acc, t) => {
+    acc[t.status]++;
+    return acc;
+  }, { todo: 0, in_progress: 0, done: 0 });
 
   document.querySelector('#todoCount')!.textContent = counts.todo.toString();
   document.querySelector('#inProgressCount')!.textContent = counts.in_progress.toString();
@@ -17,11 +16,10 @@ export function updateStatusCounts(tasks: Task[]): void {
 }
 
 export function updatePriorityCounts(tasks: Task[]): void {
-  const counts = {
-    high: tasks.filter(t => t.priority === 'high').length,
-    medium: tasks.filter(t => t.priority === 'medium').length,
-    low: tasks.filter(t => t.priority === 'low').length
-  };
+  const counts = tasks.reduce((acc, t) => {
+    acc[t.priority]++;
+    return acc;
+  }, { high: 0, medium: 0, low: 0 });
 
   document.querySelector('#highPriorityCount')!.textContent = counts.high.toString();
   document.querySelector('#mediumPriorityCount')!.textContent = counts.medium.toString();

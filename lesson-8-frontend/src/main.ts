@@ -5,6 +5,9 @@ import { createTaskHeader, createTaskMeta, createTaskActions } from './dom-utils
 import { updateStatistics } from './stats';
 import { formDataToTask, formDataToPartialTask, fillEditForm } from './form-utils';
 
+// Backend API configuration - uses same URL as TaskAPI
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 // Sort tasks by creation date (newest first)
 export function sortTasksByCreatedDate(tasks: Task[]): Task[] {
   return [...tasks].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -70,6 +73,16 @@ function renderTasks(tasks: Task[], editTask: (id: string) => void, deleteTask: 
   });
 }
 
+// Health check for backend availability
+async function checkBackendHealth(): Promise<boolean> {
+  try {
+    const response = await fetch(`${BACKEND_URL}/tasks`, { method: 'GET' });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 async function init() {
   const taskForm = document.querySelector<HTMLFormElement>('#taskForm')!;
   const backendOk = await checkBackendHealth();
@@ -77,7 +90,7 @@ async function init() {
 
   if (!backendOk) {
     backendStatus.style.display = 'block';
-    console.error('Backend is not available at http://localhost:3000');
+    console.error(`Backend is not available at ${BACKEND_URL}`);
     return;
   } else {
     backendStatus.style.display = 'none';
@@ -214,14 +227,4 @@ async function init() {
 // Only run init if not in test environment
 if (import.meta.env.MODE !== 'test') {
   init();
-}
-
-// Health check for backend availability
-async function checkBackendHealth(): Promise<boolean> {
-  try {
-    const response = await fetch('http://localhost:3000/tasks', { method: 'GET' });
-    return response.ok;
-  } catch {
-    return false;
-  }
 }
