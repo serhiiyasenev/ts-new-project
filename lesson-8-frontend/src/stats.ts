@@ -123,6 +123,7 @@ export function updateUpcomingDeadlines(tasks: Task[]): void {
   const container = document.querySelector('#upcomingDeadlines');
   if (!container) return;
   
+  // Clear all children
   container.replaceChildren();
   
   if (upcomingDeadlines.length) {
