@@ -43,7 +43,7 @@ export function updateUpcomingDeadlines(tasks: Task[]): void {
       const label = document.createElement('span');
       label.className = 'stat-label';
       const truncatedTitle = task.title.length > 20 
-        ? task.title.slice(0, 20).trimEnd() + '...' 
+        ? task.title.slice(0, 20) + '...' 
         : task.title;
       label.textContent = truncatedTitle;
       
