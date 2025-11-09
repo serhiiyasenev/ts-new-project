@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { setupTestDom } from './helpers';
-import { createSampleTask } from './helpers';
+import { setupTestDom } from './helpers/helpers';
+import { createSampleTask } from './helpers/helpers';
 import { 
   updateTotalTasks, 
   updateStatusCounts, 

@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { sortTasksByCreatedDate } from '../src/main';
 import { capitalize } from '../src/dom-utils';
 import { formDataToTask, formDataToPartialTask } from '../src/form-utils';
-import { setupTestDom } from './helpers';
-import { createSampleTask } from './helpers';
+import { setupTestDom } from './helpers/helpers';
+import { createSampleTask } from './helpers/helpers';
 import type { Task } from '../src/types';
 
 beforeEach(() => {

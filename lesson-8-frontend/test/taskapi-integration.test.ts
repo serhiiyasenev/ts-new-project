@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import type { Mock } from 'vitest';
 import { TaskAPI } from '../src/api';
-import { setupTestDom } from './helpers';
-import { createSampleTask } from './helpers';
+import { setupTestDom } from './helpers/helpers';
+import { createSampleTask } from './helpers/helpers';
 import type { Task } from '../src/types';
 
 // Mock the API module
@@ -71,11 +71,5 @@ describe('TaskAPI Integration', () => {
     await TaskAPI.deleteTask('123');
 
     expect(TaskAPI.deleteTask).toHaveBeenCalledWith('123');
-  });
-
-  it('setupTestDom should render minimal DOM correctly', () => {
-    setupTestDom();
-    expect(document.querySelector('#taskForm')).not.toBeNull();
-    expect(document.querySelector('#upcomingDeadlines')).not.toBeNull();
   });
 });

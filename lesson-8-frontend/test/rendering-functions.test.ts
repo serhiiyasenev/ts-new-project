@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { capitalize, createTaskHeader, createTaskMeta } from '../src/dom-utils';
-import { setupTestDom } from './helpers';
-import { createSampleTask } from './helpers';
+import { setupTestDom } from './helpers/helpers';
+import { createSampleTask } from './helpers/helpers';
 
 beforeEach(() => {
   setupTestDom();
