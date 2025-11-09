@@ -267,7 +267,7 @@ async function init() {
       }
     });
 
-    // Delegated drag and drop end handler
+    // Delegated drag end handler
     taskList.addEventListener('dragend', (e: Event) => {
       const target = e.target as HTMLElement;
       if (target.classList.contains('task-item')) {
