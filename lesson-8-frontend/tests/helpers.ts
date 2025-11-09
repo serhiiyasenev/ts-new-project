@@ -1,3 +1,21 @@
+import type { Task } from '../src/types';
+
+/**
+ * Helper function to create a sample task for testing
+ */
+export function createSampleTask(overrides: Partial<Task> = {}): Task {
+  return {
+    id: '1',
+    title: 'Test Task',
+    description: 'Test Description',
+    status: 'todo',
+    priority: 'medium',
+    createdAt: new Date('2024-01-01'),
+    deadline: null,
+    ...overrides,
+  };
+}
+
 // Helper to create minimal DOM for Vitest
 export function setupTestDom(): void {
   document.body.innerHTML = `

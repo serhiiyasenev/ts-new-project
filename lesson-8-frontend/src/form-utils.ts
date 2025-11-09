@@ -32,17 +32,14 @@ function parseDeadline(value: unknown): Date | null {
 }
 
 /**
- * Converts FormData from task creation form to a Task object (without id).
- * Validates all fields and throws an error if validation fails.
+ * Validates form data fields and returns validated values.
+ * Shared validation logic used by both formDataToTask and formDataToPartialTask.
  * 
- * @param formData - FormData object from the task form
- * @returns Task object without id field
+ * @param data - Object from FormData entries
+ * @returns Validated and trimmed form fields
  * @throws Error if validation fails
  */
-export function formDataToTask(formData: FormData): Omit<Task, 'id'> {
-  const data = Object.fromEntries(formData);
-  
-  // Validate required fields
+function validateFormData(data: Record<string, FormDataEntryValue>) {
   const title = data.title as string;
   const description = data.description as string;
   
@@ -67,8 +64,25 @@ export function formDataToTask(formData: FormData): Omit<Task, 'id'> {
     description: description.trim(),
     status: data.status as Status,
     priority: data.priority as Priority,
-    createdAt: new Date(),
     deadline: parseDeadline(data.deadline)
+  };
+}
+
+/**
+ * Converts FormData from task creation form to a Task object (without id).
+ * Validates all fields and throws an error if validation fails.
+ * 
+ * @param formData - FormData object from the task form
+ * @returns Task object without id field
+ * @throws Error if validation fails
+ */
+export function formDataToTask(formData: FormData): Omit<Task, 'id'> {
+  const data = Object.fromEntries(formData);
+  const validated = validateFormData(data);
+  
+  return {
+    ...validated,
+    createdAt: new Date()
   };
 }
 
@@ -82,34 +96,7 @@ export function formDataToTask(formData: FormData): Omit<Task, 'id'> {
  */
 export function formDataToPartialTask(formData: FormData): Omit<Task, 'id' | 'createdAt'> {
   const data = Object.fromEntries(formData);
-  
-  // Validate required fields
-  const title = data.title as string;
-  const description = data.description as string;
-  
-  if (!title || title.trim() === '') {
-    throw new Error('Title is required');
-  }
-  
-  if (!description || description.trim() === '') {
-    throw new Error('Description is required');
-  }
-  
-  if (!isValidStatus(data.status)) {
-    throw new Error(`Invalid status: ${data.status}. Must be one of: ${VALID_STATUSES.join(', ')}`);
-  }
-  
-  if (!isValidPriority(data.priority)) {
-    throw new Error(`Invalid priority: ${data.priority}. Must be one of: ${VALID_PRIORITIES.join(', ')}`);
-  }
-  
-  return {
-    title: title.trim(),
-    description: description.trim(),
-    status: data.status as Status,
-    priority: data.priority as Priority,
-    deadline: parseDeadline(data.deadline)
-  };
+  return validateFormData(data);
 }
 
 /**
@@ -127,4 +114,3 @@ export function fillEditForm(form: HTMLFormElement, task: Task): void {
   (form.elements.namedItem('deadline') as HTMLInputElement).value = 
     task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : '';
 }
-
