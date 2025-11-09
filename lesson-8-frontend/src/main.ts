@@ -106,6 +106,19 @@ async function init() {
     }
   };
 
+  // Find or create error message element for edit form
+  const editForm = document.querySelector('.task-edit-form') as HTMLFormElement;
+  let editFormErrorEl = editForm.querySelector('.modal-error') as HTMLElement;
+  if (!editFormErrorEl) {
+    editFormErrorEl = document.createElement('div');
+    editFormErrorEl.className = 'modal-error';
+    editFormErrorEl.style.color = 'red';
+    editFormErrorEl.style.marginTop = '8px';
+    editFormErrorEl.setAttribute('role', 'alert');
+    editFormErrorEl.setAttribute('aria-live', 'assertive');
+    editForm.appendChild(editFormErrorEl);
+  }
+
   // Edit task handler
   const editTask = async (id: string) => {
     try {
@@ -159,6 +172,20 @@ async function init() {
           // Don't abort - allow retry
         }
       };
+
+      // Handle cancel
+      const handleCancel = () => {
+        modalOverlay?.classList.remove('active');
+        form?.classList.remove('active');
+        editFormErrorEl.textContent = ''; // Clear error on cancel
+        // Abort all listeners associated with this modal interaction
+        controller.abort();
+      };
+
+      // Overlay click handler to close modal when clicking outside
+      function overlayClickHandler(e: Event) {
+        if (e.target === modalOverlay) handleCancel();
+      }
 
       form.addEventListener('submit', handleSubmit, { signal });
       form.querySelector('.cancel')?.addEventListener('click', handleCancel, { signal });
