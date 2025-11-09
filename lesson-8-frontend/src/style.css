@@ -394,3 +394,12 @@ button:hover {
   margin: 20px auto;
   max-width: 600px;
 }
+
+/* Error message styles */
+.form-error,
+.modal-error {
+  color: #b00020;
+  margin-top: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}

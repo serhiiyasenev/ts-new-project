@@ -15,6 +15,26 @@ export function sortTasksByCreatedDate(tasks: Task[]): Task[] {
   return [...tasks].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
+/**
+ * Creates or retrieves an error message element for a form.
+ * The element is created once and reused for all error displays.
+ * 
+ * @param form - The form element to attach the error element to
+ * @param className - CSS class name for the error element
+ * @returns The error message element
+ */
+function getOrCreateErrorElement(form: HTMLElement, className: string): HTMLElement {
+  let errorEl = form.querySelector(`.${className}`) as HTMLElement;
+  if (!errorEl) {
+    errorEl = document.createElement('div');
+    errorEl.className = className;
+    errorEl.setAttribute('role', 'alert');
+    errorEl.setAttribute('aria-live', 'assertive');
+    form.appendChild(errorEl);
+  }
+  return errorEl;
+}
+
 function createTaskElement(task: Task, editTask: (id: string) => void, deleteTask: (id: string) => void): HTMLDivElement {
   const taskEl = document.createElement('div');
   taskEl.className = 'task-item';
@@ -68,17 +88,9 @@ async function init() {
   const backendStatus = document.querySelector<HTMLDivElement>('#backendStatus')!;
   const editForm = document.querySelector('.task-edit-form') as HTMLFormElement;
   
-  // Create error message element for edit form once
-  let editFormErrorEl = editForm.querySelector('.modal-error') as HTMLElement;
-  if (!editFormErrorEl) {
-    editFormErrorEl = document.createElement('div');
-    editFormErrorEl.className = 'modal-error';
-    editFormErrorEl.style.color = 'red';
-    editFormErrorEl.style.marginTop = '8px';
-    editFormErrorEl.setAttribute('role', 'alert');
-    editFormErrorEl.setAttribute('aria-live', 'assertive');
-    editForm.appendChild(editFormErrorEl);
-  }
+  // Create error message elements once using helper function
+  const editFormErrorEl = getOrCreateErrorElement(editForm, 'modal-error');
+  const createFormErrorEl = getOrCreateErrorElement(taskForm, 'form-error');
 
   // Load and render tasks
   async function loadTasks() {
@@ -106,32 +118,18 @@ async function init() {
     }
   };
 
-  // Find or create error message element for edit form
-  const editForm = document.querySelector('.task-edit-form') as HTMLFormElement;
-  let editFormErrorEl = editForm.querySelector('.modal-error') as HTMLElement;
-  if (!editFormErrorEl) {
-    editFormErrorEl = document.createElement('div');
-    editFormErrorEl.className = 'modal-error';
-    editFormErrorEl.style.color = 'red';
-    editFormErrorEl.style.marginTop = '8px';
-    editFormErrorEl.setAttribute('role', 'alert');
-    editFormErrorEl.setAttribute('aria-live', 'assertive');
-    editForm.appendChild(editFormErrorEl);
-  }
-
   // Edit task handler
   const editTask = async (id: string) => {
     try {
       const task = await TaskAPI.getTaskById(id);
       const modalOverlay = document.querySelector('.modal-overlay');
-      const form = editForm;
       
       // Fill form with task data
-      fillEditForm(form, task);
+      fillEditForm(editForm, task);
 
       // Show modal
       modalOverlay?.classList.add('active');
-      form?.classList.add('active');
+      editForm?.classList.add('active');
 
       // Clear previous error
       editFormErrorEl.textContent = '';
@@ -143,16 +141,16 @@ async function init() {
       // Handle cancel
       const handleCancel = () => {
         modalOverlay?.classList.remove('active');
-        form?.classList.remove('active');
+        editForm?.classList.remove('active');
         editFormErrorEl.textContent = ''; // Clear error on cancel
         // Abort all listeners associated with this modal interaction
         controller.abort();
       };
 
       // Overlay click handler to close modal when clicking outside
-      function overlayClickHandler(e: Event) {
+      const overlayClickHandler = (e: Event) => {
         if (e.target === modalOverlay) handleCancel();
-      }
+      };
 
       // Handle form submission
       const handleSubmit = async (e: Event) => {
@@ -160,11 +158,11 @@ async function init() {
         editFormErrorEl.textContent = ''; // Clear error on new attempt
         
         try {
-          const formData = new FormData(form);
+          const formData = new FormData(editForm);
           const updates = formDataToPartialTask(formData);
           await TaskAPI.updateTask(task.id, { ...task, ...updates });
           modalOverlay?.classList.remove('active');
-          form?.classList.remove('active');
+          editForm?.classList.remove('active');
           controller.abort(); // Clean up listeners on success
           await loadTasks();
         } catch (err) {
@@ -173,39 +171,13 @@ async function init() {
         }
       };
 
-      // Handle cancel
-      const handleCancel = () => {
-        modalOverlay?.classList.remove('active');
-        form?.classList.remove('active');
-        editFormErrorEl.textContent = ''; // Clear error on cancel
-        // Abort all listeners associated with this modal interaction
-        controller.abort();
-      };
-
-      // Overlay click handler to close modal when clicking outside
-      function overlayClickHandler(e: Event) {
-        if (e.target === modalOverlay) handleCancel();
-      }
-
-      form.addEventListener('submit', handleSubmit, { signal });
-      form.querySelector('.cancel')?.addEventListener('click', handleCancel, { signal });
+      editForm.addEventListener('submit', handleSubmit, { signal });
+      editForm.querySelector('.cancel')?.addEventListener('click', handleCancel, { signal });
       modalOverlay?.addEventListener('click', overlayClickHandler, { signal });
     } catch (error) {
       console.error('Error editing task:', error);
     }
   };
-
-  // Find or create error message element for task creation form
-  let createFormErrorEl = taskForm.querySelector('.form-error') as HTMLElement;
-  if (!createFormErrorEl) {
-    createFormErrorEl = document.createElement('div');
-    createFormErrorEl.className = 'form-error';
-    createFormErrorEl.style.color = 'red';
-    createFormErrorEl.style.marginTop = '8px';
-    createFormErrorEl.setAttribute('role', 'alert');
-    createFormErrorEl.setAttribute('aria-live', 'assertive');
-    taskForm.appendChild(createFormErrorEl);
-  }
 
   // Handle form submission
   taskForm.addEventListener('submit', async (e) => {
