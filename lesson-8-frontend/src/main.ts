@@ -158,7 +158,7 @@ async function init() {
       };
 
       form.addEventListener('submit', handleSubmit, { signal });
-      form.querySelector('.cancel')?.addEventListener('click', handleCancel, { once: true, signal });
+      form.querySelector('.cancel')?.addEventListener('click', handleCancel, { signal });
       modalOverlay?.addEventListener('click', overlayClickHandler, { signal });
     } catch (error) {
       console.error('Error editing task:', error);
