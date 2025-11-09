@@ -388,7 +388,7 @@ describe('Statistics Functions', () => {
 
       const container = document.querySelector('#upcomingDeadlines');
       const label = container?.querySelector('.stat-label');
-      expect(label?.textContent).toBe('This is a very long...');
+      expect(label?.textContent).toBe('This is a very long ...');
     });
   });
 });
