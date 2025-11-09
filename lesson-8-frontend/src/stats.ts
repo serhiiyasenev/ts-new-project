@@ -50,7 +50,8 @@ export function updatePriorityCounts(tasks: Task[]): void {
  * Updates the upcoming deadlines display in the DOM.
  * Shows up to 5 tasks with future deadlines, sorted by date (earliest first).
  * Titles longer than 20 characters are truncated with '...'.
- * Modifies the #upcomingDeadlines element's content.
+ * Modifies the #upcomingDeadlines element's content by first clearing all existing children,
+ * then populating it with deadline items or a "No upcoming deadlines" message.
  * 
  * @param tasks - Array of tasks to check for upcoming deadlines
  */
