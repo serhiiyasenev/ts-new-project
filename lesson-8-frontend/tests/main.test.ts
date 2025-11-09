@@ -3,9 +3,16 @@ import type { Mock } from 'vitest';
 import type { Task } from '../src/types';
 import { sortTasksByCreatedDate } from '../src/main';
 import { capitalize, createTaskHeader, createTaskMeta } from '../src/dom-utils';
-import { updateTotalTasks, updateStatusCounts, updatePriorityCounts, updateUpcomingDeadlines } from '../src/stats';
-import { formDataToTask, formDataToPartialTask } from '../src/form-utils';
-import { setupTestDom } from '../src/setupTestDom';
+import { formDataToTask, formDataToPartialTask} from '../src/form-utils';
+import { setupTestDom } from './setupTestDom';
+import { 
+  updateTotalTasks, 
+  updateStatusCounts, 
+  updatePriorityCounts, 
+  updateUpcomingDeadlines,
+  MAX_UPCOMING_DEADLINES,
+  MAX_DEADLINE_TITLE_LENGTH 
+} from '../src/stats';
 
 // Mock the API module
 vi.mock('../src/api', () => ({
@@ -322,7 +329,7 @@ describe('Statistics Functions', () => {
       expect(container?.children[1].textContent).toContain('Task 1');
     });
 
-    it('should display max 5 upcoming deadlines', () => {
+    it(`should display max ${MAX_UPCOMING_DEADLINES} upcoming deadlines`, () => {
       const tasks: Task[] = Array.from({ length: 10 }, (_, i) => {
         const deadline = new Date();
         deadline.setDate(deadline.getDate() + i + 1);
@@ -332,7 +339,7 @@ describe('Statistics Functions', () => {
       updateUpcomingDeadlines(tasks);
 
       const container = document.querySelector('#upcomingDeadlines');
-      expect(container?.children.length).toBe(5);
+      expect(container?.children.length).toBe(MAX_UPCOMING_DEADLINES);
     });
 
     it('should ignore past deadlines', () => {
@@ -375,7 +382,7 @@ describe('Statistics Functions', () => {
       expect(container?.children.length).toBe(1);
     });
 
-    it('should truncate long task titles to 20 characters', () => {
+    it(`should truncate long task titles to ${MAX_DEADLINE_TITLE_LENGTH} characters`, () => {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
 
@@ -388,7 +395,9 @@ describe('Statistics Functions', () => {
 
       const container = document.querySelector('#upcomingDeadlines');
       const label = container?.querySelector('.stat-label');
-      expect(label?.textContent).toBe('This is a very long ...');
+      // Expected: first MAX_DEADLINE_TITLE_LENGTH chars + '...'
+      const expectedText = longTitle.slice(0, MAX_DEADLINE_TITLE_LENGTH) + '...';
+      expect(label?.textContent).toBe(expectedText);
     });
   });
 });

@@ -1,5 +1,9 @@
 import type { Task } from './types';
 
+// Configuration constants - exported for use in tests
+export const MAX_UPCOMING_DEADLINES = 5;
+export const MAX_DEADLINE_TITLE_LENGTH = 20;
+
 /**
  * Updates the total tasks count display in the DOM.
  * Modifies the #totalTasks element's text content.
@@ -7,7 +11,10 @@ import type { Task } from './types';
  * @param count - The total number of tasks
  */
 export function updateTotalTasks(count: number): void {
-  document.querySelector('#totalTasks')!.textContent = count.toString();
+  const element = document.querySelector('#totalTasks');
+  if (element) {
+    element.textContent = count.toString();
+  }
 }
 
 /**
@@ -23,9 +30,13 @@ export function updateStatusCounts(tasks: Task[]): void {
     return acc;
   }, { todo: 0, in_progress: 0, done: 0 });
 
-  document.querySelector('#todoCount')!.textContent = counts.todo.toString();
-  document.querySelector('#inProgressCount')!.textContent = counts.in_progress.toString();
-  document.querySelector('#doneCount')!.textContent = counts.done.toString();
+  const todoEl = document.querySelector('#todoCount');
+  const inProgressEl = document.querySelector('#inProgressCount');
+  const doneEl = document.querySelector('#doneCount');
+  
+  if (todoEl) todoEl.textContent = counts.todo.toString();
+  if (inProgressEl) inProgressEl.textContent = counts.in_progress.toString();
+  if (doneEl) doneEl.textContent = counts.done.toString();
 }
 
 /**
@@ -41,15 +52,19 @@ export function updatePriorityCounts(tasks: Task[]): void {
     return acc;
   }, { high: 0, medium: 0, low: 0 });
 
-  document.querySelector('#highPriorityCount')!.textContent = counts.high.toString();
-  document.querySelector('#mediumPriorityCount')!.textContent = counts.medium.toString();
-  document.querySelector('#lowPriorityCount')!.textContent = counts.low.toString();
+  const highEl = document.querySelector('#highPriorityCount');
+  const mediumEl = document.querySelector('#mediumPriorityCount');
+  const lowEl = document.querySelector('#lowPriorityCount');
+  
+  if (highEl) highEl.textContent = counts.high.toString();
+  if (mediumEl) mediumEl.textContent = counts.medium.toString();
+  if (lowEl) lowEl.textContent = counts.low.toString();
 }
 
 /**
  * Updates the upcoming deadlines display in the DOM.
- * Shows up to 5 tasks with future deadlines, sorted by date (earliest first).
- * Titles longer than 20 characters are truncated with '...'.
+ * Shows up to MAX_UPCOMING_DEADLINES tasks with future deadlines, sorted by date (earliest first).
+ * Titles longer than MAX_DEADLINE_TITLE_LENGTH characters are truncated with '...'.
  * Modifies the #upcomingDeadlines element's content by first clearing all existing children,
  * then populating it with deadline items or a "No upcoming deadlines" message.
  * 
@@ -59,9 +74,11 @@ export function updateUpcomingDeadlines(tasks: Task[]): void {
   const upcomingDeadlines = tasks
     .filter(task => task.deadline && new Date(task.deadline) > new Date())
     .sort((a, b) => new Date(a.deadline!).getTime() - new Date(b.deadline!).getTime())
-    .slice(0, 5);
+    .slice(0, MAX_UPCOMING_DEADLINES);
 
-  const container = document.querySelector('#upcomingDeadlines')!;
+  const container = document.querySelector('#upcomingDeadlines');
+  if (!container) return;
+  
   container.replaceChildren();
   
   if (upcomingDeadlines.length) {
@@ -71,8 +88,8 @@ export function updateUpcomingDeadlines(tasks: Task[]): void {
       
       const label = document.createElement('span');
       label.className = 'stat-label';
-      const truncatedTitle = task.title.length > 20 
-        ? task.title.slice(0, 20) + '...' 
+      const truncatedTitle = task.title.length > MAX_DEADLINE_TITLE_LENGTH 
+        ? task.title.slice(0, MAX_DEADLINE_TITLE_LENGTH) + '...' 
         : task.title;
       label.textContent = truncatedTitle;
       

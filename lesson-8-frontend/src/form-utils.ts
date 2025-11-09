@@ -1,8 +1,8 @@
 import type { Priority, Status, Task } from './types';
 
-// Valid enum values for runtime validation
-const VALID_STATUSES: Status[] = ['todo', 'in_progress', 'done'];
-const VALID_PRIORITIES: Priority[] = ['low', 'medium', 'high'];
+// Valid enum values for runtime validation - exported for use in tests
+export const VALID_STATUSES: Status[] = ['todo', 'in_progress', 'done'];
+export const VALID_PRIORITIES: Priority[] = ['low', 'medium', 'high'];
 
 /**
  * Validates if a string is a valid Status value
