@@ -1,167 +1,13 @@
 import './style.css';
 import { TaskAPI } from './api';
-import type { Priority, Status, Task } from './types';
-
-// Capitalize first letter of a string
-export function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+import type { Status, Task } from './types';
+import { createTaskHeader, createTaskMeta, createTaskActions } from './dom-utils';
+import { updateStatistics } from './stats';
+import { formDataToTask, formDataToPartialTask, fillEditForm } from './form-utils';
 
 // Sort tasks by creation date (newest first)
 export function sortTasksByCreatedDate(tasks: Task[]): Task[] {
   return [...tasks].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-}
-
-// Convert FormData to task object
-export function formDataToTask(formData: FormData): Omit<Task, 'id'> {
-  const data = Object.fromEntries(formData);
-  return {
-    title: data.title as string,
-    description: data.description as string,
-    status: data.status as Status,
-    priority: data.priority as Priority,
-    createdAt: new Date(),
-    deadline: data.deadline ? new Date(data.deadline as string) : null
-  };
-}
-
-// Convert FormData to partial task update
-export function formDataToPartialTask(formData: FormData): Partial<Omit<Task, 'id' | 'createdAt'>> {
-  const data = Object.fromEntries(formData);
-  return {
-    title: data.title as string,
-    description: data.description as string,
-    status: data.status as Status,
-    priority: data.priority as Priority,
-    deadline: data.deadline ? new Date(data.deadline as string) : null
-  };
-}
-
-export function updateTotalTasks(count: number): void {
-  document.querySelector('#totalTasks')!.textContent = count.toString();
-}
-
-export function updateStatusCounts(tasks: Task[]): void {
-  const counts = {
-    todo: tasks.filter(t => t.status === 'todo').length,
-    in_progress: tasks.filter(t => t.status === 'in_progress').length,
-    done: tasks.filter(t => t.status === 'done').length
-  };
-
-  document.querySelector('#todoCount')!.textContent = counts.todo.toString();
-  document.querySelector('#inProgressCount')!.textContent = counts.in_progress.toString();
-  document.querySelector('#doneCount')!.textContent = counts.done.toString();
-}
-
-export function updatePriorityCounts(tasks: Task[]): void {
-  const counts = {
-    high: tasks.filter(t => t.priority === 'high').length,
-    medium: tasks.filter(t => t.priority === 'medium').length,
-    low: tasks.filter(t => t.priority === 'low').length
-  };
-
-  document.querySelector('#highPriorityCount')!.textContent = counts.high.toString();
-  document.querySelector('#mediumPriorityCount')!.textContent = counts.medium.toString();
-  document.querySelector('#lowPriorityCount')!.textContent = counts.low.toString();
-}
-
-export function updateUpcomingDeadlines(tasks: Task[]): void {
-  const upcomingDeadlines = tasks
-    .filter(task => task.deadline && new Date(task.deadline) > new Date())
-    .sort((a, b) => new Date(a.deadline!).getTime() - new Date(b.deadline!).getTime())
-    .slice(0, 3);
-
-  const container = document.querySelector('#upcomingDeadlines')!;
-  container.innerHTML = '';
-  
-  if (upcomingDeadlines.length) {
-    upcomingDeadlines.forEach(task => {
-      const statItem = document.createElement('div');
-      statItem.className = 'stat-item';
-      
-      const label = document.createElement('span');
-      label.className = 'stat-label';
-      const truncatedTitle = task.title.length > 20 
-        ? task.title.slice(0, 20).trimEnd() + '...' 
-        : task.title;
-      label.textContent = truncatedTitle;
-      
-      const date = document.createElement('span');
-      date.textContent = new Date(task.deadline!).toLocaleDateString();
-      
-      statItem.appendChild(label);
-      statItem.appendChild(date);
-      container.appendChild(statItem);
-    });
-  } else {
-    const noDeadlines = document.createElement('div');
-    noDeadlines.className = 'stat-item';
-    noDeadlines.textContent = 'No upcoming deadlines';
-    container.appendChild(noDeadlines);
-  }
-}
-
-function updateStatistics(tasks: Task[]): void {
-  updateTotalTasks(tasks.length);
-  updateStatusCounts(tasks);
-  updatePriorityCounts(tasks);
-  updateUpcomingDeadlines(tasks);
-}
-
-export function createTaskHeader(task: Task): HTMLDivElement {
-  const headerDiv = document.createElement('div');
-  headerDiv.className = 'task-header';
-  
-  const h3 = document.createElement('h3');
-  h3.textContent = task.title;
-  headerDiv.appendChild(h3);
-  
-  const badgesDiv = document.createElement('div');
-  badgesDiv.className = 'task-badges';
-  
-  const prioritySpan = document.createElement('span');
-  prioritySpan.className = `badge priority-${task.priority}`;
-  prioritySpan.textContent = capitalize(task.priority);
-  badgesDiv.appendChild(prioritySpan);
-  
-  headerDiv.appendChild(badgesDiv);
-  return headerDiv;
-}
-
-export function createTaskMeta(task: Task): HTMLDivElement {
-  const metaDiv = document.createElement('div');
-  metaDiv.className = 'task-meta';
-  
-  const createdSpan = document.createElement('span');
-  createdSpan.textContent = `Created: ${new Date(task.createdAt).toLocaleDateString()}`;
-  metaDiv.appendChild(createdSpan);
-  
-  if (task.deadline) {
-    const deadlineSpan = document.createElement('span');
-    deadlineSpan.textContent = `Deadline: ${new Date(task.deadline).toLocaleDateString()}`;
-    metaDiv.appendChild(deadlineSpan);
-  }
-  
-  return metaDiv;
-}
-
-function createTaskActions(task: Task, editTask: (id: string) => void, deleteTask: (id: string) => void): HTMLDivElement {
-  const actionsDiv = document.createElement('div');
-  actionsDiv.className = 'task-actions';
-  
-  const editBtn = document.createElement('button');
-  editBtn.className = 'edit';
-  editBtn.textContent = 'Edit';
-  editBtn.addEventListener('click', () => editTask(task.id));
-  actionsDiv.appendChild(editBtn);
-  
-  const deleteBtn = document.createElement('button');
-  deleteBtn.className = 'delete';
-  deleteBtn.textContent = 'Delete';
-  deleteBtn.addEventListener('click', () => deleteTask(task.id));
-  actionsDiv.appendChild(deleteBtn);
-  
-  return actionsDiv;
 }
 
 function attachDragEvents(taskEl: HTMLElement, taskId: string): void {
@@ -222,15 +68,6 @@ function renderTasks(tasks: Task[], editTask: (id: string) => void, deleteTask: 
     const taskEl = createTaskElement(task, editTask, deleteTask);
     attachTaskToColumn(taskEl, task.status);
   });
-}
-
-function fillEditForm(form: HTMLFormElement, task: Task): void {
-  (form.elements.namedItem('title') as HTMLInputElement).value = task.title;
-  (form.elements.namedItem('description') as HTMLTextAreaElement).value = task.description;
-  (form.elements.namedItem('status') as HTMLSelectElement).value = task.status;
-  (form.elements.namedItem('priority') as HTMLSelectElement).value = task.priority;
-  (form.elements.namedItem('deadline') as HTMLInputElement).value = 
-    task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : '';
 }
 
 async function init() {
