@@ -16,6 +16,9 @@ export function createSampleTask(overrides: Partial<Task> = {}): Task {
 
 // Helper to create minimal DOM for Vitest
 export function setupTestDom(): void {
+  // Setting innerHTML replaces all existing content, ensuring a clean slate for each test.
+  // This is intentional: it prevents state leakage between tests by completely resetting
+  // the DOM structure to a known, predictable state.
   document.body.innerHTML = `
     <div id="modal-overlay"></div>
     <form id="taskForm"></form>

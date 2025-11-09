@@ -16,7 +16,7 @@ export function sortTasksByCreatedDate(tasks: Task[]): Task[] {
 }
 
 /**
- * Creates or retrieves an error message element for a form.
+ * Gets or creates an error message element within a form.
  * The element is created once and reused for all error displays.
  * 
  * @param form - The form element to attach the error element to
@@ -32,6 +32,7 @@ function getOrCreateErrorElement(form: HTMLElement, className: string): HTMLElem
     errorEl.setAttribute('aria-live', 'assertive');
     form.appendChild(errorEl);
   }
+  // ARIA attributes are only set when creating new element (not on every call)
   return errorEl;
 }
 

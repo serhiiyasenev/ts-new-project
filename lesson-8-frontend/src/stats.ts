@@ -22,6 +22,9 @@ export function updateTotalTasks(count: number): void {
  * Counts tasks in each status category (todo, in_progress, done) and updates
  * the corresponding DOM elements (#todoCount, #inProgressCount, #doneCount).
  * 
+ * Note: This function is exported for testing purposes. In production code,
+ * prefer using updateStatusAndPriorityCounts() for better performance.
+ * 
  * @param tasks - Array of tasks to count
  */
 export function updateStatusCounts(tasks: Task[]): void {
@@ -43,6 +46,9 @@ export function updateStatusCounts(tasks: Task[]): void {
  * Updates the task counts by priority in the DOM.
  * Counts tasks in each priority category (high, medium, low) and updates
  * the corresponding DOM elements (#highPriorityCount, #mediumPriorityCount, #lowPriorityCount).
+ * 
+ * Note: This function is exported for testing purposes. In production code,
+ * prefer using updateStatusAndPriorityCounts() for better performance.
  * 
  * @param tasks - Array of tasks to count
  */
