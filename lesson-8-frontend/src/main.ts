@@ -143,11 +143,6 @@ async function init() {
         }
       };
 
-      // Overlay click handler to close modal when clicking outside
-      function overlayClickHandler(e: Event) {
-        if (e.target === modalOverlay) handleCancel();
-      }
-
       // Handle cancel
       const handleCancel = () => {
         modalOverlay?.classList.remove('active');
@@ -156,6 +151,11 @@ async function init() {
         // Abort all listeners associated with this modal interaction
         controller.abort();
       };
+
+      // Overlay click handler to close modal when clicking outside
+      function overlayClickHandler(e: Event) {
+        if (e.target === modalOverlay) handleCancel();
+      }
 
       form.addEventListener('submit', handleSubmit, { signal });
       form.querySelector('.cancel')?.addEventListener('click', handleCancel, { signal });
