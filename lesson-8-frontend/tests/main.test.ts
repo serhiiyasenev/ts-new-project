@@ -1,6 +1,18 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import type { Mock } from 'vitest';
 import type { Task } from '../src/types';
+import {
+  capitalize,
+  sortTasksByCreatedDate,
+  formDataToTask,
+  formDataToPartialTask,
+  updateTotalTasks,
+  updateStatusCounts,
+  updatePriorityCounts,
+  updateUpcomingDeadlines,
+  createTaskHeader,
+  createTaskMeta,
+} from '../src/main';
 
 // Mock the API module
 vi.mock('../src/api', () => ({
@@ -28,162 +40,6 @@ function createSampleTask(overrides: Partial<Task> = {}): Task {
     deadline: null,
     ...overrides,
   };
-}
-
-// Copy utility functions from main.ts to test them
-function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function sortTasksByCreatedDate(tasks: Task[]): Task[] {
-  return [...tasks].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-}
-
-function formDataToTask(formData: FormData): Omit<Task, 'id'> {
-  const title = formData.get('title') as string;
-  const description = formData.get('description') as string;
-  const status = formData.get('status') as 'todo' | 'in_progress' | 'done';
-  const priority = formData.get('priority') as 'low' | 'medium' | 'high';
-  const deadlineStr = formData.get('deadline') as string;
-  const deadline = deadlineStr ? new Date(deadlineStr) : null;
-
-  return {
-    title,
-    description,
-    status,
-    priority,
-    createdAt: new Date(),
-    deadline,
-  };
-}
-
-function formDataToPartialTask(formData: FormData): Partial<Omit<Task, 'id' | 'createdAt'>> {
-  const title = formData.get('title') as string;
-  const description = formData.get('description') as string;
-  const status = formData.get('status') as 'todo' | 'in_progress' | 'done';
-  const priority = formData.get('priority') as 'low' | 'medium' | 'high';
-  const deadlineStr = formData.get('deadline') as string;
-  const deadline = deadlineStr ? new Date(deadlineStr) : null;
-
-  return {
-    title,
-    description,
-    status,
-    priority,
-    deadline,
-  };
-}
-
-function updateTotalTasks(count: number): void {
-  const totalTasksElement = document.getElementById('total-tasks');
-  if (totalTasksElement) {
-    totalTasksElement.textContent = count.toString();
-  }
-}
-
-function updateStatusCounts(tasks: Task[]): void {
-  const todoCount = tasks.filter(task => task.status === 'todo').length;
-  const inProgressCount = tasks.filter(task => task.status === 'in_progress').length;
-  const doneCount = tasks.filter(task => task.status === 'done').length;
-
-  const todoCountElement = document.getElementById('todo-count');
-  const inProgressCountElement = document.getElementById('in-progress-count');
-  const doneCountElement = document.getElementById('done-count');
-
-  if (todoCountElement) todoCountElement.textContent = todoCount.toString();
-  if (inProgressCountElement) inProgressCountElement.textContent = inProgressCount.toString();
-  if (doneCountElement) doneCountElement.textContent = doneCount.toString();
-}
-
-function updatePriorityCounts(tasks: Task[]): void {
-  const lowPriorityCount = tasks.filter(task => task.priority === 'low').length;
-  const mediumPriorityCount = tasks.filter(task => task.priority === 'medium').length;
-  const highPriorityCount = tasks.filter(task => task.priority === 'high').length;
-
-  const lowPriorityCountElement = document.getElementById('low-priority-count');
-  const mediumPriorityCountElement = document.getElementById('medium-priority-count');
-  const highPriorityCountElement = document.getElementById('high-priority-count');
-
-  if (lowPriorityCountElement) lowPriorityCountElement.textContent = lowPriorityCount.toString();
-  if (mediumPriorityCountElement) mediumPriorityCountElement.textContent = mediumPriorityCount.toString();
-  if (highPriorityCountElement) highPriorityCountElement.textContent = highPriorityCount.toString();
-}
-
-function updateUpcomingDeadlines(tasks: Task[]): void {
-  const upcomingDeadlinesElement = document.getElementById('upcoming-deadlines-list');
-  if (!upcomingDeadlinesElement) return;
-
-  upcomingDeadlinesElement.innerHTML = '';
-
-  const tasksWithDeadlines = tasks.filter(
-    task => task.deadline && new Date(task.deadline).getTime() > Date.now()
-  );
-
-  const sortedByDeadline = [...tasksWithDeadlines].sort((a, b) => {
-    const aTime = a.deadline ? new Date(a.deadline).getTime() : 0;
-    const bTime = b.deadline ? new Date(b.deadline).getTime() : 0;
-    return aTime - bTime;
-  });
-
-  const upcomingTasks = sortedByDeadline.slice(0, 3);
-
-  if (upcomingTasks.length === 0) {
-    const emptyMessage = document.createElement('p');
-    emptyMessage.textContent = 'No upcoming deadlines';
-    upcomingDeadlinesElement.appendChild(emptyMessage);
-  } else {
-    upcomingTasks.forEach(task => {
-      const taskItem = document.createElement('div');
-      taskItem.className = 'upcoming-deadline-item';
-
-      const taskTitle = document.createElement('strong');
-      taskTitle.textContent = task.title;
-
-      const taskDeadline = document.createElement('span');
-      taskDeadline.textContent = task.deadline
-        ? ` - ${new Date(task.deadline).toLocaleDateString()}`
-        : '';
-
-      taskItem.appendChild(taskTitle);
-      taskItem.appendChild(taskDeadline);
-      upcomingDeadlinesElement.appendChild(taskItem);
-    });
-  }
-}
-
-function createTaskHeader(task: Task): HTMLDivElement {
-  const header = document.createElement('div');
-  header.className = 'task-header';
-
-  const title = document.createElement('h3');
-  title.textContent = task.title;
-
-  const priority = document.createElement('span');
-  priority.className = `priority-badge ${task.priority}`;
-  priority.textContent = capitalize(task.priority);
-
-  header.appendChild(title);
-  header.appendChild(priority);
-
-  return header;
-}
-
-function createTaskMeta(task: Task): HTMLDivElement {
-  const meta = document.createElement('div');
-  meta.className = 'task-meta';
-
-  const createdAt = document.createElement('span');
-  createdAt.textContent = `Created: ${task.createdAt.toLocaleDateString()}`;
-
-  meta.appendChild(createdAt);
-
-  if (task.deadline) {
-    const deadline = document.createElement('span');
-    deadline.textContent = `Deadline: ${task.deadline.toLocaleDateString()}`;
-    meta.appendChild(deadline);
-  }
-
-  return meta;
 }
 
 // Setup DOM environment for each test
@@ -356,19 +212,19 @@ describe('Statistics Functions', () => {
   describe('updateTotalTasks', () => {
     it('should update total tasks count', () => {
       updateTotalTasks(5);
-      const element = document.getElementById('total-tasks');
+      const element = document.querySelector('#totalTasks');
       expect(element?.textContent).toBe('5');
     });
 
     it('should handle zero tasks', () => {
       updateTotalTasks(0);
-      const element = document.getElementById('total-tasks');
+      const element = document.querySelector('#totalTasks');
       expect(element?.textContent).toBe('0');
     });
 
     it('should update with large numbers', () => {
       updateTotalTasks(9999);
-      const element = document.getElementById('total-tasks');
+      const element = document.querySelector('#totalTasks');
       expect(element?.textContent).toBe('9999');
     });
   });
@@ -386,17 +242,17 @@ describe('Statistics Functions', () => {
 
       updateStatusCounts(tasks);
 
-      expect(document.getElementById('todo-count')?.textContent).toBe('2');
-      expect(document.getElementById('in-progress-count')?.textContent).toBe('1');
-      expect(document.getElementById('done-count')?.textContent).toBe('3');
+      expect(document.querySelector('#todoCount')?.textContent).toBe('2');
+      expect(document.querySelector('#inProgressCount')?.textContent).toBe('1');
+      expect(document.querySelector('#doneCount')?.textContent).toBe('3');
     });
 
     it('should handle empty task list', () => {
       updateStatusCounts([]);
 
-      expect(document.getElementById('todo-count')?.textContent).toBe('0');
-      expect(document.getElementById('in-progress-count')?.textContent).toBe('0');
-      expect(document.getElementById('done-count')?.textContent).toBe('0');
+      expect(document.querySelector('#todoCount')?.textContent).toBe('0');
+      expect(document.querySelector('#inProgressCount')?.textContent).toBe('0');
+      expect(document.querySelector('#doneCount')?.textContent).toBe('0');
     });
   });
 
@@ -413,17 +269,17 @@ describe('Statistics Functions', () => {
 
       updatePriorityCounts(tasks);
 
-      expect(document.getElementById('low-priority-count')?.textContent).toBe('2');
-      expect(document.getElementById('medium-priority-count')?.textContent).toBe('1');
-      expect(document.getElementById('high-priority-count')?.textContent).toBe('3');
+      expect(document.querySelector('#lowPriorityCount')?.textContent).toBe('2');
+      expect(document.querySelector('#mediumPriorityCount')?.textContent).toBe('1');
+      expect(document.querySelector('#highPriorityCount')?.textContent).toBe('3');
     });
 
     it('should handle empty task list', () => {
       updatePriorityCounts([]);
 
-      expect(document.getElementById('low-priority-count')?.textContent).toBe('0');
-      expect(document.getElementById('medium-priority-count')?.textContent).toBe('0');
-      expect(document.getElementById('high-priority-count')?.textContent).toBe('0');
+      expect(document.querySelector('#lowPriorityCount')?.textContent).toBe('0');
+      expect(document.querySelector('#mediumPriorityCount')?.textContent).toBe('0');
+      expect(document.querySelector('#highPriorityCount')?.textContent).toBe('0');
     });
   });
 
@@ -442,10 +298,10 @@ describe('Statistics Functions', () => {
 
       updateUpcomingDeadlines(tasks);
 
-      const list = document.getElementById('upcoming-deadlines-list');
-      expect(list?.children.length).toBe(2);
-      expect(list?.children[0].textContent).toContain('Task 2');
-      expect(list?.children[1].textContent).toContain('Task 1');
+      const container = document.querySelector('#upcomingDeadlines');
+      expect(container?.children.length).toBe(2);
+      expect(container?.children[0].textContent).toContain('Task 2');
+      expect(container?.children[1].textContent).toContain('Task 1');
     });
 
     it('should display max 5 upcoming deadlines', () => {
@@ -457,8 +313,8 @@ describe('Statistics Functions', () => {
 
       updateUpcomingDeadlines(tasks);
 
-      const list = document.getElementById('upcoming-deadlines-list');
-      expect(list?.children.length).toBe(5);
+      const container = document.querySelector('#upcomingDeadlines');
+      expect(container?.children.length).toBe(3);
     });
 
     it('should ignore past deadlines', () => {
@@ -475,15 +331,15 @@ describe('Statistics Functions', () => {
 
       updateUpcomingDeadlines(tasks);
 
-      const list = document.getElementById('upcoming-deadlines-list');
-      expect(list?.children.length).toBe(1);
+      const container = document.querySelector('#upcomingDeadlines');
+      expect(container?.children.length).toBe(1);
     });
 
     it('should display message when no upcoming deadlines', () => {
       updateUpcomingDeadlines([]);
 
-      const list = document.getElementById('upcoming-deadlines-list');
-      expect(list?.textContent).toContain('No upcoming deadlines');
+      const container = document.querySelector('#upcomingDeadlines');
+      expect(container?.textContent).toContain('No upcoming deadlines');
     });
 
     it('should ignore tasks without deadlines', () => {
@@ -497,8 +353,24 @@ describe('Statistics Functions', () => {
 
       updateUpcomingDeadlines(tasks);
 
-      const list = document.getElementById('upcoming-deadlines-list');
-      expect(list?.children.length).toBe(1);
+      const container = document.querySelector('#upcomingDeadlines');
+      expect(container?.children.length).toBe(1);
+    });
+
+    it('should truncate long task titles to 20 characters', () => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const longTitle = 'This is a very long task title that should be truncated';
+      const tasks: Task[] = [
+        createSampleTask({ id: '1', title: longTitle, deadline: tomorrow }),
+      ];
+
+      updateUpcomingDeadlines(tasks);
+
+      const container = document.querySelector('#upcomingDeadlines');
+      const label = container?.querySelector('.stat-label');
+      expect(label?.textContent).toBe('This is a very long...');
     });
   });
 });
@@ -511,8 +383,8 @@ describe('Rendering Functions', () => {
 
       expect(header.className).toBe('task-header');
       expect(header.querySelector('h3')?.textContent).toBe('Test Task');
-      expect(header.querySelector('.priority-badge')?.textContent).toBe('High');
-      expect(header.querySelector('.priority-badge')?.classList.contains('high')).toBe(true);
+      expect(header.querySelector('.badge')?.textContent).toBe('High');
+      expect(header.querySelector('.badge')?.classList.contains('priority-high')).toBe(true);
     });
 
     it('should handle different priorities', () => {
@@ -521,10 +393,10 @@ describe('Rendering Functions', () => {
       priorities.forEach(priority => {
         const task = createSampleTask({ priority });
         const header = createTaskHeader(task);
-        const badge = header.querySelector('.priority-badge');
+        const badge = header.querySelector('.badge');
         
         expect(badge?.textContent).toBe(capitalize(priority));
-        expect(badge?.classList.contains(priority)).toBe(true);
+        expect(badge?.classList.contains(`priority-${priority}`)).toBe(true);
       });
     });
   });

@@ -7,17 +7,17 @@ import type { Priority, Status, Task } from './types';
 // ============================================================================
 
 // Capitalize first letter of a string
-function capitalize(str: string): string {
+export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 // Sort tasks by creation date (newest first)
-function sortTasksByCreatedDate(tasks: Task[]): Task[] {
+export function sortTasksByCreatedDate(tasks: Task[]): Task[] {
   return [...tasks].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
 // Convert FormData to task object
-function formDataToTask(formData: FormData): Omit<Task, 'id'> {
+export function formDataToTask(formData: FormData): Omit<Task, 'id'> {
   const data = Object.fromEntries(formData);
   return {
     title: data.title as string,
@@ -30,7 +30,7 @@ function formDataToTask(formData: FormData): Omit<Task, 'id'> {
 }
 
 // Convert FormData to partial task update
-function formDataToPartialTask(formData: FormData): Partial<Omit<Task, 'id' | 'createdAt'>> {
+export function formDataToPartialTask(formData: FormData): Partial<Omit<Task, 'id' | 'createdAt'>> {
   const data = Object.fromEntries(formData);
   return {
     title: data.title as string,
@@ -45,11 +45,11 @@ function formDataToPartialTask(formData: FormData): Partial<Omit<Task, 'id' | 'c
 // STATISTICS FUNCTIONS
 // ============================================================================
 
-function updateTotalTasks(count: number): void {
+export function updateTotalTasks(count: number): void {
   document.querySelector('#totalTasks')!.textContent = count.toString();
 }
 
-function updateStatusCounts(tasks: Task[]): void {
+export function updateStatusCounts(tasks: Task[]): void {
   const counts = {
     todo: tasks.filter(t => t.status === 'todo').length,
     in_progress: tasks.filter(t => t.status === 'in_progress').length,
@@ -61,7 +61,7 @@ function updateStatusCounts(tasks: Task[]): void {
   document.querySelector('#doneCount')!.textContent = counts.done.toString();
 }
 
-function updatePriorityCounts(tasks: Task[]): void {
+export function updatePriorityCounts(tasks: Task[]): void {
   const counts = {
     high: tasks.filter(t => t.priority === 'high').length,
     medium: tasks.filter(t => t.priority === 'medium').length,
@@ -73,7 +73,7 @@ function updatePriorityCounts(tasks: Task[]): void {
   document.querySelector('#lowPriorityCount')!.textContent = counts.low.toString();
 }
 
-function updateUpcomingDeadlines(tasks: Task[]): void {
+export function updateUpcomingDeadlines(tasks: Task[]): void {
   const upcomingDeadlines = tasks
     .filter(task => task.deadline && new Date(task.deadline) > new Date())
     .sort((a, b) => new Date(a.deadline!).getTime() - new Date(b.deadline!).getTime())
@@ -90,7 +90,7 @@ function updateUpcomingDeadlines(tasks: Task[]): void {
       const label = document.createElement('span');
       label.className = 'stat-label';
       const truncatedTitle = task.title.length > 20 
-        ? task.title.slice(0, 20) + '...' 
+        ? task.title.slice(0, 20).trimEnd() + '...' 
         : task.title;
       label.textContent = truncatedTitle;
       
@@ -120,7 +120,7 @@ function updateStatistics(tasks: Task[]): void {
 // TASK ELEMENT CREATION FUNCTIONS
 // ============================================================================
 
-function createTaskHeader(task: Task): HTMLDivElement {
+export function createTaskHeader(task: Task): HTMLDivElement {
   const headerDiv = document.createElement('div');
   headerDiv.className = 'task-header';
   
@@ -140,7 +140,7 @@ function createTaskHeader(task: Task): HTMLDivElement {
   return headerDiv;
 }
 
-function createTaskMeta(task: Task): HTMLDivElement {
+export function createTaskMeta(task: Task): HTMLDivElement {
   const metaDiv = document.createElement('div');
   metaDiv.className = 'task-meta';
   
@@ -388,4 +388,7 @@ async function init() {
   await loadTasks();
 }
 
-init();
+// Only run init if not in test environment
+if (import.meta.env.MODE !== 'test') {
+  init();
+}
