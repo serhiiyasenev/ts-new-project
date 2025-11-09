@@ -37,26 +37,26 @@ function parseDeadline(value: unknown): Date | null {
  * 
  * @param data - Object from FormData entries
  * @returns Validated and trimmed form fields
- * @throws Error if validation fails
+ * @throws Error if validation fails with user-friendly messages
  */
 function validateFormData(data: Record<string, FormDataEntryValue>) {
   const title = data.title as string;
   const description = data.description as string;
   
   if (!title || title.trim() === '') {
-    throw new Error('Title is required');
+    throw new Error('Please enter a task title');
   }
   
   if (!description || description.trim() === '') {
-    throw new Error('Description is required');
+    throw new Error('Please enter a task description');
   }
   
   if (!isValidStatus(data.status)) {
-    throw new Error(`Invalid status: ${data.status}. Must be one of: ${VALID_STATUSES.join(', ')}`);
+    throw new Error('Please select a valid status (To Do, In Progress, or Done)');
   }
   
   if (!isValidPriority(data.priority)) {
-    throw new Error(`Invalid priority: ${data.priority}. Must be one of: ${VALID_PRIORITIES.join(', ')}`);
+    throw new Error('Please select a valid priority (Low, Medium, or High)');
   }
   
   return {

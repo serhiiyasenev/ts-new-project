@@ -145,7 +145,7 @@ describe('Utility Functions', () => {
       formData.set('status', 'invalid_status');
       formData.set('priority', 'high');
 
-      expect(() => formDataToPartialTask(formData)).toThrow('Invalid status');
+      expect(() => formDataToPartialTask(formData)).toThrow('Please select a valid status');
     });
 
     it('should throw error for invalid priority', () => {
@@ -155,7 +155,7 @@ describe('Utility Functions', () => {
       formData.set('status', 'todo');
       formData.set('priority', 'invalid_priority');
 
-      expect(() => formDataToPartialTask(formData)).toThrow('Invalid priority');
+      expect(() => formDataToPartialTask(formData)).toThrow('Please select a valid priority');
     });
 
     it('should throw error for empty title', () => {
@@ -165,7 +165,7 @@ describe('Utility Functions', () => {
       formData.set('status', 'todo');
       formData.set('priority', 'high');
 
-      expect(() => formDataToPartialTask(formData)).toThrow('Title is required');
+      expect(() => formDataToPartialTask(formData)).toThrow('Please enter a task title');
     });
 
     it('should throw error for empty description', () => {
@@ -175,7 +175,7 @@ describe('Utility Functions', () => {
       formData.set('status', 'todo');
       formData.set('priority', 'high');
 
-      expect(() => formDataToPartialTask(formData)).toThrow('Description is required');
+      expect(() => formDataToPartialTask(formData)).toThrow('Please enter a task description');
     });
 
     it('should trim whitespace from title and description', () => {
