@@ -55,7 +55,7 @@ The React app will start on http://localhost:5173 (or another port if 5173 is bu
 - Receives all form data
 - Calls TaskAPI.createTask() to send POST request
 - Resets form after successful submission
-- Shows success/error alerts
+- Shows success/error toast message
 
 ### ✅ Styling
 - Clean, modern UI with CSS
