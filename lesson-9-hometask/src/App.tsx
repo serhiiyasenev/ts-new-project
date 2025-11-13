@@ -27,11 +27,11 @@ function App() {
 
   const handleEditTask = (task: Task) => {
     setEditingTask(task);
-  }
+  };
 
   const handleCloseModal = () => {
     setEditingTask(null);
-  }
+  };
 
   return (
     <div className="app">
