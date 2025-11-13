@@ -103,21 +103,33 @@ export const TaskForm = ({ defaultValues, onSubmit, submitLabel, onCancel }: Tas
                 </div>
             </div>
 
-            <div className="form-group">
-                <label htmlFor="deadline">Deadline (optional)</label>
-                <input
-                    type="date"
-                    id="deadline"
-                    {...register('deadline')}
-                    className={errors.deadline ? 'input-error' : ''}
-                />
-                {errors.deadline && (
-                    <span className="error-message">{errors.deadline.message}</span>
-                )}
+            <div className="form-row-deadline">
+                <div className="form-group">
+                    <label htmlFor="deadline">Deadline (optional)</label>
+                    <input
+                        type="date"
+                        id="deadline"
+                        {...register('deadline')}
+                        className={errors.deadline ? 'input-error' : ''}
+                    />
+                    {errors.deadline && (
+                        <span className="error-message">{errors.deadline.message}</span>
+                    )}
+                </div>
+                
+                <div className="form-group-button">
+                    <button
+                        type="submit"
+                        className="submit-button"
+                        disabled={!isValid || isSubmitting}
+                    >
+                        {isSubmitting ? 'Saving...' : submitLabel}
+                    </button>
+                </div>
             </div>
 
-            <div className="form-actions">
-                {onCancel && (
+            {onCancel && (
+                <div className="form-actions">
                     <button
                         type="button"
                         className="cancel-button"
@@ -125,15 +137,8 @@ export const TaskForm = ({ defaultValues, onSubmit, submitLabel, onCancel }: Tas
                     >
                         Cancel
                     </button>
-                )}
-                <button
-                    type="submit"
-                    className="submit-button"
-                    disabled={!isValid || isSubmitting}
-                >
-                    {isSubmitting ? 'Saving...' : submitLabel}
-                </button>
-            </div>
+                </div>
+            )}
         </form>
     );
 };
