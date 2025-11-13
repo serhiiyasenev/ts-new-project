@@ -14,23 +14,23 @@ function App() {
   const { toast, showError, showSuccess, closeToast } = useToast()
 
   const handleTaskCreated = () => {
-    setRefreshKey((prev) => prev + 1)
+    setRefreshKey((prev) => prev + 1);
   }
 
   const handleTaskUpdated = () => {
-    setRefreshKey((prev) => prev + 1)
+    setRefreshKey((prev) => prev + 1);
   }
 
   const handleTaskMoved = () => {
-    setRefreshKey((prev) => prev + 1)
+    setRefreshKey((prev) => prev + 1);
   }
 
   const handleEditTask = (task: Task) => {
-    setEditingTask(task)
+    setEditingTask(task);
   }
 
   const handleCloseModal = () => {
-    setEditingTask(null)
+    setEditingTask(null);
   }
 
   return (
