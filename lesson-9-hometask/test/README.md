@@ -15,7 +15,7 @@ npm run test:ui
 npm run test:coverage
 ```
 
-## Stucture
+## Structure
 
 ```
 test/
