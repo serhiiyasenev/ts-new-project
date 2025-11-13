@@ -9,9 +9,9 @@ import type { Task } from './types/types';
 import './App.css';
 
 function App() {
-  const [refreshKey, setRefreshKey] = useState(0)
-  const [editingTask, setEditingTask] = useState<Task | null>(null)
-  const { toast, showError, showSuccess, closeToast } = useToast()
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const { toast, showError, showSuccess, closeToast } = useToast();
 
   const handleTaskCreated = () => {
     setRefreshKey((prev) => prev + 1)
