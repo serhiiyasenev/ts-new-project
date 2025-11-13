@@ -61,7 +61,7 @@ test/
 All tests use TypeScript and include:
 - Unit tests for individual components
 - Tests for custom hooks
-- Validation tests for Zod schemes
+- Validation tests for Zod schemas
 - Tests for utility functions
 
 For detailed information, see the test files in the `test/` folder.
