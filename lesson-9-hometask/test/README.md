@@ -8,7 +8,7 @@ It uses **Vitest** and **React Testing Library** for testing.
 # Run all tests
 npm test
 
-# Run all with UI
+# Run all tests with UI
 npm run test:ui
 
 # Run all tests with coverage
