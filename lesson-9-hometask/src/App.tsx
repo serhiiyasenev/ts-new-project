@@ -15,15 +15,15 @@ function App() {
 
   const handleTaskCreated = () => {
     setRefreshKey((prev) => prev + 1);
-  }
+  };
 
   const handleTaskUpdated = () => {
     setRefreshKey((prev) => prev + 1);
-  }
+  };
 
   const handleTaskMoved = () => {
     setRefreshKey((prev) => prev + 1);
-  }
+  };
 
   const handleEditTask = (task: Task) => {
     setEditingTask(task);
