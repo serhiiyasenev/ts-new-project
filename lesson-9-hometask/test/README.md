@@ -5,7 +5,7 @@ It uses **Vitest** and **React Testing Library** for testing.
 ## Test run
 
 ```bash
-# Run all test
+# Run all tests
 npm test
 
 # Run all with UI
