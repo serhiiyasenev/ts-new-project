@@ -11,7 +11,7 @@ npm test
 # Run all with UI
 npm run test:ui
 
-# Run all with coverage
+# Run all tests with coverage
 npm run test:coverage
 ```
 
