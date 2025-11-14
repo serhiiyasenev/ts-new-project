@@ -4,6 +4,33 @@ import type { Task } from './types';
 export const MAX_UPCOMING_DEADLINES = 5;
 export const MAX_DEADLINE_TITLE_LENGTH = 20;
 
+// Cached DOM elements for better performance
+let cachedElements: {
+  totalTasks?: Element | null;
+  todoCount?: Element | null;
+  inProgressCount?: Element | null;
+  doneCount?: Element | null;
+  highPriorityCount?: Element | null;
+  mediumPriorityCount?: Element | null;
+  lowPriorityCount?: Element | null;
+  upcomingDeadlines?: Element | null;
+} = {};
+
+// Clears the cached DOM elements. Useful for testing when DOM is recreated
+export function clearElementCache(): void {
+  cachedElements = {};
+}
+
+// Helper to update element text content safely
+function updateElement(key: keyof typeof cachedElements, selector: string, value: string): void {
+  if (!cachedElements[key]) {
+    cachedElements[key] = document.querySelector(selector);
+  }
+  if (cachedElements[key]) {
+    cachedElements[key]!.textContent = value;
+  }
+}
+
 /**
  * Updates the total tasks count display in the DOM.
  * Modifies the #totalTasks element's text content.
@@ -11,10 +38,7 @@ export const MAX_DEADLINE_TITLE_LENGTH = 20;
  * @param count - The total number of tasks
  */
 export function updateTotalTasks(count: number): void {
-  const element = document.querySelector('#totalTasks');
-  if (element) {
-    element.textContent = count.toString();
-  }
+  updateElement('totalTasks', '#totalTasks', count.toString());
 }
 
 /**
@@ -33,13 +57,9 @@ export function updateStatusCounts(tasks: Task[]): void {
     return acc;
   }, { todo: 0, in_progress: 0, done: 0 });
 
-  const todoEl = document.querySelector('#todoCount');
-  const inProgressEl = document.querySelector('#inProgressCount');
-  const doneEl = document.querySelector('#doneCount');
-  
-  if (todoEl) todoEl.textContent = counts.todo.toString();
-  if (inProgressEl) inProgressEl.textContent = counts.in_progress.toString();
-  if (doneEl) doneEl.textContent = counts.done.toString();
+  updateElement('todoCount', '#todoCount', counts.todo.toString());
+  updateElement('inProgressCount', '#inProgressCount', counts.in_progress.toString());
+  updateElement('doneCount', '#doneCount', counts.done.toString());
 }
 
 /**
@@ -58,13 +78,9 @@ export function updatePriorityCounts(tasks: Task[]): void {
     return acc;
   }, { high: 0, medium: 0, low: 0 });
 
-  const highEl = document.querySelector('#highPriorityCount');
-  const mediumEl = document.querySelector('#mediumPriorityCount');
-  const lowEl = document.querySelector('#lowPriorityCount');
-  
-  if (highEl) highEl.textContent = counts.high.toString();
-  if (mediumEl) mediumEl.textContent = counts.medium.toString();
-  if (lowEl) lowEl.textContent = counts.low.toString();
+  updateElement('highPriorityCount', '#highPriorityCount', counts.high.toString());
+  updateElement('mediumPriorityCount', '#mediumPriorityCount', counts.medium.toString());
+  updateElement('lowPriorityCount', '#lowPriorityCount', counts.low.toString());
 }
 
 /**
@@ -84,23 +100,15 @@ export function updateStatusAndPriorityCounts(tasks: Task[]): void {
     priority: { high: 0, medium: 0, low: 0 }
   });
   
-  // Update status counts
-  const todoEl = document.querySelector('#todoCount');
-  const inProgressEl = document.querySelector('#inProgressCount');
-  const doneEl = document.querySelector('#doneCount');
+  // Update status counts using cached elements
+  updateElement('todoCount', '#todoCount', counts.status.todo.toString());
+  updateElement('inProgressCount', '#inProgressCount', counts.status.in_progress.toString());
+  updateElement('doneCount', '#doneCount', counts.status.done.toString());
   
-  if (todoEl) todoEl.textContent = counts.status.todo.toString();
-  if (inProgressEl) inProgressEl.textContent = counts.status.in_progress.toString();
-  if (doneEl) doneEl.textContent = counts.status.done.toString();
-  
-  // Update priority counts
-  const highEl = document.querySelector('#highPriorityCount');
-  const mediumEl = document.querySelector('#mediumPriorityCount');
-  const lowEl = document.querySelector('#lowPriorityCount');
-  
-  if (highEl) highEl.textContent = counts.priority.high.toString();
-  if (mediumEl) mediumEl.textContent = counts.priority.medium.toString();
-  if (lowEl) lowEl.textContent = counts.priority.low.toString();
+  // Update priority counts using cached elements
+  updateElement('highPriorityCount', '#highPriorityCount', counts.priority.high.toString());
+  updateElement('mediumPriorityCount', '#mediumPriorityCount', counts.priority.medium.toString());
+  updateElement('lowPriorityCount', '#lowPriorityCount', counts.priority.low.toString());
 }
 
 /**
@@ -118,7 +126,10 @@ export function updateUpcomingDeadlines(tasks: Task[]): void {
     .sort((a, b) => new Date(a.deadline!).getTime() - new Date(b.deadline!).getTime())
     .slice(0, MAX_UPCOMING_DEADLINES);
 
-  const container = document.querySelector('#upcomingDeadlines');
+  if (!cachedElements.upcomingDeadlines) {
+    cachedElements.upcomingDeadlines = document.querySelector('#upcomingDeadlines');
+  }
+  const container = cachedElements.upcomingDeadlines;
   if (!container) return;
   
   // Clear all children

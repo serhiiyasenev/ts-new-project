@@ -6,6 +6,7 @@ import {
   updateStatusCounts, 
   updatePriorityCounts, 
   updateUpcomingDeadlines,
+  clearElementCache,
   MAX_UPCOMING_DEADLINES,
   MAX_DEADLINE_TITLE_LENGTH 
 } from '../src/stats';
@@ -13,6 +14,7 @@ import type { Task } from '../src/types';
 
 beforeEach(() => {
   setupTestDom();
+  clearElementCache();
 });
 
 describe('Statistics Functions', () => {

@@ -28,7 +28,7 @@ export function capitalize(str: string): string {
  * @returns A div element with class 'task-header'
  */
 export function createTaskHeader(task: Task, doc: Document = document): HTMLDivElement {
-  const headerDiv = doc.createElement('div') as HTMLDivElement;
+  const headerDiv = doc.createElement('div');
   headerDiv.className = 'task-header';
   
   const h3 = doc.createElement('h3');
@@ -58,7 +58,7 @@ export function createTaskHeader(task: Task, doc: Document = document): HTMLDivE
  * @returns A div element with class 'task-meta'
  */
 export function createTaskMeta(task: Task, doc: Document = document): HTMLDivElement {
-  const metaDiv = doc.createElement('div') as HTMLDivElement;
+  const metaDiv = doc.createElement('div');
   metaDiv.className = 'task-meta';
   
   const createdSpan = doc.createElement('span');
@@ -76,33 +76,32 @@ export function createTaskMeta(task: Task, doc: Document = document): HTMLDivEle
 
 /**
  * Creates a task actions DOM element with Edit and Delete buttons.
- * Attaches click event handlers to the buttons that call the provided callbacks.
+ * Buttons use data attributes for task ID instead of inline event listeners.
+ * Click events are handled via event delegation on the task list container.
  * 
  * @param task - The task object these actions are for
- * @param editTask - Callback function to execute when Edit button is clicked
- * @param deleteTask - Callback function to execute when Delete button is clicked
  * @param doc - Document object (defaults to global document; pass mock for testing)
  * @returns A div element with class 'task-actions' containing the buttons
  */
 export function createTaskActions(
   task: Task,
-  editTask: (id: string) => void,
-  deleteTask: (id: string) => void,
   doc: Document = document
 ): HTMLDivElement {
-  const actionsDiv = doc.createElement('div') as HTMLDivElement;
+  const actionsDiv = doc.createElement('div');
   actionsDiv.className = 'task-actions';
   
   const editBtn = doc.createElement('button');
   editBtn.className = 'edit';
   editBtn.textContent = 'Edit';
-  editBtn.addEventListener('click', () => editTask(task.id));
+  editBtn.dataset.action = 'edit';
+  editBtn.dataset.taskId = task.id;
   actionsDiv.appendChild(editBtn);
   
   const deleteBtn = doc.createElement('button');
   deleteBtn.className = 'delete';
   deleteBtn.textContent = 'Delete';
-  deleteBtn.addEventListener('click', () => deleteTask(task.id));
+  deleteBtn.dataset.action = 'delete';
+  deleteBtn.dataset.taskId = task.id;
   actionsDiv.appendChild(deleteBtn);
   
   return actionsDiv;
