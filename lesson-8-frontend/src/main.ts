@@ -29,8 +29,8 @@ function getOrCreateErrorElement(form: HTMLElement, className: string): HTMLElem
   if (!errorEl) {
     errorEl = document.createElement('div');
     errorEl.className = className;
-    errorEl.setAttribute('role', 'status');
-    errorEl.setAttribute('aria-live', 'polite');
+    errorEl.setAttribute('role', 'alert');
+    // 'aria-live' is implicit 'assertive' for role="alert"
     form.appendChild(errorEl);
   }
   return errorEl;
