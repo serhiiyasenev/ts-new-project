@@ -18,7 +18,7 @@ export function sortTasksByCreatedDate(tasks: Task[]): Task[] {
 /**
  * Gets or creates an error message element for a form.
  * The element is created once and reused for all error displays.
- * Uses role="status" and aria-live="polite" for non-aggressive screen reader announcements.
+ * Uses role="alert" with implicit aria-live="assertive" for immediate screen reader announcements.
  * 
  * @param form - The form element to attach the error element to
  * @param className - CSS class name for the error element
