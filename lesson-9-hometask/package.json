@@ -1,23 +1,46 @@
 {
-  "name": "lesson-8-frontend",
+  "name": "my-project",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "start": "concurrently \"npm run dev\" \"npm run api\"",
+    "api": "json-server --watch db.json --port 3000",
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
     "preview": "vite preview",
-    "api": "json-server --watch db.json --port 3000"
-  },
-  "devDependencies": {
-    "@types/json-server": "^0.14.8",
-    "concurrently": "^9.2.1",
-    "json-server": "^1.0.0-beta.3",
-    "typescript": "~5.9.3",
-    "vite": "^7.1.7"
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-hook-form": "^7.65.0",
     "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^24.6.0",
+    "@types/react": "^19.2.4",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.4",
+    "@vitest/ui": "^2.1.8",
+    "concurrently": "^9.2.1",
+    "eslint": "^9.36.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.22",
+    "globals": "^16.4.0",
+    "jsdom": "^26.0.0",
+    "json-server": "^1.0.0-beta.3",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.45.0",
+    "vite": "^7.1.7",
+    "vitest": "^2.1.8"
   }
 }
