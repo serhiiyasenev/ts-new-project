@@ -37,7 +37,7 @@ function getOrCreateErrorElement(form: HTMLElement, className: string): HTMLElem
 }
 
 // Creates a task DOM element
-function createTaskElement(task: Task, editTask: (id: string) => void, deleteTask: (id: string) => void): HTMLDivElement {
+function createTaskElement(task: Task): HTMLDivElement {
   const taskEl = document.createElement('div');
   taskEl.className = 'task-item';
   taskEl.setAttribute('draggable', 'true');
@@ -51,9 +51,9 @@ function createTaskElement(task: Task, editTask: (id: string) => void, deleteTas
   taskEl.appendChild(descP);
   
   taskEl.appendChild(createTaskMeta(task));
-  taskEl.appendChild(createTaskActions(task, editTask, deleteTask));
+  taskEl.appendChild(createTaskActions(task));
   
-  // Drag events handled via event delegation on parent container
+  // Drag and click events handled via event delegation on parent container
   return taskEl;
 }
 
@@ -76,13 +76,13 @@ function attachTaskToColumn(taskEl: HTMLElement, status: Status): void {
 }
 
 // Renders tasks to the DOM
-function renderTasks(tasks: Task[], editTask: (id: string) => void, deleteTask: (id: string) => void): void {
+function renderTasks(tasks: Task[]): void {
   updateStatistics(tasks);
   clearTaskLists();
   
   const sortedTasks = sortTasksByCreatedDate(tasks);
   sortedTasks.forEach(task => {
-    const taskEl = createTaskElement(task, editTask, deleteTask);
+    const taskEl = createTaskElement(task);
     attachTaskToColumn(taskEl, task.status);
   });
 }
@@ -179,11 +179,11 @@ async function init() {
     }
   };
 
-  // Load and render tasks (defined after editTask and deleteTask to avoid temporal dead zone)
+  // Load and render tasks
   async function loadTasks() {
     try {
       const tasks = await TaskAPI.getAllTasks();
-      renderTasks(tasks, editTask, deleteTask);
+      renderTasks(tasks);
       // Hide backend error on successful load
       backendStatus.style.display = 'none';
     } catch (error) {
@@ -251,9 +251,26 @@ async function init() {
     });
   });
 
-  // Setup drag event delegation on task-list container
+  // Setup event delegation on task-list container
   const taskList = document.querySelector('.task-list');
   if (taskList) {
+    // Delegated click handler for Edit and Delete buttons
+    taskList.addEventListener('click', (e: Event) => {
+      const target = e.target as HTMLElement;
+      
+      // Check if clicked element is a button with data-action attribute
+      if (target.tagName === 'BUTTON' && target.dataset.action) {
+        const taskId = target.dataset.taskId;
+        if (!taskId) return;
+        
+        if (target.dataset.action === 'edit') {
+          editTask(taskId);
+        } else if (target.dataset.action === 'delete') {
+          deleteTask(taskId);
+        }
+      }
+    });
+
     // Delegated dragstart handler
     taskList.addEventListener('dragstart', (e: Event) => {
       const target = e.target as HTMLElement;
