@@ -16,8 +16,9 @@ export function sortTasksByCreatedDate(tasks: Task[]): Task[] {
 }
 
 /**
- * Gets or creates an error message element within a form.
+ * Gets or creates an error message element for a form.
  * The element is created once and reused for all error displays.
+ * Uses role="status" and aria-live="polite" for non-aggressive screen reader announcements.
  * 
  * @param form - The form element to attach the error element to
  * @param className - CSS class name for the error element
@@ -28,11 +29,10 @@ function getOrCreateErrorElement(form: HTMLElement, className: string): HTMLElem
   if (!errorEl) {
     errorEl = document.createElement('div');
     errorEl.className = className;
+    errorEl.setAttribute('role', 'status');
+    errorEl.setAttribute('aria-live', 'polite');
     form.appendChild(errorEl);
   }
-  // Ensure ARIA attributes are set on every call for accessibility
-  errorEl.setAttribute('role', 'alert');
-  errorEl.setAttribute('aria-live', 'assertive');
   return errorEl;
 }
 
@@ -249,6 +249,11 @@ async function init() {
         console.error('Error updating task status:', error);
       }
     });
+  });
+
+  // Global cleanup for drag-over class if drag is cancelled
+  document.addEventListener('dragend', () => {
+    columns.forEach(col => col.classList.remove('drag-over'));
   });
 
   // Setup event delegation on task-list container
