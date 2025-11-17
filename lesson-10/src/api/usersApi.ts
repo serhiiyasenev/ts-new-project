@@ -1,4 +1,4 @@
-import type { CreateUserData } from "../pages/CreateUser";
+import type { CreateUserData } from "../pages/CreateUser/CreateUser";
 
 export type User = {
     id: number;
@@ -37,9 +37,13 @@ export const createUser = async (data: CreateUserData): Promise<User> => {
 };
 
 export const fetchUserById = async (id: number): Promise<User> => {
-    const response = await fetch(`/api/users/${id}`);
+    const response = await fetch(`/api/users?id=${id}`);
     if (!response.ok) {
         throw new Error('Failed to fetch user');
     }
-    return response.json();
+    const users = await response.json();
+    if (!users || users.length === 0) {
+        throw new Error('User not found');
+    }
+    return users[0];
 };

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createUser } from "../api/usersApi";
+import { createUser } from "../../api/usersApi";
 import { useNavigate } from "react-router-dom";
 
 const userSchema = z.object({

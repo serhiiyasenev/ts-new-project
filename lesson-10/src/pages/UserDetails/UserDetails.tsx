@@ -1,9 +1,8 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { fetchUserById, type User } from "../api/usersApi";
+import { fetchUserById, type User } from "../../api/usersApi";
 
 const UserDetails = () => {
-    const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
@@ -47,8 +46,6 @@ const UserDetails = () => {
       </div>
       <div>
         <Link to="/users">Back to Users</Link>
-        {" | "}
-        <button onClick={() => navigate("/users")}>Go Back</button>
       </div>
     </>
   );
