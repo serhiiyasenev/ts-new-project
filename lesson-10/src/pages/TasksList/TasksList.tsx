@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './TasksList.css';
-import type { Task } from '../TaskCreate/TaskCreate';
+import type { Task } from '../../types/task';
 import { fetchTasks } from '../../api/tasksApi';
 
 const TasksList = () => {
