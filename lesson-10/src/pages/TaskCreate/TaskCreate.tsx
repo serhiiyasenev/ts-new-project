@@ -8,7 +8,7 @@ import { createTask } from '../../api';
 
 const taskSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
-  description: z.string().min(1, 'Description is required').min(10, 'Description must be at least 10 characters'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
   status: z.enum(['To Do', 'In Progress', 'Done']),
   dueDate: z.string().min(1, 'Due date is required').refine((date) => {
     const dueDate = new Date(date);
