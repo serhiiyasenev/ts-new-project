@@ -21,11 +21,19 @@ const TasksList = () => {
       });
   }, []);
 
-  const tasksByStatus = useMemo(() => ({
-    'To Do': tasks.filter(task => task.status === 'To Do'),
-    'In Progress': tasks.filter(task => task.status === 'In Progress'),
-    'Done': tasks.filter(task => task.status === 'Done'),
-  }), [tasks]);
+  const tasksByStatus = useMemo(() => {
+    return tasks.reduce((acc, task) => {
+      if (!acc[task.status]) {
+        acc[task.status] = [];
+      }
+      acc[task.status].push(task);
+      return acc;
+    }, {
+      'To Do': [],
+      'In Progress': [],
+      'Done': []
+    } as Record<string, Task[]>);
+  }, [tasks]);
 
   if (loading) return <div>Loading tasks...</div>;
   
