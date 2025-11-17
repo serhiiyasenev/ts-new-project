@@ -1,6 +1,7 @@
-import { Link, useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { fetchUserById, type User } from "../../api/usersApi";
+import { fetchUserById } from "../../api/usersApi";
+import type { User } from "../../types/user.types";
 
 const UserDetails = () => {
     const { id } = useParams<{ id: string }>();

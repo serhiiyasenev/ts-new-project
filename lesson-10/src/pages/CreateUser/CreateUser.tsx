@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createUser } from "../../api/usersApi";
 import { useNavigate } from "react-router-dom";
+import type { CreateUserData } from "../../types/user.types";
 
 const userSchema = z.object({
     firstName: z.string().nonempty("First name is required").regex(/^[A-Za-z]+$/i, "First name must contain only letters"),
@@ -14,8 +15,6 @@ const userSchema = z.object({
         return dob < today;
     }, { message: "Date of birth must be in the past" }),
 });
-
-export type CreateUserData = z.infer<typeof userSchema>;
 
 const CreateUser = () => {
     const { register, handleSubmit, formState: { isValid, errors } } = useForm<CreateUserData>({
