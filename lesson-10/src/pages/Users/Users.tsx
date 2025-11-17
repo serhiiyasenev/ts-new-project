@@ -28,7 +28,6 @@ const Users = () => {
         setLoading(false);
       }
     };
-
     fetchUserData();
   }, []);
 
