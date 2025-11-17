@@ -36,7 +36,7 @@ const Users = () => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="error-message">{error}</div>;
   return (
-    <>
+    <div className="users-container">
       <h1>Users Page</h1>
       <table className="users-table">
         <thead>
@@ -62,7 +62,7 @@ const Users = () => {
           ))}
         </tbody>
       </table>
-    </>
+    </div>
   )
 
 }

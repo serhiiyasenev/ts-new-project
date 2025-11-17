@@ -1,20 +1,53 @@
+.users-container {
+  padding: 0;
+}
+
+.users-container h1 {
+  margin: 0 0 24px 0;
+  font-size: 2rem;
+  color: #333;
+}
+
 .users-table {
   border-collapse: collapse;
   width: 100%;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .users-table th,
 .users-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-
-.users-table th {
-  background-color: #f2f2f2;
-  font-weight: bold;
+  border: 1px solid #e0e0e0;
+  padding: 12px 16px;
   text-align: left;
 }
 
+.users-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #555;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.users-table td {
+  color: #333;
+}
+
 .users-table tr:hover {
-  background-color: #f5f5f5;
+  background-color: #f5f9ff;
+}
+
+.users-table a {
+  color: #1976d2;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.users-table a:hover {
+  color: #1565c0;
+  text-decoration: underline;
 }

@@ -43,7 +43,7 @@ const TasksList = () => {
       <div className="empty-state">
         <h2>No tasks yet</h2>
         <p>Create your first task to get started!</p>
-        <Link to="/tasks/create" className="button-primary">
+        <Link to="/tasks/create" className="create-task-btn">
           Create Task
         </Link>
       </div>
@@ -54,7 +54,7 @@ const TasksList = () => {
     <div className="tasks-list">
       <div className="tasks-header">
         <h1>Tasks</h1>
-        <Link to="/tasks/create" className="button-primary">
+        <Link to="/tasks/create" className="create-task-btn">
           Create Task
         </Link>
       </div>
