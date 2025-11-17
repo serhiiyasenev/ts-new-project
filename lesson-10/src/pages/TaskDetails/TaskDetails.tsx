@@ -43,7 +43,7 @@ const TaskDetails = () => {
         <div className="task-info">
           <div className="info-item">
             <strong>Status:</strong>
-            <span className={`task-status status-${task.status}`}>
+            <span className={`task-status status-${task.status.toLowerCase().replace(/\s+/g, '-')}`}>
               {task.status}
             </span>
           </div>

@@ -30,10 +30,10 @@ src/
 │   ├── TaskDetails/       # Task details page
 │   └── TaskCreate/        # Create task form
 ├── types/                 # TypeScript type definitions
-│   ├── user.types.ts      # User & CreateUserData types
-│   ├── task.types.ts      # Task & CreateTaskData types
+│   ├── user.ts            # User & CreateUserData types
+│   ├── task.ts            # Task & CreateTaskData types
 │   └── index.ts           # Centralized exports
-├── routet.tsx             # Router configuration
+├── router.tsx             # Router configuration
 └── main.tsx               # Application entry point
 
 test/
