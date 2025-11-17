@@ -29,18 +29,25 @@
       "dateOfBirth": "2025-11-17"
     },
     {
-      "id": 5,
+      "id": "5",
       "firstName": "Test",
       "lastName": "UserA",
       "email": "emailA@email.com",
       "dateOfBirth": "2025-11-01"
     },
     {
-      "id": 6,
+      "id": "6",
       "firstName": "Test",
       "lastName": "UserB",
       "email": "emailB@email.com",
       "dateOfBirth": "2025-10-29"
+    },
+    {
+      "id": 7,
+      "firstName": "Test",
+      "lastName": "UserC",
+      "email": "emailC@email.com",
+      "dateOfBirth": "2025-11-01"
     }
   ]
 }

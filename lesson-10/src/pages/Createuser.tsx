@@ -2,6 +2,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createUser } from "../api/usersApi";
+import { useNavigate } from "react-router-dom";
 
 const userSchema = z.object({
     firstName: z.string().nonempty("First name is required").regex(/^[A-Za-z]+$/i, "First name must contain only letters"),
@@ -21,14 +22,20 @@ const CreateUser = () => {
       mode: "onTouched", 
       resolver: zodResolver(userSchema)
     });
-      const onSubmit = (data: CreateUserData) => {
+    const navigate = useNavigate();
+      const onSubmit = async (data: CreateUserData) => {
       const payload = {
         ...data,
         dateOfBirth: new Date(data.dateOfBirth).toISOString().split('T')[0]
       };
       console.log(payload);
-
-      createUser(payload);
+      try {
+        const newUser =  await createUser(payload);
+        console.log("User created successfully:", newUser);
+        navigate("/users");
+      } catch (error) {
+        console.error("Error creating user:", error);
+      }
     }
 
   return <div>
