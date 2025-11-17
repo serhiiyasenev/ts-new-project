@@ -10,12 +10,17 @@ const taskSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   status: z.enum(['To Do', 'In Progress', 'Done']),
-  dueDate: z.string().min(1, 'Due date is required').refine((date) => {
+  dueDate: z.string().refine((date) => {
+    if (!date || date.trim() === '') {
+      return false;
+    }
     const dueDate = new Date(date);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return dueDate >= today;
-  }, { message: 'Due date must be today or in the future' }),
+  }, {
+    message: 'Due date is required and must be today or in the future',
+  }),
 });
 
 const TaskCreate = () => {
