@@ -1,4 +1,4 @@
-import { createBrowserRouter} from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import Users from "./pages/Users";
 import CreateUser from "./pages/Createuser";
 import UserDetails from "./pages/UserDetails";

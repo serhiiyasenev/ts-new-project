@@ -26,3 +26,8 @@
 .read-the-docs {
   color: #888;
 }
+
+.error {
+  color: red;
+  font-size: 0.8rem;
+}
