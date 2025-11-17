@@ -80,7 +80,7 @@ main {
   max-width: 1400px;
   width: 100%;
 }
-}
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
