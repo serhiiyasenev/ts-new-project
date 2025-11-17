@@ -21,13 +21,8 @@ export const fetchTaskById = async (id: number): Promise<Task> => {
 };
 
 export const createTask = async (data: CreateTaskData): Promise<Task> => {
-  const tasks = await fetchTasks();
-  const maxId = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) : 0;
-  const newId = maxId + 1;
-
   const newTask = {
     ...data,
-    id: newId,
     createdAt: new Date().toISOString(),
   };
 
