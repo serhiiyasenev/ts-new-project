@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import { fetchTaskById } from '../../api';
+import type { Task } from '../../types';
 import './TaskDetails.css';
-import type { Task } from '../../types/task';
-import { fetchTaskById } from '../../api/tasksApi';
 
 const TaskDetails = () => {
   const { id } = useParams<{ id: string }>();

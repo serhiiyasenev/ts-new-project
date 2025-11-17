@@ -1,6 +1,8 @@
-import { Link, useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { fetchUserById, type User } from "../../api/usersApi";
+import { fetchUserById } from "../../api";
+import type { User } from "../../types";
+import './UserDetails.css';
 
 const UserDetails = () => {
     const { id } = useParams<{ id: string }>();
@@ -22,9 +24,9 @@ const UserDetails = () => {
         }
     }, [id]);
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
-    if (!user) return <div>User not found</div>;
+    if (loading) return <div className="loading">Loading...</div>;
+    if (error) return <div className="error-message">Error: {error}</div>;
+    if (!user) return <div className="error-message">User not found</div>;
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -35,19 +37,32 @@ const UserDetails = () => {
     };
 
   return (
-    <>
+    <div className="user-details">
       <h1>User Details</h1>
-      <div>
-        <p><strong>ID:</strong> {user.id}</p>
-        <p><strong>First Name:</strong> {user.firstName}</p>
-        <p><strong>Last Name:</strong> {user.lastName}</p>
-        <p><strong>Email:</strong> {user.email}</p>
-        <p><strong>Date of Birth:</strong> {formatDate(user.dateOfBirth)}</p>
+      <div className="details-card">
+        <div className="detail-row">
+          <span className="detail-label">ID:</span>
+          <span className="detail-value">{user.id}</span>
+        </div>
+        <div className="detail-row">
+          <span className="detail-label">First Name:</span>
+          <span className="detail-value">{user.firstName}</span>
+        </div>
+        <div className="detail-row">
+          <span className="detail-label">Last Name:</span>
+          <span className="detail-value">{user.lastName}</span>
+        </div>
+        <div className="detail-row">
+          <span className="detail-label">Email:</span>
+          <span className="detail-value">{user.email}</span>
+        </div>
+        <div className="detail-row">
+          <span className="detail-label">Date of Birth:</span>
+          <span className="detail-value">{formatDate(user.dateOfBirth)}</span>
+        </div>
       </div>
-      <div>
-        <Link to="/users">Back to Users</Link>
-      </div>
-    </>
+      <Link to="/users" className="button-secondary">Back to Users</Link>
+    </div>
   );
 }
 

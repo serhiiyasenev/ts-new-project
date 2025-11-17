@@ -1,12 +1,4 @@
-import type { CreateUserData } from "../pages/CreateUser/CreateUser";
-
-export type User = {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-    dateOfBirth: string;
-};
+import type { User, CreateUserData } from '../types/user.types';
 
 export const fetchUsers = async (): Promise<User[]> => {
     const response = await fetch('/api/users');

@@ -2,9 +2,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
+import { createTask } from '../../api';
+import type { CreateTaskData } from '../../types';
 import './TaskCreate.css';
-import { createTask } from '../../api/tasksApi';
-import type { CreateTaskData } from '../../types/task';
 
 const taskSchema = z.object({
   title: z.string().min(1, 'Title is required').min(3, 'Title must be at least 3 characters'),
