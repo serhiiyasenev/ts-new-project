@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import TaskCreate from '../src/pages/TaskCreate/TaskCreate';
 
-vi.mock('../src/api/tasksApi');
+vi.mock('../src/api');
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
