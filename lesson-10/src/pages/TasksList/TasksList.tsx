@@ -33,7 +33,7 @@ const TasksList = () => {
     return (
       <div className="error-message">
         <h2>Error</h2>
-        <p>{error}</p>
+        <p>Error: {error}</p>
       </div>
     );
   }
