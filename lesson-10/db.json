@@ -43,11 +43,18 @@
       "dateOfBirth": "2025-10-29"
     },
     {
-      "id": 7,
+      "id": "7",
       "firstName": "Test",
       "lastName": "UserC",
       "email": "emailC@email.com",
       "dateOfBirth": "2025-11-01"
+    },
+    {
+      "id": 8,
+      "firstName": "Test",
+      "lastName": "UserD",
+      "email": "emailD@email.com",
+      "dateOfBirth": "2025-10-26"
     }
   ]
 }

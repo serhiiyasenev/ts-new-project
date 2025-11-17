@@ -43,22 +43,22 @@ const CreateUser = () => {
     <form onSubmit={handleSubmit(onSubmit)}>
       <div>
       <label htmlFor="firstName">First Name:</label><br />
-      <input type="text" {...register("firstName", {required: "First name is required"})} />
+      <input id="firstName" type="text" {...register("firstName", {required: "First name is required"})} />
       <div className="error"> {errors.firstName?.message} </div>
        </div>
       <div> 
       <label htmlFor="lastName">Last Name:</label><br />
-      <input type="text" {...register("lastName", {required: "Last name is required"})} />
+      <input id="lastName" type="text" {...register("lastName", {required: "Last name is required"})} />
       <div className="error"> {errors.lastName?.message} </div>
       </div>
       <div> 
       <label htmlFor="email">Email:</label><br />
-      <input type="email" {...register("email", {required: "Email is required"})} />
+      <input id="email" type="email" {...register("email", {required: "Email is required"})} />
       <div className="error"> {errors.email?.message} </div>
       </div>
       <div> 
       <label htmlFor="dateOfBirth">Date of Birth:</label><br />
-      <input type="date" {...register("dateOfBirth", {required: "Date of birth is required"})} />
+      <input id="dateOfBirth" type="date" {...register("dateOfBirth", {required: "Date of birth is required"})} />
       <div className="error"> {errors.dateOfBirth?.message} </div>
       </div>
       <button type="submit" disabled={!isValid}>Create</button>
