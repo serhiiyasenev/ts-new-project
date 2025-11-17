@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import './TaskDetails.css';
-import type { Task } from '../TaskCreate/TaskCreate';
+import type { Task } from '../../api/tasksApi';
 import { fetchTaskById } from '../../api/tasksApi';
 
 const TaskDetails = () => {
