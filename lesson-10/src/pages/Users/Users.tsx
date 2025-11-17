@@ -9,17 +9,6 @@ const Users = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchUserData = async () => {
-    try {
-      const result = await fetchUsers();
-      setUsers(result);
-      setLoading(false);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch users');
-      setLoading(false);
-    }
-  }
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -29,7 +18,18 @@ const Users = () => {
   };
 
   useEffect(() => {
-    fetchUserData()
+    const fetchUserData = async () => {
+      try {
+        const result = await fetchUsers();
+        setUsers(result);
+        setLoading(false);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch users');
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
   }, []);
 
   if (loading) return <div>Loading...</div>;
