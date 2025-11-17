@@ -11,7 +11,7 @@ describe('CreateUser', () => {
         <CreateUser />
        </MemoryRouter>
     )
-    expect(screen.getByText("Create User Page")).toBeInTheDocument()
+    expect(screen.getByText("Create New User")).toBeInTheDocument()
   })
 
   it('button is disabled when form is invalid', async () => {
@@ -20,7 +20,7 @@ describe('CreateUser', () => {
         <CreateUser />
        </MemoryRouter>
     )
-    const button = screen.getByRole("button", { name: /create/i })
+    const button = screen.getByRole("button", { name: /create user/i })
     expect(button).toBeDisabled()
   })
 

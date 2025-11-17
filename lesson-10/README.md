@@ -1,73 +1,175 @@
-# React + TypeScript + Vite
+# Task & User Management App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript + Vite application for managing tasks and users with a clean, feature-based architecture.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **User Management**: Create, view, and list users
+- **Task Management**: Kanban-style task board with To Do, In Progress, and Done columns
+- **Form Validation**: React Hook Form with Zod schema validation
+- **Routing**: React Router v7 with nested routes
+- **API Integration**: json-server for mock REST API
+- **Testing**: Vitest with React Testing Library
+- **TypeScript**: Full type safety throughout the application
 
-## React Compiler
+## 📁 Project Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```
+src/
+├── api/                    # API layer
+│   ├── usersApi.ts        # User API functions
+│   └── tasksApi.ts        # Task API functions
+├── components/            # Shared components
+│   ├── Header.tsx         # Navigation header
+│   └── Layout.tsx         # Main layout wrapper
+├── pages/                 # Page components
+│   ├── Users/             # Users list page
+│   ├── UserDetails/       # User details page
+│   ├── CreateUser/        # Create user form
+│   ├── TasksList/         # Kanban task board
+│   ├── TaskDetails/       # Task details page
+│   └── TaskCreate/        # Create task form
+├── types/                 # TypeScript type definitions
+│   ├── user.types.ts      # User & CreateUserData types
+│   ├── task.types.ts      # Task & CreateTaskData types
+│   └── index.ts           # Centralized exports
+├── routet.tsx             # Router configuration
+└── main.tsx               # Application entry point
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+test/
+├── config/                # Test configuration
+│   ├── setup.ts           # Vitest setup with jest-dom
+│   └── vitest.d.ts        # TypeScript declarations
+├── CreateUser.test.tsx    # User form tests
+├── TaskCreate.test.tsx    # Task form tests
+└── TasksList.test.tsx     # Task list tests
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠️ Tech Stack
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
+- **React 19.2.0** - UI library
+- **TypeScript** - Type safety
+- **Vite 7.2.2** - Build tool and dev server
+- **React Router DOM 7.9.6** - Client-side routing
+- **React Hook Form 7.66.0** - Form management
+- **Zod 4.1.12** - Schema validation
+- **json-server 1.0.0** - Mock REST API
+- **Vitest 4.0.10** - Testing framework
+- **@testing-library/react** - Component testing
+
+## 🏃 Getting Started
+
+### Installation
+
+```bash
+npm install
+```
+
+### Development
+
+Run both dev server and API server concurrently:
+
+```bash
+npm run dev
+```
+
+This starts:
+
+- Vite dev server on `http://localhost:5173`
+- json-server API on `http://localhost:3000`
+
+### Production Build
+
+```bash
+npm run build
+```
+
+### Testing
+
+```bash
+npm test        # Watch mode
+npm test -- --run  # Run once
+```
+
+## 🎨 Features Highlights
+
+### Kanban Task Board
+
+- Three columns: To Do, In Progress, Done
+- Color-coded status badges
+- Drag-free card-based interface
+- Empty state handling
+
+### Form Validation
+
+- Real-time validation with Zod schemas
+- Custom error messages
+- Disabled submit until valid
+- Date validation (past for users, future for tasks)
+
+### Type Safety
+
+- Centralized type definitions in `src/types/`
+- No circular dependencies
+- Consistent imports across the app
+
+### Testing
+
+- Component rendering tests
+- Form validation tests
+- User interaction tests
+- 100% test pass rate
+
+## 📝 API Endpoints
+
+The mock API (json-server) provides:
+
+**Users**
+
+- `GET /api/users` - List all users
+- `GET /api/users?id={id}` - Get user by ID
+- `POST /api/users` - Create new user
+
+**Tasks**
+
+- `GET /api/tasks` - List all tasks
+- `GET /api/tasks?id={id}` - Get task by ID
+- `POST /api/tasks` - Create new task
+
+## 🔧 Configuration
+
+- **Vite**: `vite.config.ts` - Proxy configuration for API
+- **TypeScript**: `tsconfig.json` - Compiler options
+- **Vitest**: `vitest.config.ts` - Test configuration
+- **ESLint**: `eslint.config.js` - Linting rules
+
+## 📄 License
+
+This project is part of a TypeScript learning curriculum.
+
 import reactDom from 'eslint-plugin-react-dom'
 
 export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
+globalIgnores(['dist']),
+{
+files: ['**/*.{ts,tsx}'],
+extends: [
+// Other configs...
+// Enable lint rules for React
+reactX.configs['recommended-typescript'],
+// Enable lint rules for React DOM
+reactDom.configs.recommended,
+],
+languageOptions: {
+parserOptions: {
+project: ['./tsconfig.node.json', './tsconfig.app.json'],
+tsconfigRootDir: import.meta.dirname,
+},
+// other options...
+},
+},
 ])
+
+```
+
 ```
