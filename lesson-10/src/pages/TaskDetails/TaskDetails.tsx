@@ -28,9 +28,10 @@ const TaskDetails = () => {
   if (error) return <div className="error-message">Error: {error}</div>;
   if (!task) return <div>Task not found</div>;
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '—';
     const date = new Date(dateString);
-    return date.toLocaleDateString();
+    return isNaN(date.getTime()) ? '—' : date.toLocaleDateString();
   };
 
   return (
@@ -38,30 +39,27 @@ const TaskDetails = () => {
       <Link to="/tasks" className="back-button">← Back to Tasks</Link>
       
       <div className="task-content">
-        <h1>{task.title}</h1>
+        <h1>{task.title || '—'}</h1>
         
         <div className="task-info">
           <div className="info-item">
             <strong>Status:</strong>
-            <span className={`task-status status-${task.status.toLowerCase().replace(/\s+/g, '-')}`}>
-              {task.status}
+            <span className={`task-status status-${task.status ? task.status.toLowerCase().replace(/\s+/g, '-') : 'unknown'}`}>
+              {task.status || '—'}
             </span>
           </div>
-          
           <div className="info-item">
             <strong>Due Date:</strong>
             <span>{formatDate(task.dueDate)}</span>
           </div>
-          
           <div className="info-item">
             <strong>Created:</strong>
             <span>{formatDate(task.createdAt)}</span>
           </div>
         </div>
-        
         <div className="task-description-full">
           <h2>Description</h2>
-          <p>{task.description}</p>
+          <p>{task.description || '—'}</p>
         </div>
       </div>
     </div>

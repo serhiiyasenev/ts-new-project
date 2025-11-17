@@ -3,29 +3,25 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
 import './TaskCreate.css';
-import type { CreateTaskData } from '../../types';
 import { createTask } from '../../api';
+
+type TaskFormFields = z.infer<typeof taskSchema>;
 
 const taskSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   status: z.enum(['To Do', 'In Progress', 'Done']),
-  dueDate: z.string().refine((date) => {
-    if (!date || date.trim() === '') {
-      return false;
-    }
+  dueDate: z.string().nonempty("Due date is required").refine((date) => {
     const dueDate = new Date(date);
     const today = new Date();
+    dueDate.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
     return dueDate >= today;
-  }, {
-    message: 'Due date must be today or in the future',
-  }),
+  }, { message: "Due date must be today or in the future" }),
 });
 
 const TaskCreate = () => {
-  const navigate = useNavigate();
-  const { register, handleSubmit, formState: { isValid, errors } } = useForm<CreateTaskData>({
+  const { register, handleSubmit, formState: { isValid, errors } } = useForm<TaskFormFields>({
     mode: 'onTouched',
     resolver: zodResolver(taskSchema),
     defaultValues: {
@@ -33,9 +29,14 @@ const TaskCreate = () => {
     },
   });
 
-  const onSubmit = async (data: CreateTaskData) => {
+  const navigate = useNavigate();
+
+  const onSubmit = async (data: TaskFormFields) => {
     try {
-      await createTask(data);
+      await createTask({
+        ...data,
+        createdAt: new Date().toISOString()
+      });
       navigate('/tasks');
     } catch (error) {
       console.error('Error creating task:', error);
