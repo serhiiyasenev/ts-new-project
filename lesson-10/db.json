@@ -1,67 +1,51 @@
 {
   "users": [
     {
-      "id": 1,
+      "id": "1",
       "firstName": "John",
       "lastName": "Doe",
       "email": "john.doe@example.com",
       "dateOfBirth": "1990-01-01"
     },
     {
-      "id": 2,
+      "id": "2",
       "firstName": "Jane",
       "lastName": "Smith",
       "email": "jane.smith@example.com",
       "dateOfBirth": "1992-02-02"
     },
     {
-      "id": 3,
+      "id": "3",
       "firstName": "Alice",
       "lastName": "Johnson",
       "email": "alice.johnson@example.com",
       "dateOfBirth": "1994-03-03"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "1",
+      "title": "Complete project documentation",
+      "description": "Write comprehensive documentation for the React project including setup instructions and API documentation",
+      "status": "In Progress",
+      "dueDate": "2025-12-01",
+      "createdAt": "2025-11-15T10:00:00.000Z"
     },
     {
-      "id": 4,
-      "firstName": "Test",
-      "lastName": "User",
-      "email": "email@email.com",
-      "dateOfBirth": "2025-11-17"
+      "id": "2",
+      "title": "Review pull requests",
+      "description": "Review and provide feedback on pending pull requests from team members",
+      "status": "To Do",
+      "dueDate": "2025-11-20",
+      "createdAt": "2025-11-15T11:00:00.000Z"
     },
     {
-      "id": 5,
-      "firstName": "Test",
-      "lastName": "UserA",
-      "email": "emailA@email.com",
-      "dateOfBirth": "2025-11-01"
-    },
-    {
-      "id": 6,
-      "firstName": "Test",
-      "lastName": "UserB",
-      "email": "emailB@email.com",
-      "dateOfBirth": "2025-10-29"
-    },
-    {
-      "id": 7,
-      "firstName": "Test",
-      "lastName": "UserC",
-      "email": "emailC@email.com",
-      "dateOfBirth": "2025-11-01"
-    },
-    {
-      "id": 8,
-      "firstName": "Test",
-      "lastName": "UserD",
-      "email": "emailD@email.com",
-      "dateOfBirth": "2025-10-26"
-    },
-    {
-      "id": 9,
-      "firstName": "Test",
-      "lastName": "UserE",
-      "email": "emailE@email.com",
-      "dateOfBirth": "1991-11-21"
+      "id": 3,
+      "title": "Test Task Title",
+      "description": "Test Task Title Description",
+      "status": "Done",
+      "dueDate": "2025-11-17",
+      "createdAt": "2025-11-17T16:26:51.754Z"
     }
   ]
 }
