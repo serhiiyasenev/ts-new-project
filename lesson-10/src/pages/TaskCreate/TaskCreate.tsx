@@ -19,7 +19,7 @@ const taskSchema = z.object({
     today.setHours(0, 0, 0, 0);
     return dueDate >= today;
   }, {
-    message: 'Due date is required and must be today or in the future',
+    message: 'Due date must be today or in the future',
   }),
 });
 
