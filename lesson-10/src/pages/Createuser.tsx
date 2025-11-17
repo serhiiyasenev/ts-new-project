@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createUser } from "../api/usersApi";
 
 const userSchema = z.object({
     firstName: z.string().nonempty("First name is required").regex(/^[A-Za-z]+$/i, "First name must contain only letters"),
@@ -13,19 +14,21 @@ const userSchema = z.object({
     }, { message: "Date of birth must be in the past" }),
 });
 
-type CreateUserFormData = z.infer<typeof userSchema>;
+export type CreateUserData = z.infer<typeof userSchema>;
 
 const CreateUser = () => {
-    const { register, handleSubmit, formState: { isValid, errors } } = useForm<CreateUserFormData>({
+    const { register, handleSubmit, formState: { isValid, errors } } = useForm<CreateUserData>({
       mode: "onTouched", 
       resolver: zodResolver(userSchema)
     });
-      const onSubmit = (data: CreateUserFormData) => {
+      const onSubmit = (data: CreateUserData) => {
       const payload = {
         ...data,
-        dateOfBirth: new Date(data.dateOfBirth)
+        dateOfBirth: new Date(data.dateOfBirth).toISOString().split('T')[0]
       };
       console.log(payload);
+
+      createUser(payload);
     }
 
   return <div>

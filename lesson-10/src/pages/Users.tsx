@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from "react";
 import { fetchUsers, type User } from "../api/usersApi";
+import "./Users.css";
 
 const Users = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -9,19 +10,42 @@ const Users = () => {
     setUsers(result);
   }
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   useEffect(() => {
     fetchUserData()
   }, []);
   return (
     <>
       <h1>Users Page</h1>
-      <div>
-        {users.map((user) => (
-          <div key={user.id}>
-            <h3>{user.firstName} {user.lastName}</h3>
-          </div>
-        ))}
-      </div>
+      <table className="users-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Date of Birth</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td>{user.id}</td>
+              <td>{user.firstName}</td>
+              <td>{user.lastName}</td>
+              <td>{user.email}</td>
+              <td>{formatDate(user.dateOfBirth)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </>
   )
 
