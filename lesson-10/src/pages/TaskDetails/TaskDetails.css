@@ -71,3 +71,19 @@
   color: #333;
   margin-top: 0.5em;
 }
+
+/* Status variants for task status */
+.status-To\ Do {
+  background: #ffeeba;
+  color: #856404;
+}
+
+.status-In\ Progress {
+  background: #bee5eb;
+  color: #0c5460;
+}
+
+.status-Done {
+  background: #c3e6cb;
+  color: #155724;
+}
