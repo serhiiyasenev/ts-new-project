@@ -2,9 +2,9 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
-import { createUser } from "../../api";
-import type { CreateUserData } from "../../types";
 import './CreateUser.css';
+import type { CreateUserData } from "../../types/user";
+import { createUser } from "../../api/usersApi";
 
 const userSchema = z.object({
     firstName: z.string().nonempty("First name is required").regex(/^[A-Za-z]+$/i, "First name must contain only letters"),

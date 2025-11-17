@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchUsers } from "../../api";
-import type { User } from "../../types";
 import "./Users.css";
+import type { User } from "../../types/user";
+import { fetchUsers } from "../../api/usersApi";
 
 const Users = () => {
   const [users, setUsers] = useState<User[]>([]);
