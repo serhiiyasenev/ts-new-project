@@ -1,14 +1,24 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from "react";
-import { fetchUsers, type User } from "../../api/usersApi";
 import { Link } from "react-router-dom";
+import { fetchUsers } from "../../api";
+import type { User } from "../../types";
 import "./Users.css";
 
 const Users = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const fetchUserData = async () => {
-    const result = await fetchUsers();
-    setUsers(result);
+    try {
+      const result = await fetchUsers();
+      setUsers(result);
+      setLoading(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch users');
+      setLoading(false);
+    }
   }
 
   const formatDate = (dateString: string) => {
@@ -22,6 +32,9 @@ const Users = () => {
   useEffect(() => {
     fetchUserData()
   }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div className="error-message">{error}</div>;
   return (
     <>
       <h1>Users Page</h1>

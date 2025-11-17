@@ -1,8 +1,8 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { fetchTasks } from '../../api';
+import type { Task } from '../../types';
 import './TasksList.css';
-import type { Task } from '../TaskCreate/TaskCreate';
-import { fetchTasks } from '../../api/tasksApi';
 
 const TasksList = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
