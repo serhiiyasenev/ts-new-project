@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Users from '../src/pages/Users/Users';
-import * as usersApi from '../src/api/usersApi';
+import * as api from '../src/api';
 
-vi.mock('../src/api/usersApi');
+vi.mock('../src/api');
 
 describe('Users', () => {
   beforeEach(() => {
@@ -29,7 +29,7 @@ describe('Users', () => {
       },
     ];
 
-    vi.mocked(usersApi.fetchUsers).mockResolvedValue(mockUsers);
+    vi.mocked(api.fetchUsers).mockResolvedValue(mockUsers);
 
     render(
       <MemoryRouter>
@@ -49,7 +49,7 @@ describe('Users', () => {
   });
 
   it('should show loading state initially', () => {
-    vi.mocked(usersApi.fetchUsers).mockImplementation(
+    vi.mocked(api.fetchUsers).mockImplementation(
       () => new Promise(() => {}) // Never resolves
     );
 
@@ -64,7 +64,7 @@ describe('Users', () => {
 
   it('should display error message when fetch fails', async () => {
     const errorMessage = 'Failed to fetch users';
-    vi.mocked(usersApi.fetchUsers).mockRejectedValue(new Error(errorMessage));
+    vi.mocked(api.fetchUsers).mockRejectedValue(new Error(errorMessage));
 
     render(
       <MemoryRouter>
@@ -88,7 +88,7 @@ describe('Users', () => {
       },
     ];
 
-    vi.mocked(usersApi.fetchUsers).mockResolvedValue(mockUsers);
+    vi.mocked(api.fetchUsers).mockResolvedValue(mockUsers);
 
     render(
       <MemoryRouter>

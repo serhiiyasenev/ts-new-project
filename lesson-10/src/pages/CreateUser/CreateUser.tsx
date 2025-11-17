@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import './CreateUser.css';
-import type { CreateUserData } from "../../types/user";
-import { createUser } from "../../api/usersApi";
+import type { CreateUserData } from "../../types";
+import { createUser } from "../../api";
 
 const userSchema = z.object({
     firstName: z.string().nonempty("First name is required").regex(/^[A-Za-z]+$/i, "First name must contain only letters"),
@@ -30,8 +30,7 @@ const CreateUser = () => {
         dateOfBirth: new Date(data.dateOfBirth).toISOString().split('T')[0]
       };
       try {
-        const newUser = await createUser(payload);
-        console.log("User created successfully:", newUser);
+        await createUser(payload);
         navigate("/users");
       } catch (error) {
         console.error("Error creating user:", error);

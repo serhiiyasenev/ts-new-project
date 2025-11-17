@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import TaskDetails from '../src/pages/TaskDetails/TaskDetails';
-import * as tasksApi from '../src/api/tasksApi';
+import * as api from '../src/api';
 
-vi.mock('../src/api/tasksApi');
+vi.mock('../src/api');
 
 describe('TaskDetails', () => {
   beforeEach(() => {
@@ -21,7 +21,7 @@ describe('TaskDetails', () => {
       createdAt: '2025-11-17T10:00:00.000Z',
     };
 
-    vi.mocked(tasksApi.fetchTaskById).mockResolvedValue(mockTask);
+    vi.mocked(api.fetchTaskById).mockResolvedValue(mockTask);
 
     render(
       <MemoryRouter initialEntries={['/tasks/1']}>
@@ -41,7 +41,7 @@ describe('TaskDetails', () => {
   });
 
   it('should show loading state initially', () => {
-    vi.mocked(tasksApi.fetchTaskById).mockImplementation(
+    vi.mocked(api.fetchTaskById).mockImplementation(
       () => new Promise(() => {}) // Never resolves
     );
 
@@ -58,7 +58,7 @@ describe('TaskDetails', () => {
 
   it('should display error message when fetch fails', async () => {
     const errorMessage = 'Failed to fetch task';
-    vi.mocked(tasksApi.fetchTaskById).mockRejectedValue(
+    vi.mocked(api.fetchTaskById).mockRejectedValue(
       new Error(errorMessage)
     );
 
@@ -85,7 +85,7 @@ describe('TaskDetails', () => {
       createdAt: '2025-11-17T10:00:00.000Z',
     };
 
-    vi.mocked(tasksApi.fetchTaskById).mockResolvedValue(mockTask);
+    vi.mocked(api.fetchTaskById).mockResolvedValue(mockTask);
 
     render(
       <MemoryRouter initialEntries={['/tasks/1']}>

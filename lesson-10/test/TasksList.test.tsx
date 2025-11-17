@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import TasksList from '../src/pages/TasksList/TasksList';
-import * as tasksApi from '../src/api/tasksApi';
+import * as api from '../src/api';
 
-vi.mock('../src/api/tasksApi');
+vi.mock('../src/api');
 
 describe('TasksList', () => {
   beforeEach(() => {
@@ -31,7 +31,7 @@ describe('TasksList', () => {
       },
     ];
 
-    vi.mocked(tasksApi.fetchTasks).mockResolvedValue(mockTasks);
+    vi.mocked(api.fetchTasks).mockResolvedValue(mockTasks);
 
     render(
       <MemoryRouter>
@@ -51,7 +51,7 @@ describe('TasksList', () => {
   });
 
   it('should show empty state when no tasks exist', async () => {
-    vi.mocked(tasksApi.fetchTasks).mockResolvedValue([]);
+    vi.mocked(api.fetchTasks).mockResolvedValue([]);
 
     render(
       <MemoryRouter>
@@ -68,7 +68,7 @@ describe('TasksList', () => {
 
   it('should display error message when fetch fails', async () => {
     const errorMessage = 'Failed to fetch tasks';
-    vi.mocked(tasksApi.fetchTasks).mockRejectedValue(new Error(errorMessage));
+    vi.mocked(api.fetchTasks).mockRejectedValue(new Error(errorMessage));
 
     render(
       <MemoryRouter>
