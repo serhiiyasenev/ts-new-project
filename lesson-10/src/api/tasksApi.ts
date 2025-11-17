@@ -1,5 +1,17 @@
-import type { CreateTaskData, Task } from "../pages/TaskCreate/TaskCreate";
+// Type definitions moved from TaskCreate to avoid circular dependency and maintain separation of concerns.
+export type Task = {
+  id: number;
+  title: string;
+  description: string;
+  createdAt: string;
+  // Add other fields as needed
+};
 
+export type CreateTaskData = {
+  title: string;
+  description: string;
+  // Add other fields as needed
+};
 export const fetchTasks = async (): Promise<Task[]> => {
   const response = await fetch('/api/tasks');
   if (!response.ok) {
