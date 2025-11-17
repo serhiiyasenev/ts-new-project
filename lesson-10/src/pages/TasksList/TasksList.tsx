@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchTasks } from '../../api';
 import type { Task } from '../../types';
@@ -20,6 +20,12 @@ const TasksList = () => {
         setLoading(false);
       });
   }, []);
+
+  const tasksByStatus = useMemo(() => ({
+    'To Do': tasks.filter(task => task.status === 'To Do'),
+    'In Progress': tasks.filter(task => task.status === 'In Progress'),
+    'Done': tasks.filter(task => task.status === 'Done'),
+  }), [tasks]);
 
   if (loading) return <div>Loading tasks...</div>;
   
@@ -43,12 +49,6 @@ const TasksList = () => {
       </div>
     );
   }
-
-  const tasksByStatus = {
-    'To Do': tasks.filter(task => task.status === 'To Do'),
-    'In Progress': tasks.filter(task => task.status === 'In Progress'),
-    'Done': tasks.filter(task => task.status === 'Done'),
-  };
 
   return (
     <div className="tasks-list">
