@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
 import './TaskCreate.css';
 import { createTask } from '../../api/tasksApi';
+import type { CreateTaskData } from '../../types/task';
 
 const taskSchema = z.object({
   title: z.string().min(1, 'Title is required').min(3, 'Title must be at least 3 characters'),
@@ -16,17 +17,6 @@ const taskSchema = z.object({
     return dueDate >= today;
   }, { message: 'Due date must be today or in the future' }),
 });
-
-export type Task = {
-  id: number;
-  title: string;
-  description: string;
-  status: 'To Do' | 'In Progress' | 'Done';
-  dueDate: string;
-  createdAt: string;
-};
-
-export type CreateTaskData = Omit<Task, 'id' | 'createdAt'>;
 
 const TaskCreate = () => {
   const navigate = useNavigate();
