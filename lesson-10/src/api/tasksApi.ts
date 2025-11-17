@@ -9,15 +9,15 @@ export const fetchTasks = async (): Promise<Task[]> => {
 };
 
 export const fetchTaskById = async (id: number): Promise<Task> => {
-  const response = await fetch(`/api/tasks?id=${id}`);
+  const response = await fetch(`/api/tasks/${id}`);
   if (!response.ok) {
     throw new Error('Failed to fetch task');
   }
-  const tasks = await response.json();
-  if (!tasks || tasks.length === 0) {
+  const task = await response.json();
+  if (!task) {
     throw new Error('Task not found');
   }
-  return tasks[0];
+  return task;
 };
 
 export const createTask = async (data: CreateTaskData): Promise<Task> => {
