@@ -1,5 +1,7 @@
 import type { CreateTaskData, Task } from "../pages/TaskCreate/TaskCreate";
 
+export type { Task };
+
 export const fetchTasks = async (): Promise<Task[]> => {
   const response = await fetch('/api/tasks');
   if (!response.ok) {
