@@ -77,7 +77,7 @@ describe('TasksList', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(errorMessage)).toBeInTheDocument();
+      expect(screen.getByText(/Failed to fetch tasks/i)).toBeInTheDocument();
     });
   });
 });
