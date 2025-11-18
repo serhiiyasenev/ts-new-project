@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import TasksList from '../src/pages/TasksList/TasksList';
 import * as api from '../src/api';
+import '@testing-library/jest-dom';
 
 vi.mock('../src/api');
 

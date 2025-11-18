@@ -12,7 +12,8 @@ export const createUser = async (data: CreateUserData): Promise<User> => {
     const users = await fetchUsers();
     const maxId = users.length > 0 ? Math.max(...users.map(u => u.id)) : 0;
     const newId = maxId + 1;
-
+    // This was done specifically to generate incremental number IDs,
+    //  because otherwise, json-server creates them as random strings.
     const response = await fetch('/api/users', {
         method: 'POST',
         headers: {

@@ -12,7 +12,8 @@ export const createTask = async (data: CreateTaskData): Promise<Task> => {
     const tasks = await fetchTasks();
     const maxId = tasks.length > 0 ? Math.max(...tasks.map(u => u.id)) : 0;
     const newId = maxId + 1;
-
+    // This was done specifically to generate incremental number IDs,
+    //  because otherwise, json-server creates them as random strings.
     const newTask = {
       ...data,
       id: newId
