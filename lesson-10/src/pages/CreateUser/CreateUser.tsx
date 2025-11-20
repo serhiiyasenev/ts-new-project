@@ -1,33 +1,22 @@
-import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import './CreateUser.css';
-import type { CreateUserData } from "../../types";
 import { createUser } from "../../api";
-
-const userSchema = z.object({
-    firstName: z.string().nonempty("First name is required").regex(/^[A-Za-z]+$/i, "First name must contain only letters"),
-    lastName: z.string().nonempty("Last name is required").regex(/^[A-Za-z]+$/i, "Last name must contain only letters"),
-    email: z.email("Invalid email address").min(1, "Email is required"),
-    dateOfBirth: z.string().nonempty("Date of birth is required").refine((date) => {
-        const dob = new Date(date);
-        const today = new Date();
-        return dob < today;
-    }, { message: "Date of birth must be in the past" }),
-});
+import { userSchema, type UserFormFields } from "../../schema/userSchema";
 
 const CreateUser = () => {
-    const { register, handleSubmit, formState: { isValid, errors } } = useForm<CreateUserData>({
+    const { register, handleSubmit, formState: { isValid, errors } } = useForm<UserFormFields>({
       mode: "onTouched", 
       resolver: zodResolver(userSchema)
     });
+
     const navigate = useNavigate();
     
-    const onSubmit = async (data: CreateUserData) => {
+    const onSubmit = async (data: UserFormFields) => {
       const payload = {
         ...data,
-        dateOfBirth: new Date(data.dateOfBirth).toISOString().split('T')[0]
+      createdAt: new Date().toISOString()
       };
       try {
         await createUser(payload);

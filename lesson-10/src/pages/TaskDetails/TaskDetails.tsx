@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import type { Task } from '../../types';
 import './TaskDetails.css';
 import { fetchTaskById } from '../../api';
+import { formatDateToYearMonthDay } from '../../utils/dateUtils';
 
 const TaskDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,10 +16,11 @@ const TaskDetails = () => {
       fetchTaskById(Number(id))
         .then((data) => {
           setTask(data);
-          setLoading(false);
         })
         .catch((err: Error) => {
           setError(err.message);
+        })
+        .finally(() => {
           setLoading(false);
         });
     }
@@ -27,12 +29,6 @@ const TaskDetails = () => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="error-message">Error: {error}</div>;
   if (!task) return <div>Task not found</div>;
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return '—';
-    const date = new Date(dateString);
-    return isNaN(date.getTime()) ? '—' : date.toLocaleDateString();
-  };
 
   return (
     <div className="task-details">
@@ -50,11 +46,11 @@ const TaskDetails = () => {
           </div>
           <div className="info-item">
             <strong>Due Date:</strong>
-            <span>{formatDate(task.dueDate)}</span>
+            <span>{formatDateToYearMonthDay(task.dueDate)}</span>
           </div>
           <div className="info-item">
             <strong>Created:</strong>
-            <span>{formatDate(task.createdAt)}</span>
+            <span>{formatDateToYearMonthDay(task.createdAt)}</span>
           </div>
         </div>
         <div className="task-description-full">

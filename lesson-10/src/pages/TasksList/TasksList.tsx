@@ -13,10 +13,11 @@ const TasksList = () => {
     fetchTasks()
       .then((data) => {
         setTasks(data);
-        setLoading(false);
       })
       .catch((err: Error) => {
         setError(err.message);
+      })
+      .finally(() => {
         setLoading(false);
       });
   }, []);

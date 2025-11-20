@@ -37,7 +37,7 @@ describe('TaskDetails', () => {
 
     expect(screen.getByText('This is a test task description')).toBeInTheDocument();
     expect(screen.getByText('To Do')).toBeInTheDocument();
-    expect(screen.getByText('12/31/2025')).toBeInTheDocument();
+    expect(screen.getByText('2025-12-31')).toBeInTheDocument();
   });
 
   it('should show loading state initially', () => {

@@ -4,11 +4,7 @@ export type User = {
   lastName: string;
   email: string;
   dateOfBirth: string;
+  createdAt: string;
 };
 
-export type CreateUserData = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  dateOfBirth: string;
-};
+export type CreateUserData = Omit<User, 'id'>;

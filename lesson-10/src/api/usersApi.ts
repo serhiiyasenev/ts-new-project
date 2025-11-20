@@ -19,7 +19,7 @@ export const createUser = async (data: CreateUserData): Promise<User> => {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...data, id: newId }),
+        body: JSON.stringify({ ...data, id: String(newId) }),
     });
 
     if (!response.ok) {
@@ -30,16 +30,10 @@ export const createUser = async (data: CreateUserData): Promise<User> => {
 };
 
 export const fetchUserById = async (id: number): Promise<User> => {
-    if (!Number.isInteger(id) || id <= 0) {
-        throw new Error('Invalid user ID: must be a positive integer');
-    }
-    const response = await fetch(`/api/users/${id}`);
-    if (!response.ok) {
-        throw new Error('Failed to fetch user');
-    }
-    const users = await response.json();
-    if (!users || users.length === 0) {
-        throw new Error('User not found');
-    }
-    return users[0];
+  const response = await fetch(`/api/users/${id}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch user');
+  }
+  const user = await response.json();
+  return user;
 };

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import './UserDetails.css';
 import type { User } from "../../types";
 import { fetchUserById } from "../../api";
+import { formatDateToYearMonthDay } from "../../utils/dateUtils";
 
 const UserDetails = () => {
     const { id } = useParams<{ id: string }>();
@@ -12,29 +13,22 @@ const UserDetails = () => {
 
     useEffect(() => {
         if (id) {
-            fetchUserById(Number(id))
-                .then((data) => {
-                    setUser(data);
-                    setLoading(false);
-                })
-                .catch((err) => {
-                    setError(err.message);
-                    setLoading(false);
-                });
+          fetchUserById(Number(id))
+            .then((data) => {
+              setUser(data);
+            })
+            .catch((err) => {
+              setError(err.message);
+            })
+            .finally(() => {
+              setLoading(false);
+            });
         }
     }, [id]);
 
     if (loading) return <div className="loading">Loading...</div>;
     if (error) return <div className="error-message">Error: {error}</div>;
     if (!user) return <div className="error-message">User not found</div>;
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
 
   return (
     <div className="user-details">
@@ -58,7 +52,11 @@ const UserDetails = () => {
         </div>
         <div className="detail-row">
           <span className="detail-label">Date of Birth:</span>
-          <span className="detail-value">{formatDate(user.dateOfBirth)}</span>
+          <span className="detail-value">{formatDateToYearMonthDay(user.dateOfBirth)}</span>
+        </div>
+        <div className="detail-row">
+          <span className="detail-label">Created:</span>
+          <span className="detail-value">{formatDateToYearMonthDay(user.createdAt)}</span>
         </div>
       </div>
       <Link to="/users" className="button-secondary">Back to Users</Link>

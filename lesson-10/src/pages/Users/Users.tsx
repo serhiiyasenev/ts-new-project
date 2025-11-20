@@ -3,28 +3,21 @@ import { Link } from "react-router-dom";
 import "./Users.css";
 import type { User } from "../../types";
 import { fetchUsers } from "../../api";
+import { formatDateToYearMonthDay } from "../../utils/dateUtils";
 
 const Users = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const result = await fetchUsers();
         setUsers(result);
-        setLoading(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch users');
+      } finally {
         setLoading(false);
       }
     };
@@ -44,6 +37,7 @@ const Users = () => {
             <th>Last Name</th>
             <th>Email</th>
             <th>Date of Birth</th>
+            <th>Created</th>
           </tr>
         </thead>
         <tbody>
@@ -55,7 +49,8 @@ const Users = () => {
               <td>
                 <Link to={`/users/${user.id}`}>{user.email}</Link>
               </td>
-              <td>{formatDate(user.dateOfBirth)}</td>
+              <td>{formatDateToYearMonthDay(user.dateOfBirth)}</td>
+              <td>{formatDateToYearMonthDay(user.createdAt)}</td>
             </tr>
           ))}
         </tbody>
