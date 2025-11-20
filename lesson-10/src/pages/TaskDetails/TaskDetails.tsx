@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import type { Task } from '../../types';
 import './TaskDetails.css';
 import { fetchTaskById } from '../../api';
-import { formatDate } from '../../utils/dateUtils';
+import { formatDateToYearMonthDay } from '../../utils/dateUtils';
 
 const TaskDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,11 +46,11 @@ const TaskDetails = () => {
           </div>
           <div className="info-item">
             <strong>Due Date:</strong>
-            <span>{formatDate(task.dueDate)}</span>
+            <span>{formatDateToYearMonthDay(task.dueDate)}</span>
           </div>
           <div className="info-item">
             <strong>Created:</strong>
-            <span>{formatDate(task.createdAt)}</span>
+            <span>{formatDateToYearMonthDay(task.createdAt)}</span>
           </div>
         </div>
         <div className="task-description-full">

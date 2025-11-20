@@ -37,6 +37,7 @@ const Users = () => {
             <th>Last Name</th>
             <th>Email</th>
             <th>Date of Birth</th>
+            <th>Created</th>
           </tr>
         </thead>
         <tbody>
@@ -49,6 +50,7 @@ const Users = () => {
                 <Link to={`/users/${user.id}`}>{user.email}</Link>
               </td>
               <td>{formatDateToYearMonthDay(user.dateOfBirth)}</td>
+              <td>{formatDateToYearMonthDay(user.createdAt)}</td>
             </tr>
           ))}
         </tbody>

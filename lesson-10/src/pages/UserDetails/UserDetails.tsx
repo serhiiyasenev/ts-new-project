@@ -54,6 +54,10 @@ const UserDetails = () => {
           <span className="detail-label">Date of Birth:</span>
           <span className="detail-value">{formatDateToYearMonthDay(user.dateOfBirth)}</span>
         </div>
+        <div className="detail-row">
+          <span className="detail-label">Created:</span>
+          <span className="detail-value">{formatDateToYearMonthDay(user.createdAt)}</span>
+        </div>
       </div>
       <Link to="/users" className="button-secondary">Back to Users</Link>
     </div>

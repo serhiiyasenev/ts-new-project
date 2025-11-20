@@ -1,9 +1,3 @@
-export const formatDate = (dateString?: string): string => {
-  if (!dateString) return '—';
-  const date = new Date(dateString);
-  return isNaN(date.getTime()) ? '—' : date.toLocaleDateString();
-};
-
 export const formatDateToYearMonthDay = (dateString: string) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
