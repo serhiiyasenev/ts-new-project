@@ -16,23 +16,30 @@ React + TypeScript + Vite application for managing tasks and users with a clean,
 
 ```
 src/
-├── api/                    # API layer
+├── api/                   # API layer
 │   ├── usersApi.ts        # User API functions
-│   └── tasksApi.ts        # Task API functions
+│   ├── tasksApi.ts        # Task API functions
+│   └── index.ts           # Centralized exports
 ├── components/            # Shared components
 │   ├── Header.tsx         # Navigation header
 │   └── Layout.tsx         # Main layout wrapper
-├── pages/                 # Page components
-│   ├── Users/             # Users list page
-│   ├── UserDetails/       # User details page
-│   ├── CreateUser/        # Create user form
-│   ├── TasksList/         # Kanban task board
-│   ├── TaskDetails/       # Task details page
-│   └── TaskCreate/        # Create task form
-├── types/                 # TypeScript type definitions
+├── pages/                 # Page components and CSS
+│   ├── CreateUser/        # Create user page
+│   ├── TaskCreate/        # Create task page 
+│   ├── TaskDetails/       # Task details page 
+│   ├── TasksList/         # Kanban tasks board page
+│   ├── UserDetails/       # User details page   
+│   └── Users/             # Users list page
+├── schema/                # Types schema definitions
+│   ├── taskSchema.ts      # Task schema & TaskFormFields
+│   ├── userSchema.ts      # User schema & UserFormFields
+├── types                  # TypeScript type definitions
 │   ├── user.ts            # User & CreateUserData types
 │   ├── task.ts            # Task & CreateTaskData types
 │   └── index.ts           # Centralized exports
+├── utils                  # Centralized utils
+│   └── dateUtils.ts       # Date utils
+├── App.tsx                # Export default App
 ├── router.tsx             # Router configuration
 └── main.tsx               # Application entry point
 
@@ -42,7 +49,10 @@ test/
 │   └── vitest.d.ts        # TypeScript declarations
 ├── CreateUser.test.tsx    # User form tests
 ├── TaskCreate.test.tsx    # Task form tests
-└── TasksList.test.tsx     # Task list tests
+├── TaskDetails.test.tsx   # Task details tests
+├── TasksList.test.tsx     # Task list tests
+├── UserDetails.test.tsx   # User details tests
+└── UsersList.test.tsx     # User list tests
 ```
 
 ## 🛠️ Tech Stack
@@ -87,7 +97,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test        # Watch mode
+npm test           # Watch mode
 npm test -- --run  # Run once
 ```
 
@@ -127,13 +137,13 @@ The mock API (json-server) provides:
 **Users**
 
 - `GET /api/users` - List all users
-- `GET /api/users?id={id}` - Get user by ID
+- `GET /api/users/${id}` - Get user by ID
 - `POST /api/users` - Create new user
 
 **Tasks**
 
 - `GET /api/tasks` - List all tasks
-- `GET /api/tasks?id={id}` - Get task by ID
+- `GET /api/tasks/${id}` - Get task by ID
 - `POST /api/tasks` - Create new task
 
 ## 🔧 Configuration
