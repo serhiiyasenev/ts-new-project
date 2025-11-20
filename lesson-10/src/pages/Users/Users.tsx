@@ -1,29 +1,33 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from "react";
-import { fetchUsers, type User } from "../../api/usersApi";
 import { Link } from "react-router-dom";
 import "./Users.css";
+import type { User } from "../../types";
+import { fetchUsers } from "../../api";
+import { formatDateToYearMonthDay } from "../../utils/dateUtils";
 
 const Users = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const fetchUserData = async () => {
-    const result = await fetchUsers();
-    setUsers(result);
-  }
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchUserData()
+    const fetchUserData = async () => {
+      try {
+        const result = await fetchUsers();
+        setUsers(result);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch users');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserData();
   }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div className="error-message">{error}</div>;
   return (
-    <>
+    <div className="users-container">
       <h1>Users Page</h1>
       <table className="users-table">
         <thead>
@@ -33,6 +37,7 @@ const Users = () => {
             <th>Last Name</th>
             <th>Email</th>
             <th>Date of Birth</th>
+            <th>Created</th>
           </tr>
         </thead>
         <tbody>
@@ -44,12 +49,13 @@ const Users = () => {
               <td>
                 <Link to={`/users/${user.id}`}>{user.email}</Link>
               </td>
-              <td>{formatDate(user.dateOfBirth)}</td>
+              <td>{formatDateToYearMonthDay(user.dateOfBirth)}</td>
+              <td>{formatDateToYearMonthDay(user.createdAt)}</td>
             </tr>
           ))}
         </tbody>
       </table>
-    </>
+    </div>
   )
 
 }

@@ -1,6 +1,9 @@
-import { Link, useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { fetchUserById, type User } from "../../api/usersApi";
+import './UserDetails.css';
+import type { User } from "../../types";
+import { fetchUserById } from "../../api";
+import { formatDateToYearMonthDay } from "../../utils/dateUtils";
 
 const UserDetails = () => {
     const { id } = useParams<{ id: string }>();
@@ -10,44 +13,54 @@ const UserDetails = () => {
 
     useEffect(() => {
         if (id) {
-            fetchUserById(Number(id))
-                .then((data) => {
-                    setUser(data);
-                    setLoading(false);
-                })
-                .catch((err) => {
-                    setError(err.message);
-                    setLoading(false);
-                });
+          fetchUserById(Number(id))
+            .then((data) => {
+              setUser(data);
+            })
+            .catch((err) => {
+              setError(err.message);
+            })
+            .finally(() => {
+              setLoading(false);
+            });
         }
     }, [id]);
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
-    if (!user) return <div>User not found</div>;
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
+    if (loading) return <div className="loading">Loading...</div>;
+    if (error) return <div className="error-message">Error: {error}</div>;
+    if (!user) return <div className="error-message">User not found</div>;
 
   return (
-    <>
+    <div className="user-details">
       <h1>User Details</h1>
-      <div>
-        <p><strong>ID:</strong> {user.id}</p>
-        <p><strong>First Name:</strong> {user.firstName}</p>
-        <p><strong>Last Name:</strong> {user.lastName}</p>
-        <p><strong>Email:</strong> {user.email}</p>
-        <p><strong>Date of Birth:</strong> {formatDate(user.dateOfBirth)}</p>
+      <div className="details-card">
+        <div className="detail-row">
+          <span className="detail-label">ID:</span>
+          <span className="detail-value">{user.id}</span>
+        </div>
+        <div className="detail-row">
+          <span className="detail-label">First Name:</span>
+          <span className="detail-value">{user.firstName}</span>
+        </div>
+        <div className="detail-row">
+          <span className="detail-label">Last Name:</span>
+          <span className="detail-value">{user.lastName}</span>
+        </div>
+        <div className="detail-row">
+          <span className="detail-label">Email:</span>
+          <span className="detail-value">{user.email}</span>
+        </div>
+        <div className="detail-row">
+          <span className="detail-label">Date of Birth:</span>
+          <span className="detail-value">{formatDateToYearMonthDay(user.dateOfBirth)}</span>
+        </div>
+        <div className="detail-row">
+          <span className="detail-label">Created:</span>
+          <span className="detail-value">{formatDateToYearMonthDay(user.createdAt)}</span>
+        </div>
       </div>
-      <div>
-        <Link to="/users">Back to Users</Link>
-      </div>
-    </>
+      <Link to="/users" className="button-secondary">Back to Users</Link>
+    </div>
   );
 }
 
