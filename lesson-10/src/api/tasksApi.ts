@@ -38,7 +38,7 @@ export const fetchTaskById = async (id: number): Promise<Task> => {
   if (!Number.isInteger(id) || id <= 0) {
     throw new Error('Invalid task ID: must be a positive integer');
   }
-  const response = await fetch(`/api/tasks?id=${id}`);
+  const response = await fetch(`/api/tasks/${id}`);
   if (!response.ok) {
     throw new Error('Failed to fetch task');
   }
