@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import type { Task } from '../../types';
 import './TaskDetails.css';
 import { fetchTaskById } from '../../api';
+import { formatDate } from '../../utils/dateUtils';
 
 const TaskDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,11 +29,7 @@ const TaskDetails = () => {
   if (error) return <div className="error-message">Error: {error}</div>;
   if (!task) return <div>Task not found</div>;
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return '—';
-    const date = new Date(dateString);
-    return isNaN(date.getTime()) ? '—' : date.toLocaleDateString();
-  };
+  // ...existing code...
 
   return (
     <div className="task-details">

@@ -1,24 +1,12 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+// ...existing code...
 import { useNavigate } from 'react-router-dom';
 import './TaskCreate.css';
 import { createTask } from '../../api';
 
-type TaskFormFields = z.infer<typeof taskSchema>;
-
-const taskSchema = z.object({
-  title: z.string().min(3, 'Title must be at least 3 characters'),
-  description: z.string().min(10, 'Description must be at least 10 characters'),
-  status: z.enum(['To Do', 'In Progress', 'Done']),
-  dueDate: z.string().nonempty("Due date is required").refine((date) => {
-    const dueDate = new Date(date);
-    const today = new Date();
-    dueDate.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
-    return dueDate >= today;
-  }, { message: "Due date must be today or in the future" }),
-});
+import { taskSchema } from '../../schema/taskSchema';
+import type { TaskFormFields } from '../../schema/taskSchema';
 
 const TaskCreate = () => {
   const { register, handleSubmit, formState: { isValid, errors } } = useForm<TaskFormFields>({
