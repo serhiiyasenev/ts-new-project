@@ -18,16 +18,17 @@ const TaskCreate = () => {
   const navigate = useNavigate();
 
   const onSubmit = async (data: TaskFormFields) => {
+    const payload = {
+      ...data,
+    createdAt: new Date().toISOString()
+    };
     try {
-      await createTask({
-        ...data,
-        createdAt: new Date().toString()
-      });
-      navigate('/tasks');
+      await createTask(payload);
+      navigate("/tasks");
     } catch (error) {
-      console.error('Error creating task:', error);
+      console.error("Error creating task:", error);
     }
-  };
+  }
 
   return (
     <div className="task-create">

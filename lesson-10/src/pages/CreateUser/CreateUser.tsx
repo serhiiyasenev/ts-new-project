@@ -10,12 +10,13 @@ const CreateUser = () => {
       mode: "onTouched", 
       resolver: zodResolver(userSchema)
     });
+
     const navigate = useNavigate();
     
     const onSubmit = async (data: UserFormFields) => {
       const payload = {
         ...data,
-        dateOfBirth: new Date(data.dateOfBirth).toISOString().split('T')[0]
+      createdAt: new Date().toISOString()
       };
       try {
         await createUser(payload);

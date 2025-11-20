@@ -15,9 +15,9 @@ const Users = () => {
       try {
         const result = await fetchUsers();
         setUsers(result);
-        setLoading(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch users');
+      } finally {
         setLoading(false);
       }
     };

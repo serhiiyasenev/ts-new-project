@@ -13,15 +13,16 @@ const UserDetails = () => {
 
     useEffect(() => {
         if (id) {
-            fetchUserById(Number(id))
-                .then((data) => {
-                    setUser(data);
-                    setLoading(false);
-                })
-                .catch((err) => {
-                    setError(err.message);
-                    setLoading(false);
-                });
+          fetchUserById(Number(id))
+            .then((data) => {
+              setUser(data);
+            })
+            .catch((err) => {
+              setError(err.message);
+            })
+            .finally(() => {
+              setLoading(false);
+            });
         }
     }, [id]);
 

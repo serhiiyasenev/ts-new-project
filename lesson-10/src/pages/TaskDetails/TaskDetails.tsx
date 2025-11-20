@@ -16,10 +16,11 @@ const TaskDetails = () => {
       fetchTaskById(Number(id))
         .then((data) => {
           setTask(data);
-          setLoading(false);
         })
         .catch((err: Error) => {
           setError(err.message);
+        })
+        .finally(() => {
           setLoading(false);
         });
     }
