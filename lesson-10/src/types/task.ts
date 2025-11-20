@@ -7,10 +7,4 @@ export type Task = {
   createdAt: string;
 };
 
-export type CreateTaskData = Omit<Task, 'id'>
-  title: string;
-  description: string;
-  status: 'To Do' | 'In Progress' | 'Done';
-  dueDate: string;
-  createdAt: string;
-};
+export type CreateTaskData = Omit<Task, 'id'>;

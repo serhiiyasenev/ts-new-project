@@ -1,10 +1,8 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-// ...existing code...
 import { useNavigate } from 'react-router-dom';
 import './TaskCreate.css';
 import { createTask } from '../../api';
-
 import { taskSchema } from '../../schema/taskSchema';
 import type { TaskFormFields } from '../../schema/taskSchema';
 
@@ -23,7 +21,7 @@ const TaskCreate = () => {
     try {
       await createTask({
         ...data,
-        createdAt: new Date()
+        createdAt: new Date().toString()
       });
       navigate('/tasks');
     } catch (error) {

@@ -29,8 +29,6 @@ const TaskDetails = () => {
   if (error) return <div className="error-message">Error: {error}</div>;
   if (!task) return <div>Task not found</div>;
 
-  // ...existing code...
-
   return (
     <div className="task-details">
       <Link to="/tasks" className="back-button">← Back to Tasks</Link>
