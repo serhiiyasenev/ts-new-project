@@ -33,7 +33,7 @@ export const fetchUserById = async (id: number): Promise<User> => {
     if (!Number.isInteger(id) || id <= 0) {
         throw new Error('Invalid user ID: must be a positive integer');
     }
-    const response = await fetch(`/api/users?id=${id}`);
+    const response = await fetch(`/api/users/${id}`);
     if (!response.ok) {
         throw new Error('Failed to fetch user');
     }

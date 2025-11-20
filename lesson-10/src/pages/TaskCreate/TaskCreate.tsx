@@ -23,7 +23,7 @@ const TaskCreate = () => {
     try {
       await createTask({
         ...data,
-        createdAt: new Date().toISOString()
+        createdAt: new Date()
       });
       navigate('/tasks');
     } catch (error) {
