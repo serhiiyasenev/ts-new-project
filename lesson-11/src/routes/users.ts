@@ -9,7 +9,7 @@ const bodyParamsSchema = z.object({
 });
 
 function validateBodyParams(req: Request, res: Response, next: NextFunction) {
-  console.log("Validating body parameters...");
+  console.log("Validating body parameters...", req.query);
   const validationResult = bodyParamsSchema.safeParse(req.body);
   if (!validationResult.success) {
     return res.status(400).json({ message: "Invalid body parameters", errors: validationResult.error.issues });
