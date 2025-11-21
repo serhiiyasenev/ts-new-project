@@ -1,11 +1,10 @@
 import { Request, Response, NextFunction, Router } from "express";
-import { getAllUsers, createUser, getUserById, updateUser } from "../controllers/users";
+import { getAllUsers, createUser, getUserById, updateUser, deleteUserById } from "../controllers/users";
 import { z } from "zod";
 
 const router = Router();
 
 const bodyParamsSchema = z.object({
-  id: z.uuid(),
   name: z.string().min(3)
 });
 
@@ -24,8 +23,9 @@ router.use((req, _res, next) => {
 });
 
 router.get('/', getAllUsers);
-router.post("/", createUser);
+router.post("/", validateBodyParams, createUser);
 router.get("/:id", getUserById);
-router.put("/:id", validateBodyParams,updateUser);
+router.put("/:id", validateBodyParams, updateUser);
+router.delete("/:id", deleteUserById);
 
 export default router;

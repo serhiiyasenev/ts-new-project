@@ -43,3 +43,17 @@ export const updateUser = (req: Request, res: Response) => {
     res.status(404).json({ message: "User not found" });
   }
 };
+
+export const deleteUserById = (req: Request, res: Response) => {
+  const idParam = req.params.id; 
+  if (!idParam) {
+    return res.status(400).json({ message: "Missing user id" });
+  }
+
+  const deleted = userService.deleteUser(idParam);
+  if (deleted) {
+    res.status(204).send();
+  } else {
+    res.status(404).json({ message: "User not found" });
+  }
+};
