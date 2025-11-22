@@ -91,7 +91,7 @@ export const updateTask = (req: Request, res: Response) => {
     res.json(updated);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Internal Server Error' });
+    next(err)
   }
 };
 
