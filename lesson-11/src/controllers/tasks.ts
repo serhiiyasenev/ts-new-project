@@ -60,7 +60,7 @@ export const createTask = (req: Request, res: Response) => {
   try {
     const parseResult = createTaskSchema.safeParse(req.body);
     if (!parseResult.success) {
-      return res.status(400).json({ message: 'Invalid body', errors: parseResult.error.issues });
+     throw new ApiError(message, 400);
     }
 
     const data = parseResult.data;
