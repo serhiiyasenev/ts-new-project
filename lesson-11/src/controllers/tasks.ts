@@ -17,11 +17,12 @@ export const getAllTasks = (req: Request, res: Response, next: Function) => {
       return res.status(400).json({ message: 'Invalid query params', errors: parseResult.error.issues });
     }
 
-    const { createdAt, status, priority } = parseResult.data;
+    const { createdAt, status, priority, title } = parseResult.data as Record<string, string | undefined>;
     const filters: TaskFilters = {};
     if (createdAt) filters.createdAt = createdAt;
     if (status) filters.status = parseCsv(status) as TaskStatus[];
     if (priority) filters.priority = parseCsv(priority) as TaskPriority[];
+    if (title) filters.title = title;
 
     const result = taskService.getAllTasks(filters);
     res.json(result);

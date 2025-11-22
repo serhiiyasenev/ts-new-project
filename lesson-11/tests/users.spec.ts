@@ -3,6 +3,9 @@ import app from '../src/server';
 import { describe, it, expect } from 'vitest';
 
 describe('Users API', () => {
+	it('returns 400 when createdAt query is invalid', async () => {
+		await request(app).get('/users').query({ createdAt: 'not-a-date' }).expect(400);
+	});
 	it('GET /users returns an array', async () => {
 		const res = await request(app).get('/users').expect(200);
 		expect(Array.isArray(res.body)).toBe(true);
@@ -28,6 +31,10 @@ describe('Users API', () => {
 
 		// Not found
 		await request(app).get(`/users/${created.id}`).expect(404);
+	});
+
+	it('returns 400 for invalid POST body (name too short)', async () => {
+		await request(app).post('/users').send({ name: 'ab' }).expect(400);
 	});
 });
 

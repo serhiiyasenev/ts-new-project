@@ -14,4 +14,5 @@ export type TaskFilters = {
   createdAt?: string; 
   status?: TaskStatus[];
   priority?: TaskPriority[];
+  title?: string;
 };

@@ -21,7 +21,8 @@ function validateQueryParams(req: Request, res: Response, next: NextFunction) {
 
 // Middleware: validate body for POST/PUT in this case use createTaskSchema for both
 function validateBodyParams(req: Request, res: Response, next: NextFunction) {
-  const result = createTaskSchema.safeParse(req.body);
+  const schema = req.method === 'PUT' ? createTaskSchema.partial() : createTaskSchema;
+  const result = schema.safeParse(req.body);
   if (!result.success) {
     return res.status(400).json({ message: 'Invalid body', errors: result.error.issues });
   }

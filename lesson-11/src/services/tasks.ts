@@ -28,6 +28,11 @@ export const getAllTasks = (filters?: TaskFilters): Task[] => {
     result = result.filter(t => filters.priority!.includes(t.priority));
   }
 
+  if (filters.title) {
+    const q = filters.title.toLowerCase();
+    result = result.filter(t => t.title.toLowerCase().includes(q));
+  }
+
   return result;
 };
 

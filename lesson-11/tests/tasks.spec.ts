@@ -3,6 +3,9 @@ import app from '../src/server';
 import { describe, it, expect } from 'vitest';
 
 describe('Tasks API', () => {
+	it('returns 400 when createdAt query is invalid', async () => {
+		await request(app).get('/tasks').query({ createdAt: 'not-a-date' }).expect(400);
+	});
 	it('GET /tasks returns an array and supports filters', async () => {
 		const res = await request(app).get('/tasks').expect(200);
 		expect(Array.isArray(res.body)).toBe(true);
@@ -40,5 +43,20 @@ describe('Tasks API', () => {
 
 		// After delete GET should 404
 		await request(app).get(`/tasks/${created.id}`).expect(404);
+	});
+
+	it('filters by title (case-insensitive substring)', async () => {
+		// create a task with a unique title
+		const title = 'UniqueTitle123';
+		const { body: created } = await request(app).post('/tasks').send({ title, description: 'x' }).expect(201);
+
+		const res = await request(app).get('/tasks').query({ title: 'UniqueTitle123' }).expect(200);
+		expect(Array.isArray(res.body)).toBe(true);
+		// should include the created item
+		expect(res.body.some((t: any) => t.id === created.id)).toBe(true);
+	});
+
+	it('returns 400 for invalid POST body (missing title)', async () => {
+		await request(app).post('/tasks').send({ description: 'no title' }).expect(400);
 	});
 });
