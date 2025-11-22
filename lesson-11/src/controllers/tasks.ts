@@ -34,7 +34,7 @@ export const getAllTasks = (req: Request, res: Response) => {
     const filters: TaskFilters = {};
     if (createdAt) filters.createdAt = createdAt;
     if (status) filters.status = parseCsv(status) as any;
-    if (priority) filters.priority = parseCsv(priority) as any;
+    if (priority) filters.priority = parseCsv(priority) as TaskPriority;
 
     const result = taskService.getAllTasks(filters);
     res.json(result);
