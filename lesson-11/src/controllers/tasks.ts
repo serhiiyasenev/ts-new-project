@@ -44,7 +44,7 @@ export const getAllTasks = (req: Request, res: Response) => {
   }
 };
 
-export const getTask = (req: Request, res: Response) => {
+export const getTask = (req: Request<{}, {}, {}, { id: string }>, res: Response) => {
   try {
     const id = req.params.id as string;
     const task = taskService.getTaskById(id);
