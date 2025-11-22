@@ -86,7 +86,7 @@ export const updateTask = (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Invalid body', errors: parseResult.error.issues });
     }
 
-    const updated = taskService.updateTask(id, parseResult.data as any);
+    const updated = taskService.updateTask(id, parseResult.data);
     if (!updated) return res.status(404).json({ message: 'Task not found' });
     res.json(updated);
   } catch (err) {
