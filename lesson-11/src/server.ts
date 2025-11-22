@@ -5,7 +5,7 @@ import { ApiError } from "./types/errors";
 import morgan from 'morgan';
 import cors from 'cors';
 
-export const app = express();
+const app = express();
 const port = 3000;
 
 // parse JSON bodies
