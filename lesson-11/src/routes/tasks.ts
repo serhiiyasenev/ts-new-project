@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import {
   getAllTasks,
   getTask,
@@ -6,13 +6,32 @@ import {
   updateTask,
   deleteTask
 } from '../controllers/tasks';
+import { createTaskSchema, queryTasksSchema } from '../schemas/tasks';
 
 const router = Router();
 
-router.get('/', getAllTasks);
-router.post('/', createTask);
+// Middleware: validate query params for GET /tasks
+function validateQueryParams(req: Request, res: Response, next: NextFunction) {
+  const result = queryTasksSchema.safeParse(req.query);
+  if (!result.success) {
+    return res.status(400).json({ message: 'Invalid query params', errors: result.error.issues });
+  }
+  next();
+}
+
+// Middleware: validate body for POST/PUT in this case use createTaskSchema for both
+function validateBodyParams(req: Request, res: Response, next: NextFunction) {
+  const result = createTaskSchema.safeParse(req.body);
+  if (!result.success) {
+    return res.status(400).json({ message: 'Invalid body', errors: result.error.issues });
+  }
+  next();
+}
+
+router.get('/', validateQueryParams, getAllTasks);
+router.post('/', validateBodyParams, createTask);
 router.get('/:id', getTask);
-router.put('/:id', updateTask);
+router.put('/:id', validateBodyParams, updateTask);
 router.delete('/:id', deleteTask);
 
 export default router;

@@ -1,31 +1,18 @@
 import { Request, Response } from 'express';
-import { z } from 'zod';
 import * as taskService from '../services/tasks';
-import { TaskFilters } from '../types/tasks';
+import { TaskFilters, TaskPriority, TaskStatus } from '../types/tasks';
+import { ApiError } from '../types/errors';
+import { createTaskSchema, queryTasksSchema } from '../schemas/tasks';
 
-const createTaskSchema = z.object({
-  title: z.string().min(1),
-  description: z.string().optional(),
-  status: z.enum(['todo', 'in_progress', 'done']).optional(),
-  priority: z.enum(['low', 'medium', 'high']).optional()
-});
-
-const updateTaskSchema = createTaskSchema.partial();
-
-const querySchema = z.object({
-  createdAt: z.string().optional(),
-  status: z.string().optional(), // CSV or single
-  priority: z.string().optional() // CSV or single
-});
 
 function parseCsv(value?: string): string[] | undefined {
   if (!value) return undefined;
   return value.split(',').map(s => s.trim()).filter(Boolean);
 }
 
-export const getAllTasks = (req: Request, res: Response) => {
+export const getAllTasks = (req: Request, res: Response, next: Function) => {
   try {
-   router.get('/', validateQueryParams, getAllTasks);
+    const parseResult = queryTasksSchema.safeParse(req.query);
     if (!parseResult.success) {
       return res.status(400).json({ message: 'Invalid query params', errors: parseResult.error.issues });
     }
@@ -33,8 +20,8 @@ export const getAllTasks = (req: Request, res: Response) => {
     const { createdAt, status, priority } = parseResult.data;
     const filters: TaskFilters = {};
     if (createdAt) filters.createdAt = createdAt;
-    if (status) filters.status = parseCsv(status) as TaskStatus;
-    if (priority) filters.priority = parseCsv(priority) as TaskPriority;
+    if (status) filters.status = parseCsv(status) as TaskStatus[];
+    if (priority) filters.priority = parseCsv(priority) as TaskPriority[];
 
     const result = taskService.getAllTasks(filters);
     res.json(result);
@@ -44,7 +31,7 @@ export const getAllTasks = (req: Request, res: Response) => {
   }
 };
 
-export const getTask = (req: Request<{}, {}, {}, { id: string }>, res: Response) => {
+export const getTask = (req: Request<{ id: string }>, res: Response, next: Function) => {
   try {
     const id = req.params.id;
     const task = taskService.getTaskById(id);
@@ -52,15 +39,15 @@ export const getTask = (req: Request<{}, {}, {}, { id: string }>, res: Response)
     res.json(task);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Internal Server Error' });
+    next(err);
   }
 };
 
-export const createTask = (req: Request, res: Response) => {
+export const createTask = (req: Request, res: Response, next: Function) => {
   try {
     const parseResult = createTaskSchema.safeParse(req.body);
     if (!parseResult.success) {
-     throw new ApiError(message, 400);
+     throw new ApiError(parseResult.error.message, 400);
     }
 
     const data = parseResult.data;
@@ -78,10 +65,10 @@ export const createTask = (req: Request, res: Response) => {
   }
 };
 
-export const updateTask = (req: Request, res: Response) => {
+export const updateTask = (req: Request, res: Response, next: Function) => {
   try {
     const id = req.params.id as string;
-    const parseResult = updateTaskSchema.safeParse(req.body);
+    const parseResult = createTaskSchema.partial().safeParse(req.body);
     if (!parseResult.success) {
       return res.status(400).json({ message: 'Invalid body', errors: parseResult.error.issues });
     }
@@ -95,7 +82,7 @@ export const updateTask = (req: Request, res: Response) => {
   }
 };
 
-export const deleteTask = (req: Request<{}, {}, {}, { id: string }>, res: Response) => {
+export const deleteTask = (req: Request<{ id: string }>, res: Response, next: Function) => {
   try {
     const id = req.params.id;
     const deleted = taskService.deleteTask(id);
@@ -103,7 +90,7 @@ export const deleteTask = (req: Request<{}, {}, {}, { id: string }>, res: Respon
     res.status(204).send();
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Internal Server Error' });
+    next(err);
   }
 };
 

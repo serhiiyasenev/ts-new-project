@@ -1,12 +1,8 @@
 import { Request, Response, NextFunction, Router } from "express";
 import { getAllUsers, createUser, getUserById, updateUser, deleteUserById } from "../controllers/users";
-import { z } from "zod";
+import { bodyParamsSchema } from "../schemas/users";
 
 const router = Router();
-
-const bodyParamsSchema = z.object({
-  name: z.string().min(3)
-});
 
 function validateBodyParams(req: Request, res: Response, next: NextFunction) {
   console.log("Validating body parameters...", req.query);
