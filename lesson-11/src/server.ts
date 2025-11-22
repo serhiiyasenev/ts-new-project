@@ -1,11 +1,12 @@
 import express, { Request, Response } from "express";
 import userRoutes from "./routes/users";
+import taskRoutes from "./routes/tasks";
 import { ApiError } from "./types/errors";
 import morgan from 'morgan';
 import cors from 'cors';
 
 const app = express();
-const port = 3000;  
+const port = 3000;
 
 // parse JSON bodies
 app.use(express.json());
@@ -14,10 +15,11 @@ app.use(cors());
 
 // use user routes
 app.use("/users", userRoutes);
+app.use("/tasks", taskRoutes);
 
 // Root route for GET /
 app.get("/", (_req: Request, res: Response) => {
-  res.json({ message: "API root. Use /users for user operations." });
+  res.json({ message: "API root. Use /users and /tasks for operations." });
 });
 
 // simple request logger
@@ -38,6 +40,10 @@ app.use((err: ApiError, _req: Request, res: Response, _next: Function) => {
   res.status(err.statusCode || 500).json({ message: err.message || "Internal Server Error" });
 });
 
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(port, () => {
+    console.log(`Server is running at http://localhost:${port}`);
+  });
+}
+
+export default app;

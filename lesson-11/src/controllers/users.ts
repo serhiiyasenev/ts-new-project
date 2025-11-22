@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
 import * as userService from "../services/users";
 
-export const getAllUsers = (_req: Request, res: Response) => {
-  const users = userService.getAllUsers();
+export const getAllUsers = (req: Request, res: Response) => {
+  const { createdAt, name } = req.query as Record<string, string | undefined>;
+  const filters: { createdAt?: string; name?: string } = {};
+  if (createdAt) filters.createdAt = createdAt;
+  if (name) filters.name = name;
+  const users = userService.getAllUsers(filters);
   res.json(users);
 };
 
