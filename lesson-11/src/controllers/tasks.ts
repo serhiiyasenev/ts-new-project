@@ -25,7 +25,7 @@ function parseCsv(value?: string): string[] | undefined {
 
 export const getAllTasks = (req: Request, res: Response) => {
   try {
-    const parseResult = querySchema.safeParse(req.query);
+   router.get('/', validateQueryParams, getAllTasks);
     if (!parseResult.success) {
       return res.status(400).json({ message: 'Invalid query params', errors: parseResult.error.issues });
     }
