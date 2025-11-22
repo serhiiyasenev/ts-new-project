@@ -33,7 +33,7 @@ export const getAllTasks = (req: Request, res: Response) => {
     const { createdAt, status, priority } = parseResult.data;
     const filters: TaskFilters = {};
     if (createdAt) filters.createdAt = createdAt;
-    if (status) filters.status = parseCsv(status) as any;
+    if (status) filters.status = parseCsv(status) as TaskStatus;
     if (priority) filters.priority = parseCsv(priority) as TaskPriority;
 
     const result = taskService.getAllTasks(filters);
