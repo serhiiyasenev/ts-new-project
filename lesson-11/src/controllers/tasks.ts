@@ -97,7 +97,7 @@ export const updateTask = (req: Request, res: Response) => {
 
 export const deleteTask = (req: Request, res: Response) => {
   try {
-    const id = req.params.id as string;
+    const id = req.params.id;
     const deleted = taskService.deleteTask(id);
     if (!deleted) return res.status(404).json({ message: 'Task not found' });
     res.status(204).send();
