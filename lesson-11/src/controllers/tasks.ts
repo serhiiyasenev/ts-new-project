@@ -48,7 +48,7 @@ export const getTask = (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
     const task = taskService.getTaskById(id);
-    if (!task) return res.status(404).json({ message: 'Task not found' });
+    if (!task) throw new ApiError('Task not found', 404);
     res.json(task);
   } catch (err) {
     console.error(err);
