@@ -95,7 +95,7 @@ export const updateTask = (req: Request, res: Response) => {
   }
 };
 
-export const deleteTask = (req: Request, res: Response) => {
+export const deleteTask = (req: Request<{}, {}, {}, { id: string }>, res: Response) => {
   try {
     const id = req.params.id;
     const deleted = taskService.deleteTask(id);
