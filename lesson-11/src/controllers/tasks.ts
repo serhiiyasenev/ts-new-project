@@ -74,7 +74,7 @@ export const createTask = (req: Request, res: Response) => {
     res.status(201).json(task);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Internal Server Error' });
+   next(err)
   }
 };
 
