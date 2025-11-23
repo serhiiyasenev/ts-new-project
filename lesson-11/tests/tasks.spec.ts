@@ -45,6 +45,37 @@ describe('Tasks API', () => {
 		await request(app).get(`/tasks/${created.id}`).expect(404);
 	});
 
+	it('filters by createdAt', async () => {
+		// Create a task
+		const { body: created } = await request(app).post('/tasks').send({ title: 'Task for createdAt filter', description: 'x' }).expect(201);
+		const createdAt = created.createdAt; // assuming it's returned
+
+		// Filter by exact createdAt
+		const res = await request(app).get('/tasks').query({ createdAt }).expect(200);
+		expect(Array.isArray(res.body)).toBe(true);
+		expect(res.body.some((t: any) => t.id === created.id)).toBe(true);
+	});
+
+	it('filters by status', async () => {
+		// Create a task with specific status
+		const { body: created } = await request(app).post('/tasks').send({ title: 'Task for status filter', status: 'in_progress' }).expect(201);
+
+		// Filter by status
+		const res = await request(app).get('/tasks').query({ status: 'in_progress' }).expect(200);
+		expect(Array.isArray(res.body)).toBe(true);
+		expect(res.body.some((t: any) => t.id === created.id)).toBe(true);
+	});
+
+	it('filters by priority', async () => {
+		// Create a task with specific priority
+		const { body: created } = await request(app).post('/tasks').send({ title: 'Task for priority filter', priority: 'low' }).expect(201);
+
+		// Filter by priority
+		const res = await request(app).get('/tasks').query({ priority: 'low' }).expect(200);
+		expect(Array.isArray(res.body)).toBe(true);
+		expect(res.body.some((t: any) => t.id === created.id)).toBe(true);
+	});
+
 	it('filters by title (case-insensitive substring)', async () => {
 		// create a task with a unique title
 		const title = 'UniqueTitle123';
@@ -53,6 +84,16 @@ describe('Tasks API', () => {
 		const res = await request(app).get('/tasks').query({ title: 'UniqueTitle123' }).expect(200);
 		expect(Array.isArray(res.body)).toBe(true);
 		// should include the created item
+		expect(res.body.some((t: any) => t.id === created.id)).toBe(true);
+	});
+
+	it('filters by multiple criteria', async () => {
+		// Create a task
+		const { body: created } = await request(app).post('/tasks').send({ title: 'MultiFilterTask', status: 'done', priority: 'high' }).expect(201);
+
+		// Filter by status and priority
+		const res = await request(app).get('/tasks').query({ status: 'done', priority: 'high' }).expect(200);
+		expect(Array.isArray(res.body)).toBe(true);
 		expect(res.body.some((t: any) => t.id === created.id)).toBe(true);
 	});
 

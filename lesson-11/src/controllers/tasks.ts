@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import * as taskService from '../services/tasks';
 import { TaskFilters, TaskPriority, TaskStatus } from '../types/tasks';
 import { ApiError } from '../types/errors';
-import { createTaskSchema, queryTasksSchema } from '../schemas/tasks';
 
 
 function parseCsv(value?: string): string[] | undefined {
@@ -10,14 +9,9 @@ function parseCsv(value?: string): string[] | undefined {
   return value.split(',').map(s => s.trim()).filter(Boolean);
 }
 
-export const getAllTasks = (req: Request, res: Response, next: Function) => {
+export const getAllTasks = (req: Request<{}, {}, {}, Record<string, string | undefined>>, res: Response, next: Function) => {
   try {
-    const parseResult = queryTasksSchema.safeParse(req.query);
-    if (!parseResult.success) {
-      return res.status(400).json({ message: 'Invalid query params', errors: parseResult.error.issues });
-    }
-
-    const { createdAt, status, priority, title } = req.query
+    const { createdAt, status, priority, title } = req.query;
     const filters: TaskFilters = {};
     if (createdAt) filters.createdAt = createdAt;
     if (status) filters.status = parseCsv(status) as TaskStatus[];
@@ -46,13 +40,7 @@ export const getTask = (req: Request<{ id: string }>, res: Response, next: Funct
 
 export const createTask = (req: Request, res: Response, next: Function) => {
   try {
-    const parseResult = createTaskSchema.safeParse(req.body);
-    if (!parseResult.success) {
-     throw new ApiError(parseResult.error.message, 400);
-    }
-
-    const data = parseResult.data;
-    // provide defaults
+    const data = req.body;
     const task = taskService.createTask({
       title: data.title,
       description: data.description ?? '',
@@ -69,12 +57,7 @@ export const createTask = (req: Request, res: Response, next: Function) => {
 export const updateTask = (req: Request<{ id: string }>, res: Response, next: Function) => {
   try {
     const id = req.params.id;
-    const parseResult = createTaskSchema.partial().safeParse(req.body);
-    if (!parseResult.success) {
-      return res.status(400).json({ message: 'Invalid body', errors: parseResult.error.issues });
-    }
-
-    const updated = taskService.updateTask(id, parseResult.data);
+    const updated = taskService.updateTask(id, req.body);
     if (!updated) throw new ApiError('Task not found', 404);
     res.json(updated);
   } catch (err) {
