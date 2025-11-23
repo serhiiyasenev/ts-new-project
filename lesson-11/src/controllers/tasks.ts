@@ -75,7 +75,7 @@ export const updateTask = (req: Request<{ id: string }>, res: Response, next: Fu
     }
 
     const updated = taskService.updateTask(id, parseResult.data);
-    if (!updated) return res.status(404).json({ message: 'Task not found' });
+    if (!updated) throw new ApiError('Task not found', 404);
     res.json(updated);
   } catch (err) {
     console.error(err);
