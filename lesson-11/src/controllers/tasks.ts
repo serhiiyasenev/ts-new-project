@@ -66,7 +66,7 @@ export const createTask = (req: Request, res: Response, next: Function) => {
   }
 };
 
-export const updateTask = (req: Request, res: Response, next: Function) => {
+export const updateTask = (req: Request<{ id: string }>, res: Response, next: Function) => {
   try {
     const id = req.params.id as string;
     const parseResult = createTaskSchema.partial().safeParse(req.body);
