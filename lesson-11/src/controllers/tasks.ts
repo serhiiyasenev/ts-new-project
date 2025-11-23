@@ -87,7 +87,7 @@ export const deleteTask = (req: Request<{ id: string }>, res: Response, next: Fu
   try {
     const id = req.params.id;
     const deleted = taskService.deleteTask(id);
-    if (!deleted) return res.status(404).json({ message: 'Task not found' });
+    if (!deleted) throw new ApiError('Task not found', 404);
     res.status(204).send();
   } catch (err) {
     console.error(err);
