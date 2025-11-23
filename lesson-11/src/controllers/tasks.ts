@@ -17,7 +17,7 @@ export const getAllTasks = (req: Request, res: Response, next: Function) => {
       return res.status(400).json({ message: 'Invalid query params', errors: parseResult.error.issues });
     }
 
-    const { createdAt, status, priority, title } = parseResult.data as Record<string, string | undefined>;
+    const { createdAt, status, priority, title } = req.query
     const filters: TaskFilters = {};
     if (createdAt) filters.createdAt = createdAt;
     if (status) filters.status = parseCsv(status) as TaskStatus[];
