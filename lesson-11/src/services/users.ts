@@ -34,7 +34,6 @@ export const getUserById = (id: string): User | undefined => {
 export const updateUser = (id: string, updatedData: Partial<User>): User | null => {
   const userIndex = users.findIndex(user => user.id === id);
   if (userIndex !== -1) {
-    // ensure result is recognized as a full User by TypeScript
     users[userIndex] = { ...users[userIndex], ...updatedData } as User;
     return users[userIndex];
   }

@@ -2,11 +2,27 @@ import { Task, TaskFilters } from "../types/tasks";
 
 const tasks: Task[] = [
   {
-    id: '1',
-    title: 'Example task',
-    description: 'An example task created on startup',
+    id: crypto.randomUUID(),
+    title: 'Example task 1',
+    description: 'An example task created on startup 1',
     status: 'todo',
     priority: 'medium',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: crypto.randomUUID(),
+    title: 'Example task 2',
+    description: 'An example task created on startup 2',
+    status: 'in_progress',
+    priority: 'low',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: crypto.randomUUID(),
+    title: 'Example task 3',
+    description: 'An example task created on startup 3',
+    status: 'done',
+    priority: 'high',
     createdAt: new Date().toISOString()
   }
 ];
@@ -36,14 +52,9 @@ export const getAllTasks = (filters?: TaskFilters): Task[] => {
   return result;
 };
 
-export const getTaskById = (id: string): Task | undefined => {
-  return tasks.find(t => t.id === id);
-};
-
 export const createTask = (data: Omit<Task, 'id' | 'createdAt'>): Task => {
-  const nextId = (tasks.length ? Math.max(...tasks.map(t => Number(t.id))) + 1 : 1).toString();
   const newTask: Task = {
-    id: nextId,
+    id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
     ...data
   };
@@ -51,24 +62,20 @@ export const createTask = (data: Omit<Task, 'id' | 'createdAt'>): Task => {
   return newTask;
 };
 
-export const updateTask = (id: string, patch: Partial<Omit<Task, 'id' | 'createdAt'>>): Task | null => {
-  const idx = tasks.findIndex(t => t.id === id);
-  if (idx === -1) return null;
-  tasks[idx] = { ...tasks[idx], ...patch } as Task;
-  return tasks[idx];
+export const getTaskById = (id: string): Task | undefined => {
+  return tasks.find(t => t.id === id);
+};
+
+export const updateTask = (id: string, updatedData: Partial<Omit<Task, 'id' | 'createdAt'>>): Task | null => {
+  const taskIndex = tasks.findIndex(t => t.id === id);
+  if (taskIndex === -1) return null;
+  tasks[taskIndex] = { ...tasks[taskIndex], ...updatedData } as Task;
+  return tasks[taskIndex];
 };
 
 export const deleteTask = (id: string): boolean => {
-  const idx = tasks.findIndex(t => t.id === id);
-  if (idx === -1) return false;
-  tasks.splice(idx, 1);
+  const taskIndex = tasks.findIndex(t => t.id === id);
+  if (taskIndex === -1) return false;
+  tasks.splice(taskIndex, 1);
   return true;
-};
-
-export default {
-  getAllTasks,
-  getTaskById,
-  createTask,
-  updateTask,
-  deleteTask
 };

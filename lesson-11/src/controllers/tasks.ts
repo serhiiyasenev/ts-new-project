@@ -22,14 +22,18 @@ export const getAllTasks = (req: Request<{}, {}, {}, Record<string, string | und
     res.json(result);
   } catch (err) {
     console.error(err);
-   next(err)
+    next(err)
   }
 };
 
-export const getTask = (req: Request<{ id: string }>, res: Response, next: Function) => {
+export const getTaskById = (req: Request<{ id: string }>, res: Response, next: Function) => {
   try {
-    const id = req.params.id;
-    const task = taskService.getTaskById(id);
+    const idParam = req.params.id;
+    if (!idParam) {
+    return res.status(400).json({ message: "Missing task id" });
+  }
+
+    const task = taskService.getTaskById(idParam);
     if (!task) throw new ApiError('Task not found', 404);
     res.json(task);
   } catch (err) {
@@ -50,14 +54,17 @@ export const createTask = (req: Request, res: Response, next: Function) => {
     res.status(201).json(task);
   } catch (err) {
     console.error(err);
-   next(err)
+    next(err)
   }
 };
 
 export const updateTask = (req: Request<{ id: string }>, res: Response, next: Function) => {
   try {
-    const id = req.params.id;
-    const updated = taskService.updateTask(id, req.body);
+    const idParam = req.params.id;
+    if (!idParam) {
+    return res.status(400).json({ message: "Missing task id" });
+  }
+    const updated = taskService.updateTask(idParam, req.body);
     if (!updated) throw new ApiError('Task not found', 404);
     res.json(updated);
   } catch (err) {
@@ -68,20 +75,15 @@ export const updateTask = (req: Request<{ id: string }>, res: Response, next: Fu
 
 export const deleteTask = (req: Request<{ id: string }>, res: Response, next: Function) => {
   try {
-    const id = req.params.id;
-    const deleted = taskService.deleteTask(id);
+    const idParam = req.params.id; 
+  if (!idParam) {
+    return res.status(400).json({ message: "Missing task id" });
+  }
+    const deleted = taskService.deleteTask(idParam);
     if (!deleted) throw new ApiError('Task not found', 404);
     res.status(204).send();
   } catch (err) {
     console.error(err);
     next(err);
   }
-};
-
-export default {
-  getAllTasks,
-  getTask,
-  createTask,
-  updateTask,
-  deleteTask
 };

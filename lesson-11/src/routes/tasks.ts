@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import {
   getAllTasks,
-  getTask,
+  getTaskById,
   createTask,
   updateTask,
   deleteTask
@@ -31,7 +31,7 @@ function validateBodyParams(req: Request, res: Response, next: NextFunction) {
 
 router.get('/', validateQueryParams, getAllTasks);
 router.post('/', validateBodyParams, createTask);
-router.get('/:id', getTask);
+router.get('/:id', getTaskById);
 router.put('/:id', validateBodyParams, updateTask);
 router.delete('/:id', deleteTask);
 
