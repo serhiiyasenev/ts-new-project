@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as userService from "../services/users";
 
-export const getAllUsers = (req: Request, res: Response) => {
+export const getAllUsers = (req: Request<{}, {}, {}, Record<string, string | undefined>>, res: Response) => {
   const { createdAt, name } = req.query as Record<string, string | undefined>;
   const filters: { createdAt?: string; name?: string } = {};
   if (createdAt) filters.createdAt = createdAt;
