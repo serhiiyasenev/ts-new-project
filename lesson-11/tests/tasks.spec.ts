@@ -45,6 +45,37 @@ describe('Tasks API', () => {
 		await request(app).get(`/tasks/${created.id}`).expect(404);
 	});
 
+	it('returns 400 for invalid PUT body (missing title)', async () => {
+		// Create a task first
+		const createRes = await request(app).post('/tasks').send({ title: 'Valid Task' }).expect(201);
+		const created = createRes.body;
+
+		// Try to update with invalid title
+		await request(app).put(`/tasks/${created.id}`).send({ title: '' }).expect(400);
+	});
+
+	it('returns 404 for updating non-existent task', async () => {
+		await request(app).put('/tasks/non-existent-id').send({ title: 'New Title' }).expect(404);
+	});
+
+	it('successful partial update of task', async () => {
+		// Create a task
+		const createRes = await request(app)
+			.post('/tasks')
+			.send({ title: 'Original Task', status: 'todo', priority: 'medium' })
+			.expect(201);
+		const created = createRes.body;
+
+		// Update only status and priority
+		const putRes = await request(app)
+			.put(`/tasks/${created.id}`)
+			.send({ status: 'in_progress', priority: 'high' })
+			.expect(200);
+		expect(putRes.body.status).toBe('in_progress');
+		expect(putRes.body.priority).toBe('high');
+		expect(putRes.body.title).toBe('Original Task'); // unchanged
+	});
+
 	it('filters by createdAt', async () => {
 		// Create a task
 		const { body: created } = await request(app).post('/tasks').send({ title: 'Task for createdAt filter', description: 'x' }).expect(201);
