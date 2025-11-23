@@ -44,8 +44,8 @@ export const getTaskById = (req: Request<{ id: string }>, res: Response, next: F
 
 export const createTask = (req: Request, res: Response, next: Function) => {
   try {
-    const data = req.body;
-    const task = taskService.createTask({
+      const data = req.body;
+      const task = taskService.createTask({
       title: data.title,
       description: data.description ?? '',
       status: data.status ?? 'todo',
