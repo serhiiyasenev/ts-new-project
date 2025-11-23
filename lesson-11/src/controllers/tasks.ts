@@ -68,7 +68,7 @@ export const createTask = (req: Request, res: Response, next: Function) => {
 
 export const updateTask = (req: Request<{ id: string }>, res: Response, next: Function) => {
   try {
-    const id = req.params.id as string;
+    const id = req.params.id;
     const parseResult = createTaskSchema.partial().safeParse(req.body);
     if (!parseResult.success) {
       return res.status(400).json({ message: 'Invalid body', errors: parseResult.error.issues });
