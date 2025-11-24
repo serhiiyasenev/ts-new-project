@@ -1,50 +1,47 @@
-import { User } from "../types/users";
-import crypto from "crypto";
+import { UserModel } from "../models/user.model";
+import { EmailAlreadyExistsError } from "../types/errors";
+import { Op } from "sequelize";
 
-const users: User[] = [
-  { id: crypto.randomUUID(), name: "John Doe", createdAt: new Date().toISOString() },
-  { id: crypto.randomUUID(), name: "Jane Smith", createdAt: new Date().toISOString() },
-  { id: crypto.randomUUID(), name: "Alice Johnson", createdAt: new Date().toISOString() }
-];
-
-export const getAllUsers = (filters?: { createdAt?: string; name?: string }): User[] => {
-  let result = users.slice();
-  if (!filters) return result;
-  if (filters.createdAt) {
-    const prefix = filters.createdAt;
-    result = result.filter(u => u.createdAt.startsWith(prefix));
+export const getAllUsers = async (filters?: { email?: string; name?: string }): Promise<UserModel[]> => { const where: any = {};
+  if (filters?.email) {
+    where.email = { [Op.iLike]: `%${filters.email}%` };
   }
-  if (filters.name) {
-    const s = filters.name.toLowerCase();
-    result = result.filter(u => u.name.toLowerCase().includes(s));
+  if (filters?.name) {
+    where.name = { [Op.iLike]: `%${filters.name}%` };
   }
-  return result;
+  return await UserModel.findAll({ where });
 };
 
-export const createUser = (userName: string): User => {
-  const newUser: User = { id: crypto.randomUUID(), name: userName, createdAt: new Date().toISOString() };
-  users.push(newUser);
-  return newUser;
-};
-
-export const getUserById = (id: string): User | undefined => {
-  return users.find(user => user.id === id);
-};
-
-export const updateUser = (id: string, updatedData: Partial<User>): User | null => {
-  const userIndex = users.findIndex(user => user.id === id);
-  if (userIndex !== -1) {
-    users[userIndex] = { ...users[userIndex], ...updatedData } as User;
-    return users[userIndex];
+export const createUser = async (data: Partial<UserModel>) => {
+  try {
+    return await UserModel.create(data);
+  } catch (err: any) {
+    if (err.name === "SequelizeUniqueConstraintError") {
+      throw new EmailAlreadyExistsError();
+    }
+    console.error("DB error:", err);
+    throw err;
   }
-  return null;
 };
 
-export const deleteUser = (id: string): boolean => {
-  const userIndex = users.findIndex(user => user.id === id);
-  if (userIndex !== -1) {
-    users.splice(userIndex, 1);
-    return true;
+export const getUserById = async (id: number): Promise<UserModel | null> => {
+  return await UserModel.findByPk(id);
+};
+
+export const updateUser = async (id: number, updatedData: Partial<UserModel>): Promise<UserModel | null> => {
+  const user = await UserModel.findByPk(id);
+  if (!user) return null;
+  try {
+    return await user.update(updatedData);
+  } catch (err: any) {
+    if (err.name === "SequelizeUniqueConstraintError") {
+      throw new EmailAlreadyExistsError();
+    }
+    throw err;
   }
-  return false;
+};
+
+export const deleteUser = async (id: number): Promise<boolean> => {
+  const deleted = await UserModel.destroy({ where: { id } });
+  return deleted > 0;
 };

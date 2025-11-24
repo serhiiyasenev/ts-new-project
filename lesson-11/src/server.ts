@@ -1,9 +1,10 @@
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import userRoutes from "./routes/users";
 import taskRoutes from "./routes/tasks";
-import { ApiError } from "./types/errors";
+import { ApiError, EmailAlreadyExistsError } from "./types/errors";
 import morgan from 'morgan';
 import cors from 'cors';
+import './config/database';
 
 const app = express();
 const port = 3000;
@@ -12,6 +13,12 @@ const port = 3000;
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(cors());
+
+// simple request logger
+app.use((req, _res, next) => {
+  console.log(`Request: ${req.method} ${req.url}`);
+  next();
+});
 
 // use user routes
 app.use("/users", userRoutes);
@@ -22,22 +29,24 @@ app.get("/", (_req: Request, res: Response) => {
   res.json({ message: "API root. Use /users and /tasks for operations." });
 });
 
-// simple request logger
-app.use((req, _res, next) => {
-  console.log(`Request: ${req.method} ${req.url}`);
-  next();
-});
-
 // Catch-all for unknown routes (404)
-app.use((req, res, next) => {
-  if (res.headersSent) return next();
+app.use((req: Request, res: Response) => {
   res.status(404).json({ message: "Not Found" });
 });
 
-// Error handler mest be the last middleware
-app.use((err: ApiError, _req: Request, res: Response, _next: Function) => {
-  console.error(err.stack);
-  res.status(err.statusCode || 500).json({ message: err.message || "Internal Server Error" });
+// Error handler mast be the last middleware
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error("Error:", err);
+
+  if (err instanceof EmailAlreadyExistsError) {
+    return res.status(409).json({ message: err.message });
+  }
+
+  if (err instanceof ApiError) {
+    return res.status(err.statusCode).json({ message: err.message });
+  }
+
+  res.status(500).json({message: "Internal server error"});
 });
 
 if (process.env.NODE_ENV !== 'test') {

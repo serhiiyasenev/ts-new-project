@@ -1,63 +1,57 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import * as userService from "../services/users";
 
-export const getAllUsers = (req: Request<{}, {}, {}, Record<string, string | undefined>>, res: Response) => {
-  const { createdAt, name } = req.query;
-  const filters: { createdAt?: string; name?: string } = {};
-  if (createdAt) filters.createdAt = createdAt;
-  if (name) filters.name = name;
-  const users = userService.getAllUsers(filters);
+export const getAllUsers = async (
+  req: Request<{}, {}, {}, Record<string, string | undefined>>,
+  res: Response
+) => {
+  const users = await userService.getAllUsers(req.query);
   res.json(users);
 };
 
-export const createUser = (req: Request, res: Response) => {
-  const { name } = req.body as { name?: string };
-  if (!name) {
-    return res.status(400).json({ message: "Missing user name" });
-  }
-
-  const created = userService.createUser(name);
-  res.status(201).json(created);
-};
-
-export const getUserById = (req: Request, res: Response) => {
-  const idParam = req.params.id;
-  if (!idParam) {
-    return res.status(400).json({ message: "Missing user id" });
-  }
-
-  const user = userService.getUserById(idParam);
-  if (user) {
-    res.json(user);
-  } else {
-    res.status(404).json({ message: "User not found" });
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await userService.createUser(req.body);
+    return res.status(201).json(user);
+  } catch (err) {
+    next(err);
   }
 };
 
-export const updateUser = (req: Request, res: Response) => {
-  const idParam = req.params.id;
-  if (!idParam) {
-    return res.status(400).json({ message: "Missing user id" });
-  }
+export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await userService.getUserById(Number(req.params.id));
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-  const updated = userService.updateUser(idParam, req.body as Partial<{ name: string }>);
-  if (updated) {
-    res.json(updated);
-  } else {
-    res.status(404).json({ message: "User not found" });
+    return res.json(user);
+  } catch (err) {
+    next(err);
   }
 };
 
-export const deleteUserById = (req: Request, res: Response) => {
-  const idParam = req.params.id; 
-  if (!idParam) {
-    return res.status(400).json({ message: "Missing user id" });
-  }
+export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const updated = await userService.updateUser(
+      Number(req.params.id),
+      req.body as Partial<{ name: string; email: string }>
+    );
 
-  const deleted = userService.deleteUser(idParam);
-  if (deleted) {
-    res.status(204).send();
-  } else {
-    res.status(404).json({ message: "User not found" });
+    if (!updated) return res.status(404).json({ message: "User not found" });
+
+    return res.json(updated);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteUserById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const deleted = await userService.deleteUser(Number(req.params.id));
+
+    if (!deleted) return res.status(404).json({ message: "User not found" });
+
+    return res.status(204).send();
+  } catch (err) {
+    next(err);
   }
 };

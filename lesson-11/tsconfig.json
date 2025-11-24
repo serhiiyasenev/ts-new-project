@@ -13,7 +13,10 @@
 
     "sourceMap": false,
     "declaration": false,
-    "declarationMap": false
+    "declarationMap": false,
+
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": ["src"],
   "exclude": ["dist", "node_modules", "test"]
