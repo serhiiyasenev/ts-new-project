@@ -14,7 +14,7 @@ export const updateBodySchema = z.object({
 
 export const queryUsersSchema = z.object({
   name: z.string().optional(),
-  email: z.string().email().optional()
+  email: z.string().optional()
 });
 
 export const userIdSchema = z.string()
