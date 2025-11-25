@@ -14,7 +14,7 @@ export const getAllUsers = async (filters?: UserFilters): Promise<UserModel[]> =
   if (filters?.name) {
     where.name = { [Op.iLike]: `%${filters.name}%` };
   }
-  if (typeof filters?.isActive === "boolean") {
+  if (filters?.isActive) {
     where.isActive = filters.isActive;
   }
   return await UserModel.findAll({ where });
