@@ -14,7 +14,7 @@ export const getAllPosts = async (filters?: PostFilters) : Promise<PostModel[]> 
   if (filters?.content) {
     where.content = { [Op.iLike]: `%${filters.content}%` };
   }
-  if (typeof filters?.userId === "number") {
+  if (filters?.userId) {
     where.userId = filters.userId;
   }
   return await PostModel.findAll({
