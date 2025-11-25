@@ -16,12 +16,8 @@ export const validateWithSchema = <T>(
   return parsed.data;
 };
 
-const positiveIdSchema = z.coerce.number().int().positive({
-  message: "ID must be a positive integer",
-});
-
 export const validateNumericId = (value: unknown, label: string): number => {
-  const parsed = positiveIdSchema.safeParse(value);
+  const parsed = z.coerce.number().int().positive().safeParse(value);
   if (!parsed.success) {
     throw new ApiError(`${label} must be a positive integer`, 400);
   }
