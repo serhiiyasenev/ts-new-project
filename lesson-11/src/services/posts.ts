@@ -30,7 +30,7 @@ export const getAllPosts = async (filters?: PostFilters) : Promise<PostModel[]> 
 
 export const createPost = async (data: CreatePostDto) => {
   await assertUserExists(data.userId);
-  const post = await PostModel.create(data as unknown as CreationAttributes<PostModel>);
+  const post = await PostModel.create(data);
   await post.reload({ include: [{ model: UserModel }] });
   return post;
 };
