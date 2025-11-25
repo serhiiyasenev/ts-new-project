@@ -10,7 +10,7 @@
     "test": "cross-env NODE_ENV=test vitest run",
     "test:watch": "cross-env NODE_ENV=test vitest",
     "test:coverage": "cross-env NODE_ENV=test npx vitest run --coverage",
-    "coverage:open": "node -e \"require('open')('./coverage/index.html')\""
+    "coverage:open": "node scripts/openCoverage.js"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +30,7 @@
     "@vitest/coverage-v8": "^4.0.14",
     "cross-env": "^10.1.0",
     "jest": "^30.2.0",
+    "open-cli": "^8.0.0",
     "supertest": "^6.3.4",
     "swagger-cli": "^4.0.4",
     "ts-node": "^10.9.2",
