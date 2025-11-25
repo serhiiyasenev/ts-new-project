@@ -59,7 +59,7 @@ export const updateTask = async (
 ): Promise<TaskModel | null> => {
   const task = await TaskModel.findByPk(id);
   if (!task) return null;
-  if (typeof updatedData.userId === "number") {
+  if (updatedData.userId) {
     await assertUserExists(updatedData.userId);
   }
   await task.update(updatedData);
