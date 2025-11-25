@@ -1,11 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import {
-  getAllTasks,
-  getTaskById,
-  createTask,
-  updateTask,
-  deleteTask
-} from '../controllers/tasks';
+import {getAllTasks,getTaskById,createTask,updateTask,deleteTask } from '../controllers/tasks';
 import { createTaskSchema, queryTasksSchema } from '../schemas/tasks';
 
 const router = Router();
@@ -28,6 +22,11 @@ function validateBodyParams(req: Request, res: Response, next: NextFunction) {
   }
   next();
 }
+
+router.use((req, _res, next) => {
+  console.log(`Tasks Route - Request: ${req.method} ${req.url}`);
+  next();
+});
 
 router.get('/', validateQueryParams, getAllTasks);
 router.post('/', validateBodyParams, createTask);

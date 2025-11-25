@@ -1,15 +1,13 @@
-import { Request, Response } from 'express';
-import * as taskService from '../services/tasks';
-import { TaskFilters, TaskPriority, TaskStatus } from '../types/tasks';
-import { ApiError } from '../types/errors';
+import { NextFunction, Request, Response } from "express";
+import * as taskService from "../services/tasks";
+import { TaskFilters, TaskPriority, TaskStatus } from "../types/tasks";
+import { parseCsv } from "../helpers/helpers";
 
-
-function parseCsv(value?: string): string[] | undefined {
-  if (!value) return undefined;
-  return value.split(',').map(s => s.trim()).filter(Boolean);
-}
-
-export const getAllTasks = (req: Request<{}, {}, {}, Record<string, string | undefined>>, res: Response, next: Function) => {
+export const getAllTasks = async (
+  req: Request<{}, {}, {}, Record<string, string | undefined>>,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { createdAt, status, priority, title } = req.query;
     const filters: TaskFilters = {};
@@ -17,73 +15,76 @@ export const getAllTasks = (req: Request<{}, {}, {}, Record<string, string | und
     if (status) filters.status = parseCsv(status) as TaskStatus[];
     if (priority) filters.priority = parseCsv(priority) as TaskPriority[];
     if (title) filters.title = title;
-
-    const result = taskService.getAllTasks(filters);
-    res.json(result);
+    const tasks = await taskService.getAllTasks(filters);
+    return res.json(tasks);
   } catch (err) {
-    console.error(err);
-    next(err)
-  }
-};
-
-export const getTaskById = (req: Request<{ id: string }>, res: Response, next: Function) => {
-  try {
-    const idParam = req.params.id;
-    if (!idParam) {
-    return res.status(400).json({ message: "Missing task id" });
-  }
-
-    const task = taskService.getTaskById(idParam);
-    if (!task) throw new ApiError('Task not found', 404);
-    res.json(task);
-  } catch (err) {
-    console.error(err);
     next(err);
   }
 };
 
-export const createTask = (req: Request, res: Response, next: Function) => {
+export const getTaskById = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-      const data = req.body;
-      const task = taskService.createTask({
+    const task = await taskService.getTaskById(Number(req.params.id));
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+    return res.json(task);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const createTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const data = req.body;
+    const task = await taskService.createTask({
       title: data.title,
-      description: data.description ?? '',
-      status: data.status ?? 'todo',
-      priority: data.priority ?? 'medium'
+      description: data.description ?? "",
+      status: data.status ?? "todo",
+      priority: data.priority ?? "medium",
     });
-    res.status(201).json(task);
+    return res.status(201).json(task);
   } catch (err) {
-    console.error(err);
-    next(err)
+    next(err);
   }
 };
 
-export const updateTask = (req: Request<{ id: string }>, res: Response, next: Function) => {
+export const updateTask = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const idParam = req.params.id;
-    if (!idParam) {
-    return res.status(400).json({ message: "Missing task id" });
-  }
-    const updated = taskService.updateTask(idParam, req.body);
-    if (!updated) throw new ApiError('Task not found', 404);
-    res.json(updated);
+    const updated = await taskService.updateTask(Number(req.params.id), req.body);
+    if (!updated) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+    return res.json(updated);
   } catch (err) {
-    console.error(err);
-    next(err)
+    next(err);
   }
 };
 
-export const deleteTask = (req: Request<{ id: string }>, res: Response, next: Function) => {
+export const deleteTask = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const idParam = req.params.id; 
-  if (!idParam) {
-    return res.status(400).json({ message: "Missing task id" });
-  }
-    const deleted = taskService.deleteTask(idParam);
-    if (!deleted) throw new ApiError('Task not found', 404);
-    res.status(204).send();
+    const deleted = await taskService.deleteTask(Number(req.params.id));
+    if (!deleted) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+    return res.status(204).send();
   } catch (err) {
-    console.error(err);
     next(err);
   }
 };

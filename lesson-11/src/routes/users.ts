@@ -4,6 +4,7 @@ import { bodyParamsSchema, queryUsersSchema, userIdSchema, updateBodySchema } fr
 
 const router = Router();
 
+// Middleware: validate body for POST /users
 function validateBodyParams(req: Request, res: Response, next: NextFunction) {
   console.log("Validating body parameters...", req.query);
   const validationResult = bodyParamsSchema.safeParse(req.body);
@@ -13,6 +14,7 @@ function validateBodyParams(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+// Middleware: validate body for PUT /users/:id
 function validateUpdateBodyParams(req: Request, res: Response, next: NextFunction) {
   console.log("Validating update body parameters...", req.query);
   const validationResult = updateBodySchema.safeParse(req.body);
@@ -22,6 +24,7 @@ function validateUpdateBodyParams(req: Request, res: Response, next: NextFunctio
   next();
 }
 
+// Middleware: validate query params for GET /users
 function validateQueryParams(req: Request, res: Response, next: NextFunction) {
   const result = queryUsersSchema.safeParse(req.query);
   if (!result.success) {
@@ -30,6 +33,7 @@ function validateQueryParams(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+// Middleware: validate user ID param for routes with :id
 function validateUserId(req: Request, res: Response, next: NextFunction) {
   const result = userIdSchema.safeParse(req.params.id);
   if (!result.success) {
