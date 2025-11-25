@@ -22,12 +22,14 @@ sequelize.authenticate()
     console.error('Unable to connect to the database:', error);
   });
 
+if (process.env.NODE_ENV !== 'test') {
   sequelize.sync({ alter: true })
-  .then(() => {
-    console.log('Database synchronized successfully.');
-  })
-  .catch((error) => {
-    console.error('Error synchronizing the database:', error);
-  });
+    .then(() => {
+      console.log('Database synchronized successfully.');
+    })
+    .catch((error) => {
+      console.error('Error synchronizing the database:', error);
+    });
+}
 
 export default sequelize;

@@ -18,20 +18,18 @@ describe('Users API (comprehensive)', () => {
 
 	it('validates POST body and returns 400 on invalid input', async () => {
 		const res = await request(app).post('/users').send({ email: 'no-name@example.com' });
-		// validation may produce a 400, or the validation library/error handler may surface 500
-		expect([400, 500]).toContain(res.status);
-		if (res.status === 400 && res.body && res.body.message) expect(res.body.message.toLowerCase()).toContain('name');
+		expect(res.status).toBe(400);
+		expect(res.body.message.toLowerCase()).toMatch(/invalid user payload|'name' is required|name must/);
 	});
 
 	it('prevents duplicate emails (unique constraint) and surfaces error', async () => {
 		const timestamp = Date.now();
 		const email = `dup${timestamp}@example.com`;
-		const r1 = await request(app).post('/users').send({ name: 'A', email }).expect(201);
+		const r1 = await request(app).post('/users').send({ name: 'Alpha User', email }).expect(201);
 		// Attempt duplicate
-		const r2 = await request(app).post('/users').send({ name: 'B', email });
-		expect(r2.status).toBeGreaterThanOrEqual(400);
-		expect(r2.status).toBeLessThanOrEqual(500);
-		if (r2.body && r2.body.message) expect(r2.body.message.toLowerCase()).toMatch(/email|exists/);
+		const r2 = await request(app).post('/users').send({ name: 'Beta User', email });
+		expect(r2.status).toBe(409);
+		expect(r2.body.message.toLowerCase()).toContain('email');
 
 		// cleanup
 		await request(app).delete(`/users/${r1.body.id}`).expect(204);
@@ -50,8 +48,26 @@ describe('Users API (comprehensive)', () => {
 		const byName = await request(app).get('/users').query({ name: 'FilterName' }).expect(200);
 		expect(byName.body.some((u: any) => u.id === create.body.id)).toBe(true);
 
+		const inactive = await request(app)
+			.post('/users')
+			.send({ name: 'Inactive', email: `inactive${timestamp}@example.com`, isActive: false })
+			.expect(201);
+
+		const byIsActive = await request(app).get('/users').query({ isActive: 'false' }).expect(200);
+		expect(byIsActive.body.some((u: any) => u.id === inactive.body.id)).toBe(true);
+
+		const combined = await request(app).get('/users').query({ name: 'FilterName', email: 'filter', isActive: 'true' }).expect(200);
+		expect(combined.body.length).toBeGreaterThan(0);
+
 		// cleanup
 		await request(app).delete(`/users/${create.body.id}`).expect(204);
+		await request(app).delete(`/users/${inactive.body.id}`).expect(204);
+	});
+
+	it('rejects invalid isActive filter value', async () => {
+		const res = await request(app).get('/users').query({ isActive: 'maybe' });
+		expect(res.status).toBe(400);
+		expect(res.body.message.toLowerCase()).toContain('invalid user query parameters');
 	});
 
 	it('GET by id returns 200 for existing and 404 for missing', async () => {
@@ -62,18 +78,37 @@ describe('Users API (comprehensive)', () => {
 		await request(app).get(`/users/${create.body.id}`).expect(404);
 	});
 
+	it('rejects invalid path parameters', async () => {
+		await request(app).get('/users/not-a-number').expect(400);
+	});
+
 	it('PUT updates an existing user and validates input', async () => {
 		const timestamp = Date.now();
 		const create = await request(app).post('/users').send({ name: 'Updatable', email: `up${timestamp}@example.com` }).expect(201);
 		const updated = await request(app).put(`/users/${create.body.id}`).send({ name: 'UpdatedName' }).expect(200);
 		expect(updated.body.name).toBe('UpdatedName');
 
-		// invalid update: some environments return 400, others accept and return 200
-		const invalid = await request(app).put(`/users/${create.body.id}`).send({ name: 'a' });
-		expect([200, 400, 500]).toContain(invalid.status);
+		const invalid = await request(app).put(`/users/${create.body.id}`).send({ name: 'a' }).expect(400);
+		expect(invalid.body.message.toLowerCase()).toContain('invalid user update payload');
+
+		await request(app).put(`/users/${create.body.id}`).send({}).expect(400);
 
 		// cleanup
 		await request(app).delete(`/users/${create.body.id}`).expect(204);
+	});
+
+	it('prevents updating email to an existing address', async () => {
+		const first = await request(app).post('/users').send({ name: 'First', email: `first${Date.now()}@example.com` }).expect(201);
+		const second = await request(app).post('/users').send({ name: 'Second', email: `second${Date.now()}@example.com` }).expect(201);
+
+		await request(app).put(`/users/${second.body.id}`).send({ email: first.body.email }).expect(409);
+
+		await request(app).delete(`/users/${first.body.id}`).expect(204);
+		await request(app).delete(`/users/${second.body.id}`).expect(204);
+	});
+
+	it('returns 404 when updating a non-existent user', async () => {
+		await request(app).put('/users/999999').send({ name: 'Ghost' }).expect(404);
 	});
 
 	it('DELETE returns 204 for existing and 404 for missing', async () => {

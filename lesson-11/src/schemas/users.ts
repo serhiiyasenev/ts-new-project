@@ -1,18 +1,5 @@
 import { z } from "zod";
 
-export type UserFilters = {
-  name?: string;
-  email?: string;
-};
-
-export interface CreateUserDto {
-  name: string;
-  email: string;
-  isActive?: boolean;
-}
-
-export interface UpdateUserDto extends Partial<CreateUserDto> {}
-
 export const createUserSchema = z.object({
   name: z.string().min(2, "Name must have at least 2 characters"),
   email: z.string().email("Email must be valid"),
@@ -21,7 +8,19 @@ export const createUserSchema = z.object({
 
 export const updateUserSchema = createUserSchema.partial();
 
+const isActiveStringSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .refine((val) => val === "true" || val === "false", {
+    message: "isActive must be true or false",
+  })
+  .transform((val) => val === "true");
+
+const isActiveQuerySchema = z.union([z.boolean(), isActiveStringSchema]);
+
 export const queryUsersSchema = z.object({
-  name: z.string().optional(),
-  email: z.string().optional()
+  name: z.string().trim().min(1).optional(),
+  email: z.string().trim().min(1).optional(),
+  isActive: isActiveQuerySchema.optional()
 });

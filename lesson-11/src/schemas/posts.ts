@@ -1,29 +1,30 @@
 import { z } from "zod";
 
-export type PostFilters = {
-  title?: string;
-  content?: string;
-  userId?: number;
-};
-
-export interface CreatePostDto {
-  title: string;
-  content: string;
-  userId: number;
-}
-
-export interface UpdatePostDto extends Partial<CreatePostDto> {}
-
-export const createPostSchema = z.object({
+const basePostSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
-  userId: z.number().int().positive()
 });
 
-export const updatePostSchema = createPostSchema.partial();
+export const createPostSchema = basePostSchema.extend({
+  userId: z.number().int().positive(),
+});
+
+export const updatePostSchema = z.object({
+  actorUserId: z.number().int().positive(),
+  title: basePostSchema.shape.title.optional(),
+  content: basePostSchema.shape.content.optional(),
+});
 
 export const queryPostsSchema = z.object({
-  title: z.string().optional(),
-  content: z.string().optional(),
-  userId: z.string().regex(/^\d+$/, "userId must be numeric").optional()
+  title: z.string().trim().min(1).optional(),
+  content: z.string().trim().min(1).optional(),
+  userId: z
+    .union([
+      z.number().int().positive(),
+      z
+        .string()
+        .regex(/^\d+$/, "userId must be numeric")
+        .transform((val) => parseInt(val, 10))
+    ])
+    .optional()
 });

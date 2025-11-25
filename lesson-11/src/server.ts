@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import { RegisterRoutes } from "./routes-tsoa/routes";
 import { ApiError, EmailAlreadyExistsError } from "./types/errors";
+import { ValidateError } from "tsoa";
 import morgan from "morgan";
 import cors from "cors";
 import "./config/database";
@@ -43,6 +44,12 @@ app.use((req: Request, res: Response) => {
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error("Error:", err);
 
+  if (err instanceof ValidateError) {
+    const messages = Object.values(err.fields ?? {}).map((field) => field.message);
+    const details = messages.length ? messages.join("; ") : "Validation failed";
+    return res.status(400).json({ message: details });
+  }
+
   if (err instanceof EmailAlreadyExistsError) {
     return res.status(409).json({ message: err.message });
   }
@@ -54,7 +61,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ message: "Internal server error" });
 });
 
-const firstRunFlag = ".first-run";;
+const firstRunFlag = ".first-run";
 
 if (process.env.NODE_ENV !== "test") {
 if (!fs.existsSync(firstRunFlag)) {

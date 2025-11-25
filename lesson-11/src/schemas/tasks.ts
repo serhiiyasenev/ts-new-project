@@ -12,60 +12,55 @@ export enum TaskPriority {
   High = "high"
 }
 
-export type TaskFilters = {
-  status?: TaskStatus[];
-  priority?: TaskPriority[];
-  title?: string;
-};
-
-export interface CreateTaskDto {
-  title: string;
-  description?: string;
-  status?: TaskStatus;
-  priority?: TaskPriority;
-  userId?: number | undefined;
-}
-
-export interface UpdateTaskDto extends Partial<CreateTaskDto> {}
-
-export const createTaskSchema = z.object({
+const baseTaskSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  status: z.enum([
-    TaskStatus.Todo,
-    TaskStatus.InProgress,
-    TaskStatus.Done
-  ]).optional(),
-  priority: z.enum([
-    TaskPriority.Low,
-    TaskPriority.Medium,
-    TaskPriority.High
-  ]).optional(),
-  userId: z.number().int().positive().optional(),
+  status: z.nativeEnum(TaskStatus).optional(),
+  priority: z.nativeEnum(TaskPriority).optional(),
+  userId: z
+    .union([z.number().int().positive(), z.null()])
+    .optional()
+    .transform((val) => (val === undefined ? val : val)),
 });
 
-export const updateTaskSchema = createTaskSchema.partial();
+export const createTaskSchema = baseTaskSchema.extend({
+  status: baseTaskSchema.shape.status.default(TaskStatus.Todo),
+  priority: baseTaskSchema.shape.priority.default(TaskPriority.Medium),
+});
+
+export const updateTaskSchema = baseTaskSchema.partial();
 
 export const queryTasksSchema = z.object({
   status: z.string().optional()
-    .transform((val) => val?.split(","))
+    .transform((val) =>
+      val
+        ?.split(",")
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0)
+    )
     .pipe(
-      z.array(z.enum([
-        TaskStatus.Todo,
-        TaskStatus.InProgress,
-        TaskStatus.Done
-      ])).optional()
+      z.array(z.nativeEnum(TaskStatus)).optional()
     ),
 
   priority: z.string().optional()
-    .transform((val) => val?.split(","))
+    .transform((val) =>
+      val
+        ?.split(",")
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0)
+    )
     .pipe(
-      z.array(z.enum([
-        TaskPriority.Low,
-        TaskPriority.Medium,
-        TaskPriority.High
-      ])).optional()
+      z.array(z.nativeEnum(TaskPriority)).optional()
     ),
 
-  title: z.string().optional()
+  title: z.string().trim().min(1).transform((val) => val.trim()).optional(),
+  userId: z
+    .union([
+      z.number().int().positive(),
+      z
+        .string()
+        .regex(/^\d+$/, "userId must be numeric")
+        .transform((val) => parseInt(val, 10))
+    ])
+    .optional()
 });

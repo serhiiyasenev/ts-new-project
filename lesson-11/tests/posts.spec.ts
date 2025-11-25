@@ -13,6 +13,22 @@ describe('Posts API (comprehensive)', () => {
 		await request(app).get('/posts').query({ userId: 'not-a-number' }).expect(400);
 	});
 
+	it('rejects invalid POST userId', async () => {
+		const res = await request(app).post('/posts').send({ title: 'x', content: 'y', userId: 0 });
+		expect(res.status).toBe(400);
+		expect(res.body.message.toLowerCase()).toContain('invalid post payload');
+	});
+
+	it('requires userId when creating a post', async () => {
+		await request(app).post('/posts').send({ title: 'MissingUser', content: 'Body' }).expect(400);
+	});
+
+	it('rejects POST when referenced user does not exist', async () => {
+		const res = await request(app).post('/posts').send({ title: 'NoUser', content: 'X', userId: 9999 });
+		expect(res.status).toBe(404);
+		expect(res.body.message).toContain('User not found');
+	});
+
 	it('creates a post (POST) and returns 201 with included user', async () => {
 		const user = await createUser();
 		const res = await request(app).post('/posts').send({ title: 'Hello', content: 'World', userId: user.id }).expect(201);
@@ -31,8 +47,7 @@ describe('Posts API (comprehensive)', () => {
 
 	it('validates POST body and returns 400 when missing required fields', async () => {
 		const user = await createUser();
-		const res = await request(app).post('/posts').send({ content: 'no title', userId: user.id });
-		expect([400, 500]).toContain(res.status);
+		await request(app).post('/posts').send({ content: 'no title', userId: user.id }).expect(400);
 		await request(app).delete(`/users/${user.id}`).expect(204);
 	});
 
@@ -61,16 +76,11 @@ describe('Posts API (comprehensive)', () => {
 
 		await request(app).get(`/posts/${created.id}`).expect(200);
 
-		// invalid update: empty title
-		const invalidRes = await request(app).put(`/posts/${created.id}`).send({ title: '' });
-		// server may validate and return 400, or accept the value and return 200
-		expect([200, 400, 500]).toContain(invalidRes.status);
-		if (invalidRes.status === 200) {
-			expect(invalidRes.body.title).toBe('');
-		}
+		await request(app).put(`/posts/${created.id}`).send({ actorUserId: user.id, title: '' }).expect(400);
+		await request(app).put(`/posts/${created.id}`).send({ actorUserId: user.id }).expect(400);
 
 		// valid partial update
-		const updated = await request(app).put(`/posts/${created.id}`).send({ content: 'updated' }).expect(200);
+		const updated = await request(app).put(`/posts/${created.id}`).send({ actorUserId: user.id, content: 'updated' }).expect(200);
 		expect(updated.body.content).toBe('updated');
 
 		await request(app).delete(`/posts/${created.id}`).expect(204);
@@ -78,7 +88,52 @@ describe('Posts API (comprehensive)', () => {
 	});
 
 	it('PUT non-existent returns 404 and DELETE non-existent returns 404', async () => {
-		await request(app).put('/posts/999999').send({ title: 'X' }).expect(404);
+		await request(app).put('/posts/999999').send({ actorUserId: 1, title: 'X' }).expect(404);
 		await request(app).delete('/posts/999999').expect(404);
+	});
+
+	it('prevents updating a post by a different user and requires actorUserId', async () => {
+		const owner = await createUser();
+		const intruder = await createUser();
+		const { body: post } = await request(app).post('/posts').send({ title: 'Secure', content: 'Secret', userId: owner.id }).expect(201);
+
+		// missing actor id
+		await request(app).put(`/posts/${post.id}`).send({ title: 'Fail' }).expect(400);
+
+		// wrong user
+		const forbidden = await request(app)
+			.put(`/posts/${post.id}`)
+			.send({ actorUserId: intruder.id, content: 'Hack' });
+		expect(forbidden.status).toBe(403);
+		expect(forbidden.body.message.toLowerCase()).toContain('forbidden');
+
+		await request(app)
+			.put(`/posts/${post.id}`)
+			.send({ actorUserId: owner.id, content: 'Owner update' })
+			.expect(200);
+
+		await request(app).delete(`/posts/${post.id}`).expect(204);
+		await request(app).delete(`/users/${owner.id}`).expect(204);
+		await request(app).delete(`/users/${intruder.id}`).expect(204);
+	});
+
+	it('filters by title/content case-insensitively and by userId simultaneously', async () => {
+		const user = await createUser();
+		const title = 'CaseMatchTitle';
+		const content = 'CaseMatchContent';
+		const { body: created } = await request(app)
+			.post('/posts')
+			.send({ title, content, userId: user.id })
+			.expect(201);
+
+		const filters = await request(app)
+			.get('/posts')
+			.query({ title: 'casematch', content: 'content', userId: user.id.toString() })
+			.expect(200);
+
+		expect(filters.body.some((p: any) => p.id === created.id)).toBe(true);
+
+		await request(app).delete(`/posts/${created.id}`).expect(204);
+		await request(app).delete(`/users/${user.id}`).expect(204);
 	});
 });

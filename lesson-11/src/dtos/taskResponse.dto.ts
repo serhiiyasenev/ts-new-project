@@ -7,7 +7,7 @@ export interface TaskResponseDto {
   description?: string;
   status: TaskStatus;
   priority: TaskPriority;
-  userId?: number;
+  userId: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -19,7 +19,7 @@ export function mapTaskModelToDto(model: TaskModel): TaskResponseDto {
     description: model.description,
     status: model.status as TaskStatus,
     priority: model.priority as TaskPriority,
-    userId: model.userId,
+    userId: model.userId ?? null,
     createdAt: model.createdAt.toISOString(),
     updatedAt: model.updatedAt.toISOString(),
   };

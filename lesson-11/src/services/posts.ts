@@ -1,16 +1,20 @@
-import { Op } from "sequelize";
+import { Op, CreationAttributes } from "sequelize";
 import { PostModel } from "../models/post.model";
 import { UserModel } from "../models/user.model";
-import { PostFilters } from "../schemas/posts";
+import { PostFilters } from "../types/filters";
+import { CreatePostDto } from "../dtos/postRequest.dto";
+import { ApiError } from "../types/errors";
+import { assertUserExists } from "../helpers/user";
 
-export const getAllPosts = async (filters?: PostFilters) : Promise<PostModel[]> => { const where: any = {};
+export const getAllPosts = async (filters?: PostFilters) : Promise<PostModel[]> => {
+  const where: Record<string, unknown> = {};
   if (filters?.title) {
     where.title = { [Op.iLike]: `%${filters.title}%` };
   }
   if (filters?.content) {
     where.content = { [Op.iLike]: `%${filters.content}%` };
   }
-  if (filters?.userId) {
+  if (typeof filters?.userId === "number") {
     where.userId = filters.userId;
   }
   return await PostModel.findAll({
@@ -24,16 +28,11 @@ export const getAllPosts = async (filters?: PostFilters) : Promise<PostModel[]> 
   });
 };
 
-export const createPost = async (data: Partial<PostModel>) => {
-  try {
-    const post = await PostModel.create(data);
-    return await PostModel.findByPk(post.id, {
-      include: [{ model: UserModel }],
-    });
-  } catch (err) {
-    console.error("DB error:", err);
-    throw err;
-  }
+export const createPost = async (data: CreatePostDto) => {
+  await assertUserExists(data.userId);
+  const post = await PostModel.create(data as unknown as CreationAttributes<PostModel>);
+  await post.reload({ include: [{ model: UserModel }] });
+  return post;
 };
 
 export const getPostById = async (id: number) => {
@@ -42,10 +41,17 @@ export const getPostById = async (id: number) => {
   });
 };
 
-export const updatePost = async (id: number, data: Partial<PostModel>) => {
+export const updatePost = async (
+  id: number,
+  changes: Partial<Pick<PostModel, "title" | "content">>,
+  actorUserId: number
+) => {
   const post = await PostModel.findByPk(id);
   if (!post) return null;
-  await post.update(data);
+  if (post.userId !== actorUserId) {
+    throw new ApiError("Forbidden: cannot modify another user's post", 403);
+  }
+  await post.update(changes);
   return await PostModel.findByPk(id, {
     include: [{ model: UserModel }],
   });
