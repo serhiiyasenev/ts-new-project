@@ -16,7 +16,7 @@ export const getAllTasks = async (filters?: TaskFilters): Promise<TaskModel[]> =
   if (filters?.title) {
     where.title = { [Op.iLike]: `%${filters.title}%` };
   }
-  if (typeof filters?.userId === "number") {
+  if (filters?.userId) {
     where.userId = filters.userId;
   }
   return await TaskModel.findAll({
