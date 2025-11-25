@@ -7,9 +7,9 @@
     "dev": "npm run tsoa && tsx watch src/server.ts",
     "tsoa": "tsoa spec && tsoa routes",
     "build": "tsc -p tsconfig.json",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "npx vitest run --coverage"
+    "test": "cross-env NODE_ENV=test vitest run",
+    "test:watch": "cross-env NODE_ENV=test vitest",
+    "test:coverage": "cross-env NODE_ENV=test npx vitest run --coverage"
   },
   "keywords": [],
   "author": "",
@@ -18,12 +18,14 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
+    "@types/jest": "^30.0.0",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.10.1",
     "@types/supertest": "^2.0.16",
     "@types/swagger-ui-express": "^4.1.8",
     "@vitest/coverage-v8": "^4.0.14",
     "cross-env": "^10.1.0",
+    "jest": "^30.2.0",
     "supertest": "^6.3.4",
     "swagger-cli": "^4.0.4",
     "ts-node": "^10.9.2",
