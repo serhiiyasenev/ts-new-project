@@ -13,7 +13,6 @@ export enum TaskPriority {
 }
 
 export type TaskFilters = {
-  createdAt?: string;
   status?: TaskStatus[];
   priority?: TaskPriority[];
   title?: string;
@@ -48,14 +47,6 @@ export const createTaskSchema = z.object({
 export const updateTaskSchema = createTaskSchema.partial();
 
 export const queryTasksSchema = z.object({
-  createdAt: z
-    .string()
-    .optional()
-    .refine(
-      (s) => !s || !Number.isNaN(Date.parse(s)),
-      { message: "createdAt must be a valid date string" }
-    ),
-
   status: z.string().optional()
     .transform((val) => val?.split(","))
     .pipe(

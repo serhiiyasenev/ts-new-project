@@ -236,7 +236,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: undefined,
+                successStatus: 201,
               });
             } catch (err) {
                 return next(err);
@@ -305,7 +305,6 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsTaskController_getAllTasks: Record<string, TsoaRoute.ParameterSchema> = {
-                createdAt: {"in":"query","name":"createdAt","dataType":"string"},
                 status: {"in":"query","name":"status","dataType":"string"},
                 priority: {"in":"query","name":"priority","dataType":"string"},
                 title: {"in":"query","name":"title","dataType":"string"},
@@ -390,7 +389,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: undefined,
+                successStatus: 201,
               });
             } catch (err) {
                 return next(err);
@@ -543,7 +542,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: undefined,
+                successStatus: 201,
               });
             } catch (err) {
                 return next(err);

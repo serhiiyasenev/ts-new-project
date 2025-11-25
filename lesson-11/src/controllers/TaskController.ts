@@ -1,4 +1,4 @@
-import { Route, Get, Post, Put, Delete, Query, Path, Body } from "tsoa";
+import { Route, Get, Post, Put, Delete, Query, Path, Body, SuccessResponse } from "tsoa";
 import * as taskService from "../services/tasks";
 import { CreateTaskDto, UpdateTaskDto, TaskFilters, queryTasksSchema } from "../schemas/tasks";
 import { ApiError } from "../types/errors";
@@ -11,21 +11,23 @@ export class TaskController {
 
   @Get()
   public async getAllTasks(
-    @Query() createdAt?: string,
     @Query() status?: string,
     @Query() priority?: string,
     @Query() title?: string
   ): Promise<TaskResponseDto[]> {
 
-    const query = queryTasksSchema.parse({
-      createdAt,
-      status,
-      priority,
-      title
-    });
+    let query;
+    try {
+      query = queryTasksSchema.parse({
+        status,
+        priority,
+        title
+      });
+    } catch (error) {
+      throw new ApiError("Invalid query parameters", 400);
+    }
 
     const filters: TaskFilters = {
-      createdAt: query.createdAt,
       status: query.status,
       priority: query.priority,
       title: query.title
@@ -49,6 +51,7 @@ export class TaskController {
   }
 
   @Post()
+@SuccessResponse("201", "Created")
   public async createTask(
     @Body() data: CreateTaskDto
   ): Promise<TaskResponseDto> {

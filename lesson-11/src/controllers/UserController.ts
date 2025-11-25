@@ -1,4 +1,4 @@
-import {Route, Get, Post, Put, Delete, Query, Path, Body } from "tsoa";
+import {Route, Get, Post, Put, Delete, Query, Path, Body, SuccessResponse } from "tsoa";
 import * as userService from "../services/users";
 import { queryUsersSchema, UserFilters, CreateUserDto, UpdateUserDto } from "../schemas/users";
 import { ApiError } from "../types/errors";
@@ -15,7 +15,12 @@ export class UserController {
     @Query() email?: string,
     @Query() isActive?: string
   ): Promise<UserResponseDto[]> {
-    const query = queryUsersSchema.parse({ name, email, isActive });
+    let query;
+    try {
+      query = queryUsersSchema.parse({ name, email, isActive });
+    } catch (error) {
+      throw new ApiError("Invalid query parameters", 400);
+    }
     const filters: UserFilters = query;
     const users = await userService.getAllUsers(filters);
     return users.map(mapUserModelToDto);
@@ -33,6 +38,7 @@ export class UserController {
   }
 
   @Post()
+@SuccessResponse("201", "Created")
   public async createUser(
     @Body() data: CreateUserDto
   ): Promise<UserResponseDto> {

@@ -5,9 +5,6 @@ import { UserModel } from "../models/user.model";
 
 export const getAllTasks = async (filters?: TaskFilters): Promise<TaskModel[]> => {
   const where: any = {};
-  if (filters?.createdAt) {
-    where.createdAt = { [Op.iLike]: `%${filters.createdAt}%` };
-  }
   if (filters?.status?.length) {
     where.status = { [Op.in]: filters.status };
   }

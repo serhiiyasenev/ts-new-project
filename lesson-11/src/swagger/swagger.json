@@ -329,8 +329,8 @@
 			"post": {
 				"operationId": "CreateUser",
 				"responses": {
-					"200": {
-						"description": "Ok",
+					"201": {
+						"description": "Created",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -477,14 +477,6 @@
 				"parameters": [
 					{
 						"in": "query",
-						"name": "createdAt",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
 						"name": "status",
 						"required": false,
 						"schema": {
@@ -512,8 +504,8 @@
 			"post": {
 				"operationId": "CreateTask",
 				"responses": {
-					"200": {
-						"description": "Ok",
+					"201": {
+						"description": "Created",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -687,8 +679,8 @@
 			"post": {
 				"operationId": "CreatePost",
 				"responses": {
-					"200": {
-						"description": "Ok",
+					"201": {
+						"description": "Created",
 						"content": {
 							"application/json": {
 								"schema": {
