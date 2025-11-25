@@ -10,7 +10,6 @@ import { TaskFilters } from "../types/filters";
 @Route("tasks")
 @Tags("Tasks")
 export class TaskController extends Controller {
-
   @Get()
   public async getAllTasks(
     @Query() status?: string,
@@ -18,20 +17,17 @@ export class TaskController extends Controller {
     @Query() title?: string,
     @Query() userId?: string
   ): Promise<TaskResponseDto[]> {
-
     const query = validateWithSchema(
       queryTasksSchema,
       { status, priority, title, userId },
       "Invalid task query parameters"
     );
-
     const filters: TaskFilters = {
       status: query.status,
       priority: query.priority,
       title: query.title,
       userId: query.userId,
     };
-
     const tasks = await taskService.getAllTasks(filters);
     return tasks.map(mapTaskModelToDto);
   }
@@ -42,11 +38,9 @@ export class TaskController extends Controller {
   ): Promise<TaskResponseDto> {
     const taskId = validateNumericId(id, "Task id");
     const task = await taskService.getTaskById(taskId);
-
     if (!task) {
       throw new ApiError("Task not found", 404);
     }
-
     return mapTaskModelToDto(task);
   }
 
@@ -55,14 +49,12 @@ export class TaskController extends Controller {
   public async createTask(
     @Body() data: CreateTaskDto
   ): Promise<TaskResponseDto> {
-
     const payload = validateWithSchema(createTaskSchema, data, "Invalid task payload");
     const task = await taskService.createTask(payload as CreateTaskDto);
     if (!task) {
       throw new ApiError("Failed to create task", 500);
     }
     this.setStatus(201);
-
     return mapTaskModelToDto(task);
   }
 
@@ -71,18 +63,15 @@ export class TaskController extends Controller {
     @Path() id: string,
     @Body() data: UpdateTaskDto
   ): Promise<TaskResponseDto> {
-
     const taskId = validateNumericId(id, "Task id");
     const payload = validateWithSchema(updateTaskSchema, data, "Invalid task update payload");
     if (!Object.keys(payload).length) {
       throw new ApiError("Update payload cannot be empty", 400);
     }
     const updated = await taskService.updateTask(taskId, payload);
-
     if (!updated) {
       throw new ApiError("Task not found", 404);
     }
-    
     return mapTaskModelToDto(updated);
   }
 
@@ -91,14 +80,11 @@ export class TaskController extends Controller {
   public async deleteTask(
     @Path() id: string
   ): Promise<void> {
-
     const taskId = validateNumericId(id, "Task id");
     const deleted = await taskService.deleteTask(taskId);
-
     if (!deleted) {
         throw new ApiError("Task not found", 404);
     }
-
     this.setStatus(204);
   }
 }

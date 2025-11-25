@@ -10,7 +10,6 @@ import { UserFilters } from "../types/filters";
 @Route("users")
 @Tags("Users")
 export class UserController extends Controller {
-
   @Get()
   public async getAllUsers(
     @Query() name?: string,
