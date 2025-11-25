@@ -1,10 +1,11 @@
-import { Op, CreationAttributes } from "sequelize";
+import { Op } from "sequelize";
 import { PostModel } from "../models/post.model";
 import { TaskModel } from "../models/task.model";
 import { UserModel } from "../models/user.model";
 import { CreateUserDto, UpdateUserDto } from "../dtos/userRequest.dto";
 import { EmailAlreadyExistsError } from "../types/errors";
 import { UserFilters } from "../types/filters";
+import { mapCreateUserDtoToPayload } from "../helpers/user";
 
 export const getAllUsers = async (filters?: UserFilters): Promise<UserModel[]> => {
   const where: Record<string, unknown> = {};
@@ -33,7 +34,8 @@ const ensureEmailUnique = async (email: string, excludeUserId?: number) => {
 
 export const createUser = async (data: CreateUserDto): Promise<UserModel> => {
   await ensureEmailUnique(data.email);
-  return await UserModel.create(data);
+  const payload = mapCreateUserDtoToPayload(data);
+  return await UserModel.create(payload);
 };
 
 export const getUserById = async (id: number): Promise<UserModel | null> => {

@@ -1,10 +1,11 @@
-import { Op, CreationAttributes } from "sequelize";
+import { Op } from "sequelize";
 import { PostModel } from "../models/post.model";
 import { UserModel } from "../models/user.model";
 import { PostFilters } from "../types/filters";
 import { CreatePostDto } from "../dtos/postRequest.dto";
 import { ApiError } from "../types/errors";
 import { assertUserExists } from "../helpers/user";
+import { mapCreatePostDtoToPayload } from "../helpers/post";
 
 export const getAllPosts = async (filters?: PostFilters) : Promise<PostModel[]> => {
   const where: Record<string, unknown> = {};
@@ -30,7 +31,8 @@ export const getAllPosts = async (filters?: PostFilters) : Promise<PostModel[]> 
 
 export const createPost = async (data: CreatePostDto) => {
   await assertUserExists(data.userId);
-  const post = await PostModel.create(data);
+    const payload = mapCreatePostDtoToPayload(data);
+  const post = await PostModel.create(payload);
   await post.reload({ include: [{ model: UserModel }] });
   return post;
 };

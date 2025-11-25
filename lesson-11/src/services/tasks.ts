@@ -1,9 +1,10 @@
-import { Op, CreationAttributes } from "sequelize";
+import { Op } from "sequelize";
 import { TaskModel } from "../models/task.model";
 import { UserModel } from "../models/user.model";
 import { TaskFilters } from "../types/filters";
 import { CreateTaskDto, UpdateTaskDto } from "../dtos/taskRequest.dto";
 import { assertUserExists } from "../helpers/user";
+import { mapCreateTaskDtoToPayload } from "../helpers/task";
 
 export const getAllTasks = async (filters?: TaskFilters): Promise<TaskModel[]> => {
   const where: Record<string, unknown> = {};
@@ -35,7 +36,8 @@ export const createTask = async (data: CreateTaskDto) => {
   if (data.userId) {
     await assertUserExists(data.userId);
   }
-  const created = await TaskModel.create(data);
+  const payload = mapCreateTaskDtoToPayload(data);
+  const created = await TaskModel.create(payload);
   await created.reload({
     include: [{ model: UserModel, attributes: ["id", "name", "email"], required: false }],
   });
