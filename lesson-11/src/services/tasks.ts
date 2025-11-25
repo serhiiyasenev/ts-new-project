@@ -35,7 +35,7 @@ export const createTask = async (data: CreateTaskDto) => {
   if (data.userId) {
     await assertUserExists(data.userId);
   }
-  const created = await TaskModel.create(data as unknown as CreationAttributes<TaskModel>);
+  const created = await TaskModel.create(data);
   await created.reload({
     include: [{ model: UserModel, attributes: ["id", "name", "email"], required: false }],
   });
