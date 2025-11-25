@@ -1,6 +1,9 @@
 import request from 'supertest';
 import app from '../../src/server';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import { TaskController } from '../../src/controllers/TaskController';
+import * as taskService from '../../src/services/tasks';
+import { ApiError } from '../../src/types/errors';
 
 describe('Tasks API (comprehensive)', () => {
 	async function createUser() {
@@ -122,5 +125,29 @@ describe('Tasks API (comprehensive)', () => {
 
 	it('PUT non-existent returns 404', async () => {
 		await request(app).put('/tasks/999999').send({ title: 'Nope' }).expect(404);
+	});
+
+	it('GET non-existent returns 404', async () => {
+		await request(app).get('/tasks/999999').expect(404);
+	});
+
+	it('DELETE non-existent returns 404', async () => {
+		await request(app).delete('/tasks/999999').expect(404);
+	});
+
+	describe('TaskController (unit)', () => {
+		beforeEach(() => vi.restoreAllMocks());
+
+		it('createTask throws 500 when creation fails', async () => {
+			vi.spyOn(taskService, 'createTask').mockResolvedValue(null as any);
+			const ctrl = new TaskController();
+			await expect(ctrl.createTask({ title: 'New' } as any)).rejects.toBeInstanceOf(ApiError);
+		});
+
+		it('deleteTask throws 404 when not found', async () => {
+			vi.spyOn(taskService, 'deleteTask').mockResolvedValue(false as any);
+			const ctrl = new TaskController();
+			await expect(ctrl.deleteTask('999')).rejects.toBeInstanceOf(ApiError);
+		});
 	});
 });

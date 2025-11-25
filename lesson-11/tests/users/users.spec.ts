@@ -1,6 +1,9 @@
 import request from 'supertest';
 import app from '../../src/server';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import { UserController } from '../../src/controllers/UserController';
+import * as userService from '../../src/services/users';
+import { ApiError } from '../../src/types/errors';
 
 describe('Users API (comprehensive)', () => {
 	it('creates a user (POST) and returns 201 with created resource', async () => {
@@ -117,4 +120,52 @@ describe('Users API (comprehensive)', () => {
 		await request(app).delete(`/users/${create.body.id}`).expect(204);
 		await request(app).delete(`/users/${create.body.id}`).expect(404);
 	});
-});
+
+		// Merge of controller unit tests to avoid duplication and preserve controller branch coverage
+		describe('UserController (unit)', () => {
+			beforeEach(() => {
+				vi.restoreAllMocks();
+			});
+
+			it('getAllUsers maps and returns dtos', async () => {
+				const now = new Date();
+				const mockUsers: any[] = [
+					{ id: 1, name: 'A', email: 'a@example.com', isActive: true, lastLoginAt: null, createdAt: now, updatedAt: now },
+				];
+				vi.spyOn(userService, 'getAllUsers').mockResolvedValue(mockUsers as any);
+
+				const ctrl = new UserController();
+				const res = await ctrl.getAllUsers(undefined, undefined, undefined);
+				expect(Array.isArray(res)).toBe(true);
+				expect(res[0].id).toBe(1);
+				expect(res[0].email).toBe('a@example.com');
+			});
+
+			it('getUserById throws 404 when not found', async () => {
+				vi.spyOn(userService, 'getUserById').mockResolvedValue(null as any);
+				const ctrl = new UserController();
+				await expect(ctrl.getUserById('123')).rejects.toBeInstanceOf(ApiError);
+			});
+
+			it('createUser sets status 201 and returns dto', async () => {
+				const now = new Date();
+				const created = { id: 5, name: 'New', email: 'n@example.com', isActive: true, lastLoginAt: null, createdAt: now, updatedAt: now } as any;
+				vi.spyOn(userService, 'createUser').mockResolvedValue(created);
+
+				const ctrl = new UserController();
+				const res = await ctrl.createUser({ name: 'New', email: 'n@example.com' } as any);
+				expect(res.id).toBe(5);
+			});
+
+			it('updateUser throws when payload empty', async () => {
+				const ctrl = new UserController();
+				await expect(ctrl.updateUser('1', {} as any)).rejects.toBeInstanceOf(ApiError);
+			});
+
+			it('deleteUser throws 404 when not found', async () => {
+				vi.spyOn(userService, 'deleteUser').mockResolvedValue(false as any);
+				const ctrl = new UserController();
+				await expect(ctrl.deleteUser('999')).rejects.toBeInstanceOf(ApiError);
+			});
+		});
+	});
