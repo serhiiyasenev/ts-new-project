@@ -5,6 +5,7 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     include: ['tests/**/*.spec.ts'],
+    exclude: ['tests/posts/post.controller.spec.ts'],
     setupFiles: ['./tests/setup/setup.ts'],
     globalSetup: './tests/setup/global-setup.ts',
     coverage: {

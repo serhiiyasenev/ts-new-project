@@ -87,6 +87,10 @@ describe('Posts API (comprehensive)', () => {
 		await request(app).delete(`/users/${user.id}`).expect(204);
 	});
 
+	it('GET non-existent returns 404', async () => {
+		await request(app).get('/posts/999999').expect(404);
+	});
+
 	it('PUT non-existent returns 404 and DELETE non-existent returns 404', async () => {
 		await request(app).put('/posts/999999').send({ actorUserId: 1, title: 'X' }).expect(404);
 		await request(app).delete('/posts/999999').expect(404);
