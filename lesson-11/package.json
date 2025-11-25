@@ -9,7 +9,7 @@
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:watch:ui": "vitest --watch"
+    "test:coverage": "npx vitest run --coverage"
   },
   "keywords": [],
   "author": "",
