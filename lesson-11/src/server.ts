@@ -1,18 +1,24 @@
 import express, { NextFunction, Request, Response } from "express";
-import userRoutes from "./routes/users";
-import taskRoutes from "./routes/tasks";
+import { RegisterRoutes } from "./routes-tsoa/routes";
 import { ApiError, EmailAlreadyExistsError } from "./types/errors";
-import morgan from 'morgan';
-import cors from 'cors';
-import './config/database';
+import morgan from "morgan";
+import cors from "cors";
+import "./config/database";
+import swaggerUi from "swagger-ui-express";
+import swaggerDocument from "./swagger/swagger.json";
+import open from "open";
+import fs from "fs";
 
 const app = express();
 const port = 3000;
 
 // parse JSON bodies
 app.use(express.json());
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 app.use(cors());
+
+// Swagger UI setup http://localhost:3000/swagger
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // simple request logger
 app.use((req, _res, next) => {
@@ -20,21 +26,20 @@ app.use((req, _res, next) => {
   next();
 });
 
-// use user routes
-app.use("/users", userRoutes);
-app.use("/tasks", taskRoutes);
+// TSOA auto-generated routes
+RegisterRoutes(app);
 
-// Root route for GET /
+// Root route
 app.get("/", (_req: Request, res: Response) => {
-  res.json({ message: "API root. Use /users and /tasks for operations." });
+  res.json({ message: "API root. Use /users, /posts and /tasks for operations." });
 });
 
-// Catch-all for unknown routes (404)
+// 404 handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({ message: "Not Found" });
 });
 
-// Error handler mast be the last middleware
+// Error handler (must be last)
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error("Error:", err);
 
@@ -46,13 +51,20 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     return res.status(err.statusCode).json({ message: err.message });
   }
 
-  res.status(500).json({message: "Internal server error"});
+  res.status(500).json({ message: "Internal server error" });
 });
 
-if (process.env.NODE_ENV !== 'test') {
-  app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
-  });
+const firstRunFlag = ".first-run";;
+
+if (process.env.NODE_ENV !== "test") {
+if (!fs.existsSync(firstRunFlag)) {
+  fs.writeFileSync(firstRunFlag, "initialized");
+  open(`http://localhost:${port}/swagger`);
 }
 
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
+}
+    
 export default app;

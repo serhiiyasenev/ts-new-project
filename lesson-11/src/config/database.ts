@@ -1,5 +1,7 @@
 import { Sequelize } from "sequelize-typescript";
 import { UserModel } from "../models/user.model";
+import { TaskModel } from "../models/task.model";
+import { PostModel } from "../models/post.model";
 
 const sequelize = new Sequelize({
   host: 'localhost',
@@ -9,7 +11,7 @@ const sequelize = new Sequelize({
   username: 'postgres',
   password: 'admin',
   logging: false,
-  models: [UserModel],
+  models: [UserModel, TaskModel, PostModel],
 });
 
 sequelize.authenticate()

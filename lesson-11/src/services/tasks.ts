@@ -1,6 +1,7 @@
 import { Op } from "sequelize";
 import { TaskModel } from "../models/task.model";
-import { TaskFilters } from "../schemas/tasks";
+import { TaskFilters, UpdateTaskDto } from "../schemas/tasks";
+import { UserModel } from "../models/user.model";
 
 export const getAllTasks = async (filters?: TaskFilters): Promise<TaskModel[]> => {
   const where: any = {};
@@ -16,12 +17,23 @@ export const getAllTasks = async (filters?: TaskFilters): Promise<TaskModel[]> =
   if (filters?.title) {
     where.title = { [Op.iLike]: `%${filters.title}%` };
   }
-  return await TaskModel.findAll({ where });
+  return await TaskModel.findAll({
+    where,
+    include: [
+      {
+        model: UserModel,
+        attributes: ["id", "name", "email"], required: false
+      },
+    ],
+  });
 };
 
 export const createTask = async (data: Partial<TaskModel>) => {
   try {
-    return await TaskModel.create(data);
+    const created = await TaskModel.create(data);
+    return await TaskModel.findByPk(created.id, {
+      include: [{ model: UserModel, attributes: ["id", "name", "email"], required: false }],
+    });
   } catch (err: any) {
     console.error("DB error:", err);
     throw err;
@@ -29,21 +41,26 @@ export const createTask = async (data: Partial<TaskModel>) => {
 };
 
 export const getTaskById = async (id: number): Promise<TaskModel | null> => {
-  return await TaskModel.findByPk(id);
-};
+  return await TaskModel.findByPk(id, {
+    include: [
+      {
+        model: UserModel,
+        attributes: ["id", "name", "email"], required: false
+      }
+    ],
+  });
+}
 
 export const updateTask = async (
   id: number,
-  updatedData: Partial<TaskModel>
+  updatedData: UpdateTaskDto
 ): Promise<TaskModel | null> => {
   const task = await TaskModel.findByPk(id);
   if (!task) return null;
-  try {
-    return await task.update(updatedData);
-  } catch (err: any) {
-    console.error("DB error:", err);
-    throw err;
-  }
+  await task.update(updatedData);
+  return await TaskModel.findByPk(id, {
+    include: [{ model: UserModel, attributes: ["id", "name", "email"], required: false }],
+  });
 };
 
 export const deleteTask = async (id: number): Promise<boolean> => {

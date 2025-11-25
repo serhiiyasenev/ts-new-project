@@ -1,10 +1,16 @@
 import { z } from "zod";
 
-export const TaskStatusEnum = z.enum(["todo", "in_progress", "done"]);
-export const TaskPriorityEnum = z.enum(["low", "medium", "high"]);
+export enum TaskStatus {
+  Todo = "todo",
+  InProgress = "in_progress",
+  Done = "done"
+}
 
-export type TaskStatus = z.infer<typeof TaskStatusEnum>;
-export type TaskPriority = z.infer<typeof TaskPriorityEnum>;
+export enum TaskPriority {
+  Low = "low",
+  Medium = "medium",
+  High = "high"
+}
 
 export type TaskFilters = {
   createdAt?: string;
@@ -13,11 +19,30 @@ export type TaskFilters = {
   title?: string;
 };
 
+export interface CreateTaskDto {
+  title: string;
+  description?: string;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  userId?: number | undefined;
+}
+
+export interface UpdateTaskDto extends Partial<CreateTaskDto> {}
+
 export const createTaskSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  status: TaskStatusEnum.optional(),
-  priority: TaskPriorityEnum.optional(),
+  status: z.enum([
+    TaskStatus.Todo,
+    TaskStatus.InProgress,
+    TaskStatus.Done
+  ]).optional(),
+  priority: z.enum([
+    TaskPriority.Low,
+    TaskPriority.Medium,
+    TaskPriority.High
+  ]).optional(),
+  userId: z.number().int().positive().optional(),
 });
 
 export const updateTaskSchema = createTaskSchema.partial();
@@ -30,13 +55,26 @@ export const queryTasksSchema = z.object({
       (s) => !s || !Number.isNaN(Date.parse(s)),
       { message: "createdAt must be a valid date string" }
     ),
-  status: z.string().optional(),
-  priority: z.string().optional(),
+
+  status: z.string().optional()
+    .transform((val) => val?.split(","))
+    .pipe(
+      z.array(z.enum([
+        TaskStatus.Todo,
+        TaskStatus.InProgress,
+        TaskStatus.Done
+      ])).optional()
+    ),
+
+  priority: z.string().optional()
+    .transform((val) => val?.split(","))
+    .pipe(
+      z.array(z.enum([
+        TaskPriority.Low,
+        TaskPriority.Medium,
+        TaskPriority.High
+      ])).optional()
+    ),
+
   title: z.string().optional()
 });
-
-export const taskIdSchema = z
-  .string()
-  .refine((v) => /^\d+$/.test(v), {
-    message: "Task ID must be a numeric value",
-  });

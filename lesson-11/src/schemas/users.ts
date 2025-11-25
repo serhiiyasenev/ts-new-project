@@ -1,22 +1,27 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-export const bodyParamsSchema = z.object({
-  name: z.string().min(3),
-  email: z.email()
+export type UserFilters = {
+  name?: string;
+  email?: string;
+};
+
+export interface CreateUserDto {
+  name: string;
+  email: string;
+  isActive?: boolean;
+}
+
+export interface UpdateUserDto extends Partial<CreateUserDto> {}
+
+export const createUserSchema = z.object({
+  name: z.string().min(2, "Name must have at least 2 characters"),
+  email: z.string().email("Email must be valid"),
+  isActive: z.boolean().optional()
 });
 
-export const updateBodySchema = z.object({
-  name: z.string().min(3).optional(),
-  email: z.email().optional()
-}).refine((data) => Object.keys(data).length > 0, {
-  message: "At least one field must be provided for update"
-});
+export const updateUserSchema = createUserSchema.partial();
 
 export const queryUsersSchema = z.object({
   name: z.string().optional(),
   email: z.string().optional()
 });
-
-export const userIdSchema = z.string()
-  .min(1, { message: "Missing user id" })
-  .regex(/^([1-9]\d*)$/, { message: "Invalid user id" });

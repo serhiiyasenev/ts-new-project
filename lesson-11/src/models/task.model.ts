@@ -1,4 +1,5 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import { Column, DataType, Model, Table, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { UserModel } from './user.model';
 
 @Table({tableName: 'tasks', timestamps: true})
 export class TaskModel extends Model {
@@ -10,4 +11,9 @@ export class TaskModel extends Model {
   declare status: string;
   @Column({type: DataType.STRING, allowNull: false})
   declare priority: string;
+  @ForeignKey(() => UserModel)
+  @Column({ type: DataType.INTEGER, allowNull: true })
+  declare userId: number;
+  @BelongsTo(() => UserModel)
+  declare user?: UserModel | null;
 }

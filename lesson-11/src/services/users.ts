@@ -1,8 +1,11 @@
+import { PostModel } from "../models/post.model";
+import { TaskModel } from "../models/task.model";
 import { UserModel } from "../models/user.model";
+import { UserFilters } from "../schemas/users";
 import { EmailAlreadyExistsError } from "../types/errors";
 import { Op } from "sequelize";
 
-export const getAllUsers = async (filters?: { email?: string; name?: string }): Promise<UserModel[]> => { const where: any = {};
+export const getAllUsers = async (filters?: UserFilters): Promise<UserModel[]> => { const where: any = {};
   if (filters?.email) {
     where.email = { [Op.iLike]: `%${filters.email}%` };
   }
@@ -25,7 +28,16 @@ export const createUser = async (data: Partial<UserModel>) => {
 };
 
 export const getUserById = async (id: number): Promise<UserModel | null> => {
-  return await UserModel.findByPk(id);
+  return await UserModel.findByPk(id, {
+    include: [
+      {
+        model: TaskModel,
+      },
+      {
+        model: PostModel,
+      }
+    ]
+  });
 };
 
 export const updateUser = async (id: number, updatedData: Partial<UserModel>): Promise<UserModel | null> => {
