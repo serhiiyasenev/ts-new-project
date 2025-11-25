@@ -33,7 +33,7 @@ const ensureEmailUnique = async (email: string, excludeUserId?: number) => {
 
 export const createUser = async (data: CreateUserDto): Promise<UserModel> => {
   await ensureEmailUnique(data.email);
-  return await UserModel.create(data as unknown as CreationAttributes<UserModel>);
+  return await UserModel.create(data);
 };
 
 export const getUserById = async (id: number): Promise<UserModel | null> => {
