@@ -32,7 +32,7 @@ export const getAllTasks = async (filters?: TaskFilters): Promise<TaskModel[]> =
 };
 
 export const createTask = async (data: CreateTaskDto) => {
-  if (typeof data.userId === "number") {
+  if (data.userId) {
     await assertUserExists(data.userId);
   }
   const created = await TaskModel.create(data as unknown as CreationAttributes<TaskModel>);
