@@ -32,6 +32,12 @@ describe('TaskController (unit)', () => {
     expect(res.id).toBe(7);
   });
 
+  it('createTask throws 500 when creation fails', async () => {
+    vi.spyOn(taskService, 'createTask').mockResolvedValue(null as any);
+    const ctrl = new TaskController();
+    await expect(ctrl.createTask({ title: 'New' } as any)).rejects.toBeInstanceOf(ApiError);
+  });
+
   it('updateTask throws when not found', async () => {
     vi.spyOn(taskService, 'updateTask').mockResolvedValue(null as any);
     const ctrl = new TaskController();
