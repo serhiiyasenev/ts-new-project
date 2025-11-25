@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import * as taskService from "../services/tasks";
-import { TaskFilters, TaskPriority, TaskStatus } from "../types/tasks";
+import { TaskFilters, TaskStatus, TaskPriority } from "../schemas/tasks";
 import { parseCsv } from "../helpers/helpers";
 
 export const getAllTasks = async (

@@ -42,6 +42,7 @@ function validateUserId(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+// Global route logger for users routes
 router.use((req, _res, next) => {
   console.log(`Users Route - Request: ${req.method} ${req.url}`);
   next();

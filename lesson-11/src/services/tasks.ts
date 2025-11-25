@@ -1,26 +1,21 @@
 import { Op } from "sequelize";
 import { TaskModel } from "../models/task.model";
-import { TaskFilters } from "../types/tasks";
+import { TaskFilters } from "../schemas/tasks";
 
 export const getAllTasks = async (filters?: TaskFilters): Promise<TaskModel[]> => {
   const where: any = {};
-
   if (filters?.createdAt) {
     where.createdAt = { [Op.iLike]: `%${filters.createdAt}%` };
   }
-
   if (filters?.status?.length) {
     where.status = { [Op.in]: filters.status };
   }
-
   if (filters?.priority?.length) {
     where.priority = { [Op.in]: filters.priority };
   }
-
   if (filters?.title) {
     where.title = { [Op.iLike]: `%${filters.title}%` };
   }
-
   return await TaskModel.findAll({ where });
 };
 
@@ -37,7 +32,10 @@ export const getTaskById = async (id: number): Promise<TaskModel | null> => {
   return await TaskModel.findByPk(id);
 };
 
-export const updateTask = async (id: number,updatedData: Partial<TaskModel>): Promise<TaskModel | null> => {
+export const updateTask = async (
+  id: number,
+  updatedData: Partial<TaskModel>
+): Promise<TaskModel | null> => {
   const task = await TaskModel.findByPk(id);
   if (!task) return null;
   try {
