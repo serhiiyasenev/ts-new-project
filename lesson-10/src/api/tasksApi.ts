@@ -36,3 +36,14 @@ export const fetchTaskById = async (id: number): Promise<Task> => {
   }
   return await response.json();
 };
+export const updateTask = async (id: number, data: Partial<Task>): Promise<Task> => {
+  const response = await fetch(`/api/tasks/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to update task');
+  }
+  return response.json();
+};

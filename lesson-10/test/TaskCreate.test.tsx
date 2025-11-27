@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import TaskCreate from '../src/pages/TaskCreate/TaskCreate';
+import * as api from '../src/api';
 
 vi.mock('../src/api');
 const mockNavigate = vi.fn();
@@ -87,5 +88,37 @@ describe('TaskCreate', () => {
     });
 
     expect(submitButton).toBeDisabled();
+  });
+
+  it('submits valid form, calls createTask and navigates', async () => {
+    const user = userEvent.setup();
+    const createTaskMock = vi.mocked(api.createTask);
+    createTaskMock.mockResolvedValue({ id: 99, title: 'Valid Task Title', description: 'Valid description', status: 'To Do', dueDate: '2025-12-31', createdAt: '2025-11-20' });
+
+    render(
+      <MemoryRouter>
+        <TaskCreate />
+      </MemoryRouter>
+    );
+
+    const titleInput = screen.getByLabelText(/Title/i);
+    const descriptionInput = screen.getByLabelText(/Description/i);
+    const statusSelect = screen.getByLabelText(/Status/i);
+    const dueDateInput = screen.getByLabelText(/Due Date/i);
+    const submitButton = screen.getByRole('button', { name: /Create Task/i });
+
+    await user.type(titleInput, 'Valid Task Title');
+    await user.type(descriptionInput, 'This is a valid description with more than 10 characters');
+    await user.selectOptions(statusSelect, 'To Do');
+    await user.type(dueDateInput, '2025-12-31');
+
+    await waitFor(() => expect(submitButton).not.toBeDisabled());
+
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(createTaskMock).toHaveBeenCalled();
+      expect(mockNavigate).toHaveBeenCalledWith('/tasks');
+    });
   });
 });

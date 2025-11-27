@@ -19,6 +19,7 @@ describe('Users', () => {
         lastName: 'Doe',
         email: 'john@example.com',
         dateOfBirth: '1990-01-15',
+        createdAt: '2025-11-20'
       },
       {
         id: 2,
@@ -26,6 +27,7 @@ describe('Users', () => {
         lastName: 'Smith',
         email: 'jane@example.com',
         dateOfBirth: '1992-05-20',
+        createdAt: '2025-11-20'
       },
     ];
 
@@ -85,6 +87,7 @@ describe('Users', () => {
         lastName: 'Doe',
         email: 'john@example.com',
         dateOfBirth: '1990-01-15',
+        createdAt: '2025-11-20'
       },
     ];
 

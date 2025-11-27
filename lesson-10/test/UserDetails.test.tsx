@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import UserDetails from '../src/pages/UserDetails/UserDetails';
 import * as api from '../src/api';
@@ -18,6 +19,7 @@ describe('UserDetails', () => {
       lastName: 'Doe',
       email: 'john@example.com',
       dateOfBirth: '1990-01-15',
+      createdAt: '2025-11-20'
     };
 
     vi.mocked(api.fetchUserById).mockResolvedValue(mockUser);
@@ -82,6 +84,7 @@ describe('UserDetails', () => {
       lastName: 'Doe',
       email: 'john@example.com',
       dateOfBirth: '1990-01-15',
+      createdAt: '2025-11-20'
     };
 
     vi.mocked(api.fetchUserById).mockResolvedValue(mockUser);
