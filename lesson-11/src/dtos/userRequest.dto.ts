@@ -4,5 +4,5 @@ export interface CreateUserDto {
   isActive?: boolean;
 }
 
-export interface UpdateUserDto extends Partial<CreateUserDto> {}
+export type UpdateUserDto = Partial<CreateUserDto>;
 

@@ -168,7 +168,7 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"UpdateUserDto": {
+			"Partial_CreateUserDto_": {
 				"properties": {
 					"name": {
 						"type": "string"
@@ -181,7 +181,10 @@
 					}
 				},
 				"type": "object",
-				"additionalProperties": false
+				"description": "Make all properties in T optional"
+			},
+			"UpdateUserDto": {
+				"$ref": "#/components/schemas/Partial_CreateUserDto_"
 			},
 			"CreateTaskDto": {
 				"properties": {
@@ -520,7 +523,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/TaskResponseDto"
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/TaskResponseDto"
+										}
+									],
+									"nullable": true
 								}
 							}
 						}

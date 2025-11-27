@@ -39,7 +39,7 @@ app.use((req: Request, res: Response) => {
 });
 
 // Error handler (must be last)
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
   console.error("Error:", err);
 
   if (err instanceof ValidateError) {

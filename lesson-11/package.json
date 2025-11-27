@@ -10,7 +10,9 @@
     "test": "cross-env NODE_ENV=test vitest run",
     "test:watch": "cross-env NODE_ENV=test vitest",
     "test:coverage": "cross-env NODE_ENV=test npx vitest run --coverage",
-    "coverage:open": "node scripts/openCoverage.js"
+    "coverage:open": "node scripts/openCoverage.js",
+    "lint": "eslint \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\" --ext .ts,.tsx",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\" --ext .ts,.tsx --fix"
   },
   "keywords": [],
   "author": "",
@@ -29,9 +31,12 @@
     "@vitest/coverage-v8": "^4.0.14",
     "cross-env": "^10.1.0",
     "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.5.0",
     "jiti": "^2.6.1",
     "open-cli": "^8.0.0",
+    "prettier": "^3.7.1",
     "supertest": "^6.3.4",
     "swagger-cli": "^4.0.4",
     "ts-node": "^10.9.2",
