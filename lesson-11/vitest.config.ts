@@ -5,7 +5,6 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     include: ['tests/**/*.spec.ts'],
-    exclude: ['tests/posts/post.controller.spec.ts', 'tests/users/user.controller.spec.ts'],
     setupFiles: ['./tests/setup/setup.ts'],
     globalSetup: './tests/setup/global-setup.ts',
     coverage: {
@@ -13,18 +12,17 @@ export default defineConfig({
       reporter: ['text', 'lcov'],
       include: [
         'src/controllers/**/*.ts',
-        'src/services/**/*.ts',
-        'src/schemas/**/*.ts',
+        'src/dtos/**/*.ts',
         'src/helpers/**/*.ts',
-        'src/types/errors.ts'
+        'src/schemas/**/*.ts',
+        'src/services/**/*.ts',
+        'src/types/**/*.ts'
       ],
       exclude: [
         'src/config/**',
         'src/swagger/**',
         'src/routes-tsoa/**',
-        'src/server.ts',
-        'src/dtos/**',
-        'src/types/**'
+        'src/server.ts'
       ]
     }
   }
