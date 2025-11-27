@@ -2,6 +2,8 @@
   "compilerOptions": {
     "module": "CommonJS",
     "target": "ES2020",
+    "moduleResolution": "node",
+    "types": ["vitest"],
 
     "rootDir": "./src",
     "outDir": "./dist",

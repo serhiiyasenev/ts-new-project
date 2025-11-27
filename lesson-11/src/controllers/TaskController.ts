@@ -48,7 +48,7 @@ export class TaskController extends Controller {
   @SuccessResponse("201", "Created")
   public async createTask(
     @Body() data: CreateTaskDto
-  ): Promise<TaskResponseDto> {
+  ): Promise<TaskResponseDto | null> {
     const payload = validateWithSchema(createTaskSchema, data, "Invalid task payload");
     const task = await taskService.createTask(payload as CreateTaskDto);
     if (!task) {

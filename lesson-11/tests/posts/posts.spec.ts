@@ -1,6 +1,7 @@
 import request from 'supertest';
 import app from '../../src/server';
 import { describe, it, expect } from 'vitest';
+import { PostResponseDto } from '../../src/dtos/postResponse.dto';
 
 describe('Posts API (comprehensive)', () => {
 	// helper to create a user
@@ -57,13 +58,16 @@ describe('Posts API (comprehensive)', () => {
 		const { body: created } = await request(app).post('/posts').send({ title, content: 'filtercontent', userId: user.id }).expect(201);
 
 		const byTitle = await request(app).get('/posts').query({ title }).expect(200);
-		expect(byTitle.body.some((p: any) => p.id === created.id)).toBe(true);
+		const postsByTitle = byTitle.body as PostResponseDto[];
+		expect(postsByTitle.some(p => p.id === created.id)).toBe(true);
 
 		const byContent = await request(app).get('/posts').query({ content: 'filter' }).expect(200);
-		expect(byContent.body.some((p: any) => p.id === created.id)).toBe(true);
+		const postsByContent = byContent.body as PostResponseDto[];
+		expect(postsByContent.some(p => p.id === created.id)).toBe(true);
 
 		const byUser = await request(app).get('/posts').query({ userId: user.id.toString() }).expect(200);
-		expect(byUser.body.some((p: any) => p.id === created.id)).toBe(true);
+		const postsByUser = byUser.body as PostResponseDto[];
+		expect(postsByUser.some(p => p.id === created.id)).toBe(true);
 
 		// cleanup
 		await request(app).delete(`/posts/${created.id}`).expect(204);
@@ -135,7 +139,8 @@ describe('Posts API (comprehensive)', () => {
 			.query({ title: 'casematch', content: 'content', userId: user.id.toString() })
 			.expect(200);
 
-		expect(filters.body.some((p: any) => p.id === created.id)).toBe(true);
+		const posts = filters.body as PostResponseDto[];
+		expect(posts.some(p => p.id === created.id)).toBe(true);
 
 		await request(app).delete(`/posts/${created.id}`).expect(204);
 		await request(app).delete(`/users/${user.id}`).expect(204);

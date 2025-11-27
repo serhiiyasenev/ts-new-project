@@ -1,9 +1,12 @@
 import request from 'supertest';
 import app from '../../src/server';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UserController } from '../../src/controllers/UserController';
 import * as userService from '../../src/services/users';
+import { UserModel } from '../../src/models/user.model';
+import { CreateUserDto } from '../../src/dtos/userRequest.dto';
 import { ApiError } from '../../src/types/errors';
+import { UserResponseDto } from '../../src/dtos/userResponse.dto';
 
 describe('Users API (comprehensive)', () => {
 	it('creates a user (POST) and returns 201 with created resource', async () => {
@@ -46,10 +49,10 @@ describe('Users API (comprehensive)', () => {
 
 		const byEmail = await request(app).get('/users').query({ email }).expect(200);
 		expect(Array.isArray(byEmail.body)).toBe(true);
-		expect(byEmail.body.some((u: any) => u.id === create.body.id)).toBe(true);
+		expect((byEmail.body as UserResponseDto[]).some(u => u.id === create.body.id)).toBe(true);
 
 		const byName = await request(app).get('/users').query({ name: 'FilterName' }).expect(200);
-		expect(byName.body.some((u: any) => u.id === create.body.id)).toBe(true);
+		expect((byName.body as UserResponseDto[]).some(u => u.id === create.body.id)).toBe(true);
 
 		const inactive = await request(app)
 			.post('/users')
@@ -57,7 +60,7 @@ describe('Users API (comprehensive)', () => {
 			.expect(201);
 
 		const byIsActive = await request(app).get('/users').query({ isActive: 'false' }).expect(200);
-		expect(byIsActive.body.some((u: any) => u.id === inactive.body.id)).toBe(true);
+		expect((byIsActive.body as UserResponseDto[]).some(u => u.id === inactive.body.id)).toBe(true);
 
 		const combined = await request(app).get('/users').query({ name: 'FilterName', email: 'filter', isActive: 'true' }).expect(200);
 		expect(combined.body.length).toBeGreaterThan(0);
@@ -128,11 +131,11 @@ describe('Users API (comprehensive)', () => {
 			});
 
 			it('getAllUsers maps and returns dtos', async () => {
-				const now = new Date();
-				const mockUsers: any[] = [
-					{ id: 1, name: 'A', email: 'a@example.com', isActive: true, lastLoginAt: null, createdAt: now, updatedAt: now },
-				];
-				vi.spyOn(userService, 'getAllUsers').mockResolvedValue(mockUsers as any);
+					const now = new Date();
+					const mockUsers = [
+						{ id: 1, name: 'A', email: 'a@example.com', isActive: true, lastLoginAt: null, createdAt: now, updatedAt: now },
+					] as unknown as UserModel[];
+					vi.spyOn(userService, 'getAllUsers').mockResolvedValue(mockUsers);
 
 				const ctrl = new UserController();
 				const res = await ctrl.getAllUsers(undefined, undefined, undefined);
@@ -142,28 +145,30 @@ describe('Users API (comprehensive)', () => {
 			});
 
 			it('getUserById throws 404 when not found', async () => {
-				vi.spyOn(userService, 'getUserById').mockResolvedValue(null as any);
+				vi.spyOn(userService, 'getUserById').mockResolvedValue(null);
 				const ctrl = new UserController();
 				await expect(ctrl.getUserById('123')).rejects.toBeInstanceOf(ApiError);
 			});
 
 			it('createUser sets status 201 and returns dto', async () => {
 				const now = new Date();
-				const created = { id: 5, name: 'New', email: 'n@example.com', isActive: true, lastLoginAt: null, createdAt: now, updatedAt: now } as any;
-				vi.spyOn(userService, 'createUser').mockResolvedValue(created);
+				const createdModel = { id: 5, name: 'New', email: 'n@example.com', isActive: true, lastLoginAt: null, createdAt: now, updatedAt: now } as unknown as UserModel;
+				vi.spyOn(userService, 'createUser').mockResolvedValue(
+					createdModel as unknown as Awaited<ReturnType<typeof userService.createUser>>
+				);
 
 				const ctrl = new UserController();
-				const res = await ctrl.createUser({ name: 'New', email: 'n@example.com' } as any);
+				const res = await ctrl.createUser({ name: 'New', email: 'n@example.com' } as CreateUserDto);
 				expect(res.id).toBe(5);
 			});
 
 			it('updateUser throws when payload empty', async () => {
 				const ctrl = new UserController();
-				await expect(ctrl.updateUser('1', {} as any)).rejects.toBeInstanceOf(ApiError);
+				await expect(ctrl.updateUser('1', {} as UserResponseDto)).rejects.toBeInstanceOf(ApiError);
 			});
 
 			it('deleteUser throws 404 when not found', async () => {
-				vi.spyOn(userService, 'deleteUser').mockResolvedValue(false as any);
+				vi.spyOn(userService, 'deleteUser').mockResolvedValue(false);
 				const ctrl = new UserController();
 				await expect(ctrl.deleteUser('999')).rejects.toBeInstanceOf(ApiError);
 			});

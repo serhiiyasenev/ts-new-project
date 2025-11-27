@@ -7,12 +7,10 @@ export const mapCreateTaskDtoToPayload = (
 ): CreationAttributes<TaskModel> => {
   const payload: CreationAttributes<TaskModel> = {
     title: data.title,
-    // map optional description to null when not provided so DB nullable column is satisfied
-    description: typeof data.description === "undefined" ? null : data.description,
+    description: data.description ?? null,
     status: data.status,
     priority: data.priority,
-    // userId column is nullable in the model; map undefined -> null
-    userId: typeof data.userId === "undefined" ? null : data.userId,
+    userId: data.userId ?? null,
   };
   return payload;
 };

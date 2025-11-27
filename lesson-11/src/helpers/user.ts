@@ -9,7 +9,7 @@ export const mapCreateUserDtoToPayload = (
   const payload: CreationAttributes<UserModel> = {
     name: data.name,
     email: data.email,
-    ...(typeof data.isActive !== "undefined" ? { isActive: data.isActive } : {}),
+    isActive: data.isActive ?? true,
   };
   return payload;
 };

@@ -1,9 +1,10 @@
 import request from 'supertest';
 import app from '../../src/server';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TaskController } from '../../src/controllers/TaskController';
 import * as taskService from '../../src/services/tasks';
 import { ApiError } from '../../src/types/errors';
+import { TaskResponseDto } from '../../src/dtos/taskResponse.dto';
 
 describe('Tasks API (comprehensive)', () => {
 	async function createUser() {
@@ -45,13 +46,13 @@ describe('Tasks API (comprehensive)', () => {
 		const { body: otherStatus } = await request(app).post('/tasks').send({ title: `Other${ts}`, status: 'todo' }).expect(201);
 
 		const byStatus = await request(app).get('/tasks').query({ status: 'in_progress' }).expect(200);
-		expect(byStatus.body.some((t: any) => t.id === created.id)).toBe(true);
+		expect((byStatus.body as TaskResponseDto[]).some(t => t.id === created.id)).toBe(true);
 
 		const byPriority = await request(app).get('/tasks').query({ priority: 'high' }).expect(200);
-		expect(byPriority.body.some((t: any) => t.id === created.id)).toBe(true);
+		expect((byPriority.body as TaskResponseDto[]).some(t => t.id === created.id)).toBe(true);
 
 		const byTitle = await request(app).get('/tasks').query({ title: title }).expect(200);
-		expect(byTitle.body.some((t: any) => t.id === created.id)).toBe(true);
+		expect((byTitle.body as TaskResponseDto[]).some(t => t.id === created.id)).toBe(true);
 
 		const user = await createUser();
 
@@ -59,10 +60,10 @@ describe('Tasks API (comprehensive)', () => {
 		expect(assigned.body.userId).toBe(user.id);
 
 		const byUser = await request(app).get('/tasks').query({ userId: user.id.toString() }).expect(200);
-		expect(byUser.body.some((t: any) => t.id === created.id)).toBe(true);
+		expect((byUser.body as TaskResponseDto[]).some(t => t.id === created.id)).toBe(true);
 
 		const multiStatus = await request(app).get('/tasks').query({ status: 'todo,in_progress' }).expect(200);
-		const ids = multiStatus.body.map((t: any) => t.id);
+		const ids = (multiStatus.body as TaskResponseDto[]).map(t => t.id);
 		expect(ids).toEqual(expect.arrayContaining([created.id, otherStatus.id]));
 
 		// cleanup
@@ -139,13 +140,15 @@ describe('Tasks API (comprehensive)', () => {
 		beforeEach(() => vi.restoreAllMocks());
 
 		it('createTask throws 500 when creation fails', async () => {
-			vi.spyOn(taskService, 'createTask').mockResolvedValue(null as any);
+			vi.spyOn(taskService, 'createTask').mockResolvedValue(
+				null as unknown as Awaited<ReturnType<typeof taskService.createTask>>
+			);
 			const ctrl = new TaskController();
-			await expect(ctrl.createTask({ title: 'New' } as any)).rejects.toBeInstanceOf(ApiError);
+			await expect(ctrl.createTask({ title: 'New' })).rejects.toBeInstanceOf(ApiError);
 		});
 
 		it('deleteTask throws 404 when not found', async () => {
-			vi.spyOn(taskService, 'deleteTask').mockResolvedValue(false as any);
+			vi.spyOn(taskService, 'deleteTask').mockResolvedValue(false);
 			const ctrl = new TaskController();
 			await expect(ctrl.deleteTask('999')).rejects.toBeInstanceOf(ApiError);
 		});

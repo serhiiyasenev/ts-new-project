@@ -1,4 +1,4 @@
-import {Table, Column, Model, DataType, ForeignKey, BelongsTo, AllowNull } from "sequelize-typescript";
+import {Table, Column, Model, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { UserModel } from "./user.model";
 
 @Table({ tableName: "posts", timestamps: true })
