@@ -121,4 +121,70 @@ describe('TaskCreate', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/tasks');
     });
   });
+
+  it('cancel button navigates back to tasks', async () => {
+    render(
+      <MemoryRouter>
+        <TaskCreate />
+      </MemoryRouter>
+    );
+
+    const cancelBtn = screen.getByRole('button', { name: /cancel/i });
+    await cancelBtn.click();
+    expect(mockNavigate).toHaveBeenCalledWith('/tasks');
+  });
+
+  it('logs error when createTask fails', async () => {
+    const createTaskMock = vi.mocked(api.createTask);
+    createTaskMock.mockRejectedValue(new Error('Network error'));
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <TaskCreate />
+      </MemoryRouter>
+    );
+
+    await user.type(screen.getByLabelText(/Title/i), 'Valid Task Title');
+    await user.type(screen.getByLabelText(/Description/i), 'This is a valid description with more than 10 characters');
+    await user.selectOptions(screen.getByLabelText(/Status/i), 'To Do');
+    await user.type(screen.getByLabelText(/Due Date/i), '2025-12-31');
+
+    const submitButton = screen.getByRole('button', { name: /Create Task/i });
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(createTaskMock).toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalled();
+    });
+
+    consoleSpy.mockRestore();
+  });
+
+  it('shows status validation when status is invalid', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <TaskCreate />
+      </MemoryRouter>
+    );
+
+    // Fill other required fields so the form becomes valid except status
+    await user.type(screen.getByLabelText(/Title/i), 'Valid Task Title');
+    await user.type(screen.getByLabelText(/Description/i), 'This is a valid description with more than 10 characters');
+    await user.type(screen.getByLabelText(/Due Date/i), '2025-12-31');
+
+    const statusSelect = screen.getByLabelText(/Status/i) as HTMLSelectElement;
+    // Force an invalid value by dispatching change to an empty string
+    statusSelect.value = '';
+    statusSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    statusSelect.dispatchEvent(new Event('blur', { bubbles: true }));
+
+    await waitFor(() => {
+      const statusInput = screen.getByLabelText(/Status/i);
+      const group = statusInput.closest('.form-group');
+      expect(group?.querySelector('.error')).toBeInTheDocument();
+    });
+  });
 });

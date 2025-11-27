@@ -79,6 +79,21 @@ describe('Users', () => {
     });
   });
 
+  it('shows default error text when rejection is not an Error instance', async () => {
+    // provide a non-Error rejection at runtime but keep TypeScript happy
+    vi.mocked(api.fetchUsers).mockRejectedValue('oops' as unknown as Error);
+
+    render(
+      <MemoryRouter>
+        <Users />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Failed to fetch users')).toBeInTheDocument();
+    });
+  });
+
   it('should render email links correctly', async () => {
     const mockUsers = [
       {

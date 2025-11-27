@@ -90,4 +90,45 @@ describe('CreateUser', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/users')
     })
   })
+
+  it('cancel button navigates back to users', async () => {
+    render(
+      <MemoryRouter>
+        <CreateUser />
+      </MemoryRouter>
+    );
+
+    const cancelBtn = screen.getByRole('button', { name: /cancel/i });
+    await cancelBtn.click();
+    expect(mockNavigate).toHaveBeenCalledWith('/users');
+  })
+
+  it('logs error when createUser fails', async () => {
+    const user = userEvent.setup();
+    const createUserMock = vi.mocked(api.createUser);
+    createUserMock.mockRejectedValue(new Error('Network error'));
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    render(
+      <MemoryRouter>
+        <CreateUser />
+      </MemoryRouter>
+    );
+
+    await user.type(screen.getByLabelText(/First Name/i), 'Alice')
+    await user.type(screen.getByLabelText(/Last Name/i), 'Smith')
+    await user.type(screen.getByLabelText(/Email/i), 'alice.smith@example.com')
+    await user.type(screen.getByLabelText(/Date of Birth/i), '1990-05-05')
+
+    const submitButton = screen.getByRole('button', { name: /Create User/i })
+    await user.click(submitButton)
+
+    await waitFor(() => {
+      expect(createUserMock).toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalled();
+    });
+
+    consoleSpy.mockRestore();
+  })
 })

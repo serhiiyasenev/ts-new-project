@@ -68,9 +68,7 @@ const TaskCreate = () => {
             <option value="In Progress">In Progress</option>
             <option value="Done">Done</option>
           </select>
-          {errors.status && (
-            <div className="error">{errors.status.message}</div>
-          )}
+          <div className="error">{errors.status?.message}</div>
         </div>
 
         <div className="form-group">

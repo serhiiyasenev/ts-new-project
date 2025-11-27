@@ -102,4 +102,56 @@ describe('TaskDetails', () => {
     const backLink = screen.getByText(/Back to Tasks/i);
     expect(backLink).toHaveAttribute('href', '/tasks');
   });
+
+  it('should show "Task not found" when API returns null', async () => {
+    vi.mocked(api.fetchTaskById).mockResolvedValue(null as TaskDetails);
+
+    render(
+      <MemoryRouter initialEntries={['/tasks/1']}>
+        <Routes>
+          <Route path="/tasks/:id" element={<TaskDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Task not found/i)).toBeInTheDocument();
+    });
+  });
+
+  it('renders fallbacks for missing fields', async () => {
+    const mockTask = {
+      id: 2,
+      title: '',
+      description: '',
+      status: '',
+      dueDate: '',
+      createdAt: '',
+    };
+    vi.mocked(api.fetchTaskById).mockResolvedValue(mockTask as TaskDetails);
+
+    render(
+      <MemoryRouter initialEntries={['/tasks/2']}>
+        <Routes>
+          <Route path="/tasks/:id" element={<TaskDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+    });
+  });
+
+  it('does nothing when no id param is provided (loading stays true)', () => {
+    render(
+      <MemoryRouter initialEntries={['/tasks']}>
+        <Routes>
+          <Route path="/tasks" element={<TaskDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText(/Loading/i)).toBeInTheDocument();
+  });
 });
