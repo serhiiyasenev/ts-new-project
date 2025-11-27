@@ -12,11 +12,11 @@ export default defineConfig({
       reporter: ['text', 'lcov'],
       include: [
         'src/controllers/**/*.ts',
-        'src/dtos/**/*.ts',
+        'src/dtos/*Response.dto.ts',
         'src/helpers/**/*.ts',
         'src/schemas/**/*.ts',
         'src/services/**/*.ts',
-        'src/types/**/*.ts'
+        'src/types/errors.ts',
       ],
       exclude: [
         'src/config/**',
