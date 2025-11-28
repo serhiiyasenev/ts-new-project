@@ -71,7 +71,7 @@ jobs:
               cd - > /dev/null
               continue
             fi
-            
+
             if [ -z "$HAS_TEST" ]; then
               echo "⚠️ No test script → skipping"
               cd - > /dev/null
@@ -86,3 +86,54 @@ jobs:
 
             cd - > /dev/null
           done
+
+      - name: Extract test results
+        id: test_info
+        run: |
+          TOTAL_TESTS=$(find . -type f -name "vitest-report.json" -exec jq '.stats.tests' {} \; 2>/dev/null | awk '{sum+=$1} END {print sum}')
+          if [ -z "$TOTAL_TESTS" ]; then TOTAL_TESTS=0; fi
+
+          COVERAGE=$(find . -type f -name "coverage-summary.json" -exec jq '.total.lines.pct' {} \; 2>/dev/null | awk '{sum+=$1; count++} END {if (count==0) print 0; else print sum/count}')
+          if [ -z "$COVERAGE" ]; then COVERAGE=0; fi
+
+          echo "total_tests=$TOTAL_TESTS" >> $GITHUB_OUTPUT
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+
+      - name: Update README.md with results + badges
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "📘 Updating README.md…"
+
+          TESTS=${{ steps.test_info.outputs.total_tests }}
+          COV=${{ steps.test_info.outputs.coverage }}
+
+          BADGE_TESTS="![Tests](https://img.shields.io/badge/tests-${TESTS}-brightgreen)"
+          BADGE_COVERAGE="![Coverage](https://img.shields.io/badge/coverage-${COV}%25-blue)"
+
+          HEADER_SECTION="${BADGE_TESTS} ${BADGE_COVERAGE}"
+          SUMMARY_SECTION="## 📊 Test Summary\n\n${BADGE_TESTS} ${BADGE_COVERAGE}\n\n- **Total tests:** ${TESTS}\n- **Coverage:** ${COV}%\n"
+
+          # Update top section
+          if grep -q "<!-- TEST_BADGES_START -->" README.md; then
+            sed -i "/<!-- TEST_BADGES_START -->/,/<!-- TEST_BADGES_END -->/c\\<!-- TEST_BADGES_START -->\n${HEADER_SECTION}\n<!-- TEST_BADGES_END -->" README.md
+          else
+            sed -i "1a <!-- TEST_BADGES_START -->\n${HEADER_SECTION}\n<!-- TEST_BADGES_END -->\n" README.md
+          fi
+
+          # Update bottom summary
+          if grep -q "## 📊 Test Summary" README.md; then
+            sed -i "/## 📊 Test Summary/,\$d" README.md
+            echo -e "\n---\n\n${SUMMARY_SECTION}" >> README.md
+          else
+            echo -e "\n---\n\n${SUMMARY_SECTION}" >> README.md
+          fi
+
+      - name: Commit & Push README.md
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
+
+          git add README.md
+          git commit -m "🔄 Update test badges and summary in README.md" || echo "No changes to commit."
+          git push
