@@ -1,4 +1,7 @@
-# 🎯 Task Management System - JIRA Style
+# Architecture Overview
+<!-- TEST_BADGES_START -->
+![Tests](https://img.shields.io/badge/tests-264-brightgreen)
+<!-- TEST_BADGES_END -->
 
 > A modern, full-stack task management application inspired by Atlassian JIRA
 

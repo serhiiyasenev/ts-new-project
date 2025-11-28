@@ -1,0 +1,143 @@
+name: Run all tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: db_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: admin
+        options: >-
+          --health-cmd="pg_isready -U postgres -d db_test"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      HUSKY: 0
+      NODE_ENV: test
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: admin
+      PGDATABASE: db_test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Run tests in all subprojects
+        run: |
+          echo "" > $GITHUB_WORKSPACE/test-output.log
+          echo "🔍 Searching for TypeScript projects..."
+
+          for pkg in $(find . -type f -name package.json); do
+            project_dir=$(dirname "$pkg")
+
+            case "$project_dir" in
+              *node_modules*|*dist*|*build*)
+                continue
+                ;;
+            esac
+
+            echo "==============================" | tee -a $GITHUB_WORKSPACE/test-output.log
+            echo "📦 Project: $project_dir" | tee -a $GITHUB_WORKSPACE/test-output.log
+            echo "==============================" | tee -a $GITHUB_WORKSPACE/test-output.log
+
+            cd "$project_dir"
+
+            HAS_TEST=$(jq -r '.scripts.test // empty' package.json)
+
+            if echo "$HAS_TEST" | grep -qi "no test specified"; then
+              echo "⚠️ Dummy test script → skipping" | tee -a $GITHUB_WORKSPACE/test-output.log
+              cd - > /dev/null
+              continue
+            fi
+
+            if [ -z "$HAS_TEST" ]; then
+              echo "⚠️ No test script → skipping" | tee -a $GITHUB_WORKSPACE/test-output.log
+              cd - > /dev/null
+              continue
+            fi
+
+            npm install --silent
+            npm test 2>&1 | tee -a $GITHUB_WORKSPACE/test-output.log
+
+            cd - > /dev/null
+          done
+          
+      - name: Extract test results
+        id: test_info
+        run: |
+          LOG="$GITHUB_WORKSPACE/test-output.log"
+
+          TOTAL=0
+
+          # Vitest: "Tests 56 passed."
+          VITEST1=$(grep -o 'Tests [0-9]\+ passed' "$LOG" | awk '{sum+=$2} END{print sum+0}')
+          TOTAL=$((TOTAL + VITEST1))
+
+          # Vitest alt: "(8 tests)"
+          VITEST2=$(grep -o '([0-9]\+ tests)' "$LOG" | grep -o '[0-9]\+' | awk '{sum+=$1} END{print sum+0}')
+          TOTAL=$((TOTAL + VITEST2))
+
+          # Jest: "12 tests passed" / "Ran 12 tests"
+          JEST=$(grep -o '[0-9]\+ tests' "$LOG" | grep -o '^[0-9]\+' | awk '{sum+=$1} END{print sum+0}')
+          TOTAL=$((TOTAL + JEST))
+
+          # Mocha: "12 passing"
+          MOCHA=$(grep -o '[0-9]\+ passing' "$LOG" | grep -o '^[0-9]\+' | awk '{sum+=$1} END{print sum+0}')
+          TOTAL=$((TOTAL + MOCHA))
+
+          echo "total_tests=$TOTAL" >> $GITHUB_OUTPUT
+          echo "✔ Total tests found: $TOTAL"
+
+      - name: Update README.md with test badge
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "📘 Updating README.md…"
+
+          TESTS=${{ steps.test_info.outputs.total_tests }}
+
+          BADGE_TESTS="![Tests](https://img.shields.io/badge/tests-${TESTS}-brightgreen)"
+
+          HEADER_SECTION="${BADGE_TESTS}"
+          SUMMARY_SECTION="## 📊 Test Summary\n\n${BADGE_TESTS}\n\n- **Total tests:** ${TESTS}\n"
+
+          # Update top section
+          if grep -q "<!-- TEST_BADGES_START -->" README.md; then
+            sed -i "/<!-- TEST_BADGES_START -->/,/<!-- TEST_BADGES_END -->/c\\<!-- TEST_BADGES_START -->\n${HEADER_SECTION}\n<!-- TEST_BADGES_END -->" README.md
+          else
+            sed -i "1a <!-- TEST_BADGES_START -->\n${HEADER_SECTION}\n<!-- TEST_BADGES_END -->\n" README.md
+          fi
+
+      - name: Commit & Push README.md
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
+
+          git add README.md
+          git commit -m "🔄 Update test badges and summary in README.md" || echo "No changes to commit."
+          git push
