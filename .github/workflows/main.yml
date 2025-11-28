@@ -1,4 +1,4 @@
-name: CI - Run all tests
+name: Run all tests
 
 on:
   push:
@@ -10,6 +10,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    env:
+      HUSKY: 0
 
     steps:
       - name: Checkout repository
@@ -23,12 +26,12 @@ jobs:
 
       - name: Run tests in all subprojects
         run: |
-          echo "Searching for TypeScript projects..."
+          echo "🔍 Searching for TypeScript projects..."
 
           for pkg in $(find . -type f -name package.json); do
             project_dir=$(dirname "$pkg")
 
-            # Skip node_modules, dist, build
+            echo "Skipping unnecessary directories..."
             case "$project_dir" in
               *node_modules*|*dist*|*build*)
                 continue
@@ -37,16 +40,16 @@ jobs:
 
             echo ""
             echo "=============================="
-            echo "Project: $project_dir"
+            echo "📦 Project: $project_dir"
             echo "=============================="
 
             cd "$project_dir"
 
-            # Check test scripts
+            echo "Check if tests are present..."
             HAS_TEST=$(jq -r '.scripts.test // empty' package.json)
 
             if [ -z "$HAS_TEST" ]; then
-              echo "No test script found → skipping."
+              echo "⚠️ No test script found → skipping"
               cd - > /dev/null
               continue
             fi
