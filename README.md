@@ -1,6 +1,6 @@
 # Architecture Overview
 <!-- TEST_BADGES_START -->
-![Tests](https://img.shields.io/badge/tests-0-brightgreen) ![Coverage](https://img.shields.io/badge/coverage-0%25-blue)
+![Tests](https://img.shields.io/badge/tests-0-brightgreen)
 <!-- TEST_BADGES_END -->
 
 
@@ -124,10 +124,12 @@ flowchart LR
 
 ---
 
+
+---
+
 ## 📊 Test Summary
 
-![Tests](https://img.shields.io/badge/tests-0-brightgreen) ![Coverage](https://img.shields.io/badge/coverage-0%25-blue)
+![Tests](https://img.shields.io/badge/tests-0-brightgreen)
 
 - **Total tests:** 0
-- **Coverage:** 0%
 
