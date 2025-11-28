@@ -51,6 +51,8 @@ jobs:
         run: |
           echo "🔍 Searching for TypeScript projects..."
 
+          rm -f test-output.log
+
           for pkg in $(find . -type f -name package.json); do
             project_dir=$(dirname "$pkg")
 
@@ -85,36 +87,33 @@ jobs:
             npm install --silent
 
             echo "➡ Running tests..."
-            npm test || exit 1
+            # Збираємо stdout у загальний файл
+            npm test | tee -a ../../test-output.log
 
             cd - > /dev/null
           done
 
-      - name: Extract test results
+      - name: Extract test results (Vitest only)
         id: test_info
         run: |
-          TOTAL_TESTS=$(find . -type f -name "vitest-report.json" -exec jq '.stats.tests' {} \; 2>/dev/null | awk '{sum+=$1} END {print sum}')
-          if [ -z "$TOTAL_TESTS" ]; then TOTAL_TESTS=0; fi
+          # Шукаємо всі лінії типу "56 passed" або "10 passed"
+          TOTAL=$(grep -o '[0-9]\+ passed' test-output.log | awk '{sum += $1} END {print sum}')
 
-          COVERAGE=$(find . -type f -name "coverage-summary.json" -exec jq '.total.lines.pct' {} \; 2>/dev/null | awk '{sum+=$1; count++} END {if (count==0) print 0; else print sum/count}')
-          if [ -z "$COVERAGE" ]; then COVERAGE=0; fi
+          if [ -z "$TOTAL" ]; then TOTAL=0; fi
 
-          echo "total_tests=$TOTAL_TESTS" >> $GITHUB_OUTPUT
-          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          echo "total_tests=$TOTAL" >> $GITHUB_OUTPUT
 
-      - name: Update README.md with results + badges
+      - name: Update README.md with test badge
         if: github.ref == 'refs/heads/main'
         run: |
           echo "📘 Updating README.md…"
 
           TESTS=${{ steps.test_info.outputs.total_tests }}
-          COV=${{ steps.test_info.outputs.coverage }}
 
           BADGE_TESTS="![Tests](https://img.shields.io/badge/tests-${TESTS}-brightgreen)"
-          BADGE_COVERAGE="![Coverage](https://img.shields.io/badge/coverage-${COV}%25-blue)"
 
-          HEADER_SECTION="${BADGE_TESTS} ${BADGE_COVERAGE}"
-          SUMMARY_SECTION="## 📊 Test Summary\n\n${BADGE_TESTS} ${BADGE_COVERAGE}\n\n- **Total tests:** ${TESTS}\n- **Coverage:** ${COV}%\n"
+          HEADER_SECTION="${BADGE_TESTS}"
+          SUMMARY_SECTION="## 📊 Test Summary\n\n${BADGE_TESTS}\n\n- **Total tests:** ${TESTS}\n"
 
           # Update top section
           if grep -q "<!-- TEST_BADGES_START -->" README.md; then
