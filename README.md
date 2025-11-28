@@ -1,6 +1,6 @@
 # Architecture Overview
 <!-- TEST_BADGES_START -->
-![Tests](https://img.shields.io/badge/tests-0-brightgreen)
+![Tests](https://img.shields.io/badge/tests-246330-brightgreen)
 <!-- TEST_BADGES_END -->
 
 
@@ -127,9 +127,12 @@ flowchart LR
 
 ---
 
+
+---
+
 ## 📊 Test Summary
 
-![Tests](https://img.shields.io/badge/tests-0-brightgreen)
+![Tests](https://img.shields.io/badge/tests-246330-brightgreen)
 
-- **Total tests:** 0
+- **Total tests:** 246330
 
