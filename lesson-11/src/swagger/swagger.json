@@ -11,6 +11,7 @@
 				"enum": [
 					"todo",
 					"in_progress",
+					"review",
 					"done"
 				],
 				"type": "string"
@@ -185,6 +186,42 @@
 			},
 			"UpdateUserDto": {
 				"$ref": "#/components/schemas/Partial_CreateUserDto_"
+			},
+			"TasksGroupedByStatusDto": {
+				"properties": {
+					"todo": {
+						"items": {
+							"$ref": "#/components/schemas/TaskResponseDto"
+						},
+						"type": "array"
+					},
+					"in_progress": {
+						"items": {
+							"$ref": "#/components/schemas/TaskResponseDto"
+						},
+						"type": "array"
+					},
+					"review": {
+						"items": {
+							"$ref": "#/components/schemas/TaskResponseDto"
+						},
+						"type": "array"
+					},
+					"done": {
+						"items": {
+							"$ref": "#/components/schemas/TaskResponseDto"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"todo",
+					"in_progress",
+					"review",
+					"done"
+				],
+				"type": "object",
+				"additionalProperties": false
 			},
 			"CreateTaskDto": {
 				"properties": {
@@ -467,10 +504,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/TaskResponseDto"
-									},
-									"type": "array"
+									"anyOf": [
+										{
+											"items": {
+												"$ref": "#/components/schemas/TaskResponseDto"
+											},
+											"type": "array"
+										},
+										{
+											"$ref": "#/components/schemas/TasksGroupedByStatusDto"
+										}
+									]
 								}
 							}
 						}
@@ -508,6 +552,30 @@
 					{
 						"in": "query",
 						"name": "userId",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "groupBy",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "dateFrom",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "dateTo",
 						"required": false,
 						"schema": {
 							"type": "string"

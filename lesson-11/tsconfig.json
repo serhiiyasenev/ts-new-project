@@ -3,9 +3,9 @@
     "module": "CommonJS",
     "target": "ES2020",
     "moduleResolution": "node",
-    "types": ["vitest"],
+    "types": ["vitest", "node"],
 
-    "rootDir": "./src",
+    "rootDir": ".",
     "outDir": "./dist",
 
     "strict": true,
@@ -22,6 +22,6 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "include": ["src"],
-  "exclude": ["dist", "node_modules", "test"]
+  "include": ["src", "tests"],
+  "exclude": ["dist", "node_modules"]
 }

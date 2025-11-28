@@ -30,12 +30,12 @@ export class PostController extends Controller {
   public async getAllPosts(
     @Query() title?: string,
     @Query() content?: string,
-    @Query() userId?: string,
+    @Query() userId?: string
   ): Promise<PostResponseDto[]> {
     const query = validateWithSchema(
       queryPostsSchema,
       { title, content, userId },
-      "Invalid post query parameters",
+      "Invalid post query parameters"
     );
     const filters: PostFilters = {
       title: query.title,
@@ -59,12 +59,12 @@ export class PostController extends Controller {
   @Post()
   @SuccessResponse("201", "Created")
   public async createPost(
-    @Body() data: CreatePostDto,
+    @Body() data: CreatePostDto
   ): Promise<PostResponseDto> {
     const payload = validateWithSchema(
       createPostSchema,
       data,
-      "Invalid post payload",
+      "Invalid post payload"
     );
     const post = await postService.createPost(payload);
     this.setStatus(201);
@@ -74,13 +74,13 @@ export class PostController extends Controller {
   @Put("{id}")
   public async updatePost(
     @Path() id: string,
-    @Body() data: UpdatePostDto,
+    @Body() data: UpdatePostDto
   ): Promise<PostResponseDto> {
     const postId = validateNumericId(id, "Post id");
     const payload = validateWithSchema(
       updatePostSchema,
       data,
-      "Invalid post update payload",
+      "Invalid post update payload"
     );
     const { actorUserId, ...changes } = payload;
     if (!Object.keys(changes).length) {

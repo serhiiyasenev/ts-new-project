@@ -22,6 +22,16 @@ export const getAllTasks = async (
   if (filters?.userId) {
     where.userId = filters.userId;
   }
+  if (filters?.dateFrom || filters?.dateTo) {
+    const dateFilter: Record<symbol, Date> = {};
+    if (filters.dateFrom) {
+      dateFilter[Op.gte] = new Date(filters.dateFrom);
+    }
+    if (filters.dateTo) {
+      dateFilter[Op.lte] = new Date(filters.dateTo);
+    }
+    where.createdAt = dateFilter;
+  }
   return await TaskModel.findAll({
     where,
     include: [

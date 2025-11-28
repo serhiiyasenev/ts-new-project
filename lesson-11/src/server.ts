@@ -9,11 +9,16 @@ import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./swagger/swagger.json";
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
 
 // parse JSON bodies
 app.use(express.json());
-app.use(morgan("dev"));
+
+// Morgan logging (dev only)
+if (process.env.NODE_ENV !== "production") {
+  app.use(morgan("dev"));
+}
+
 app.use(cors());
 
 // Swagger UI setup http://localhost:3000/swagger

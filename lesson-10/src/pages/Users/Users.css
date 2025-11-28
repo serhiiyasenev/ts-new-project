@@ -51,3 +51,15 @@
   color: #1565c0;
   text-decoration: underline;
 }
+
+.actions-cell {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.actions-cell .button-secondary,
+.actions-cell .button-danger {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}

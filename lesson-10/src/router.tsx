@@ -3,15 +3,34 @@ import Users from "./pages/Users/Users";
 import CreateUser from "./pages/CreateUser/CreateUser";
 import UserDetails from "./pages/UserDetails/UserDetails";
 import Layout from "./components/Layout";
-import TasksList from "./pages/TasksList/TasksList";
 import TaskCreate from "./pages/TaskCreate/TaskCreate";
 import TaskDetails from "./pages/TaskDetails/TaskDetails";
+import KanbanBoard from "./pages/KanbanBoard/KanbanBoard";
+import Posts from "./pages/Posts/Posts";
+import PostCreate from "./pages/PostCreate/PostCreate";
+import PostDetails from "./pages/PostDetails/PostDetails";
 
 const router = createBrowserRouter([
     {
         path: "/",
         element: <Layout />,
         children: [
+            {
+                path: "",
+                element: <KanbanBoard />,
+            },
+            {
+                path: "board",
+                element: <KanbanBoard />,
+            },
+            {
+                path: "board/create",
+                element: <TaskCreate />,
+            },
+            {
+                path: "board/:id",
+                element: <TaskDetails />
+            },
             {
                 path: "users",
                 element: <Users />,
@@ -25,16 +44,16 @@ const router = createBrowserRouter([
                 element: <UserDetails />
             },
             {
-                path: "tasks",
-                element: <TasksList />,
+                path: "posts",
+                element: <Posts />,
             },
             {
-                path: "tasks/create",
-                element: <TaskCreate />,
+                path: "posts/create",
+                element: <PostCreate />,
             },
             {
-                path: "tasks/:id",
-                element: <TaskDetails />
+                path: "posts/:id",
+                element: <PostDetails />
             }
         ]
     },

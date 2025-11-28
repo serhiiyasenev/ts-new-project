@@ -13,16 +13,19 @@ describe('TaskDetails', () => {
   });
 
   it('should display task details correctly', async () => {
-    const mockTask = {
+    const mockTask: Task = {
       id: 1,
       title: 'Test Task',
       description: 'This is a test task description',
-      status: 'To Do' as const,
-      dueDate: '2025-12-31',
+      status: 'todo',
+      priority: 'high',
+      userId: null,
       createdAt: '2025-11-17T10:00:00.000Z',
+      updatedAt: '2025-11-17T10:00:00.000Z',
     };
 
     vi.mocked(api.fetchTaskById).mockResolvedValue(mockTask);
+    vi.mocked(api.fetchUsers).mockResolvedValue([]);
 
     render(
       <MemoryRouter initialEntries={['/tasks/1']}>
@@ -37,8 +40,7 @@ describe('TaskDetails', () => {
     });
 
     expect(screen.getByText('This is a test task description')).toBeInTheDocument();
-    expect(screen.getByText('To Do')).toBeInTheDocument();
-    expect(screen.getByText('2025-12-31')).toBeInTheDocument();
+    expect(screen.getByText('high')).toBeInTheDocument();
   });
 
   it('should show loading state initially', () => {
@@ -77,16 +79,19 @@ describe('TaskDetails', () => {
   });
 
   it('should have back to tasks link', async () => {
-    const mockTask = {
+    const mockTask: Task = {
       id: 1,
       title: 'Test Task',
       description: 'Test description',
-      status: 'To Do' as const,
-      dueDate: '2025-12-31',
+      status: 'todo',
+      priority: 'medium',
+      userId: null,
       createdAt: '2025-11-17T10:00:00.000Z',
+      updatedAt: '2025-11-17T10:00:00.000Z',
     };
 
     vi.mocked(api.fetchTaskById).mockResolvedValue(mockTask);
+    vi.mocked(api.fetchUsers).mockResolvedValue([]);
 
     render(
       <MemoryRouter initialEntries={['/tasks/1']}>
@@ -97,7 +102,7 @@ describe('TaskDetails', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/Back to Tasks/i)).toBeInTheDocument();
+      expect(screen.getByText(/Back to Board/i)).toBeInTheDocument();
     });
 
     const backLink = screen.getByText(/Back to Tasks/i);
@@ -105,7 +110,7 @@ describe('TaskDetails', () => {
   });
 
   it('should show "Task not found" when API returns null', async () => {
-    vi.mocked(api.fetchTaskById).mockResolvedValue(null);
+    vi.mocked(api.fetchTaskById).mockRejectedValue(new Error('Task not found'));
 
     render(
       <MemoryRouter initialEntries={['/tasks/1']}>
@@ -125,11 +130,14 @@ describe('TaskDetails', () => {
       id: 2,
       title: '',
       description: '',
-      status: 'To Do',
-      dueDate: '',
+      status: 'todo',
+      priority: 'medium',
+      userId: null,
       createdAt: '',
+      updatedAt: '',
     };
     vi.mocked(api.fetchTaskById).mockResolvedValue(mockTask);
+    vi.mocked(api.fetchUsers).mockResolvedValue([]);
 
     render(
       <MemoryRouter initialEntries={['/tasks/2']}>
@@ -140,20 +148,23 @@ describe('TaskDetails', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+      expect(screen.getByText('No description provided')).toBeInTheDocument();
     });
   });
 
-  it('renders unknown status class when status is empty', async () => {
+  it('renders status correctly', async () => {
     const mockTask: Task = {
       id: 3,
-      title: 'Empty Status',
-      description: 'No status here',
-      status: '' as unknown as Task['status'],
-      dueDate: '2025-12-31',
+      title: 'Test Task',
+      description: 'Test Description',
+      status: 'in_progress',
+      priority: 'high',
+      userId: null,
       createdAt: '2025-11-17T10:00:00.000Z',
+      updatedAt: '2025-11-17T10:00:00.000Z',
     };
     vi.mocked(api.fetchTaskById).mockResolvedValue(mockTask);
+    vi.mocked(api.fetchUsers).mockResolvedValue([]);
 
     const { container } = render(
       <MemoryRouter initialEntries={['/tasks/3']}>
@@ -166,8 +177,7 @@ describe('TaskDetails', () => {
     await waitFor(() => {
       const statusEl = container.querySelector('.task-status');
       expect(statusEl).toBeTruthy();
-      expect(statusEl?.className).toContain('status-unknown');
-      expect(statusEl?.textContent).toBe('—');
+      expect(statusEl?.className).toContain('status-in_progress');
     });
   });
 

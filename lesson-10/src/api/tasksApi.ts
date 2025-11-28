@@ -1,49 +1,66 @@
-import type { Task, CreateTaskData } from '../types';
+import type { Task, CreateTaskData, UpdateTaskData } from "../types";
 
-export const fetchTasks = async (): Promise<Task[]> => {
-  const response = await fetch('/api/tasks');
+const API_BASE = "/api";
+
+const handleResponse = async <T>(response: Response): Promise<T> => {
   if (!response.ok) {
-    throw new Error('Failed to fetch tasks');
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Request failed" }));
+    throw new Error(error.message || `HTTP ${response.status}`);
+  }
+  if (response.status === 204) {
+    return undefined as T;
   }
   return response.json();
+};
+
+export interface TasksByStatus {
+  todo: Task[];
+  in_progress: Task[];
+  review: Task[];
+  done: Task[];
+}
+
+export const fetchTasks = async (): Promise<Task[]> => {
+  const response = await fetch(`${API_BASE}/tasks`);
+  return handleResponse<Task[]>(response);
+};
+
+export const fetchTasksGrouped = async (): Promise<TasksByStatus> => {
+  const response = await fetch(`${API_BASE}/tasks?groupBy=status`);
+  return handleResponse<TasksByStatus>(response);
+};
+
+export const fetchTaskById = async (id: number): Promise<Task> => {
+  const response = await fetch(`${API_BASE}/tasks/${id}`);
+  return handleResponse<Task>(response);
 };
 
 export const createTask = async (data: CreateTaskData): Promise<Task> => {
-    const tasks = await fetchTasks();
-    const maxId = tasks.length > 0 ? Math.max(...tasks.map(u => u.id)) : 0;
-    const newId = maxId + 1;
-    // This was done specifically to generate incremental number IDs,
-    //  because otherwise, json-server creates them as random strings.
-    const response = await fetch('/api/tasks', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ ...data, id: String(newId) }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to create task');
-    }
-
-    return response.json();
-};
-
-export const fetchTaskById = async (id: number): Promise<Task | null> => {
-  const response = await fetch(`/api/tasks/${id}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch task');
-  }
-  return await response.json();
-};
-export const updateTask = async (id: number, data: Partial<Task>): Promise<Task> => {
-  const response = await fetch(`/api/tasks/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+  const response = await fetch(`${API_BASE}/tasks`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!response.ok) {
-    throw new Error('Failed to update task');
-  }
-  return response.json();
+  return handleResponse<Task>(response);
+};
+
+export const updateTask = async (
+  id: number,
+  data: UpdateTaskData
+): Promise<Task> => {
+  const response = await fetch(`${API_BASE}/tasks/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse<Task>(response);
+};
+
+export const deleteTask = async (id: number): Promise<void> => {
+  const response = await fetch(`${API_BASE}/tasks/${id}`, {
+    method: "DELETE",
+  });
+  return handleResponse<void>(response);
 };

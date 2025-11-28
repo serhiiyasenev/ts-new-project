@@ -15,19 +15,21 @@ describe('Users', () => {
     const mockUsers = [
       {
         id: 1,
-        firstName: 'John',
-        lastName: 'Doe',
+        name: 'John Doe',
         email: 'john@example.com',
-        dateOfBirth: '1990-01-15',
-        createdAt: '2025-11-20'
+        isActive: true,
+        lastLoginAt: null,
+        createdAt: '2025-11-20',
+        updatedAt: '2025-11-20'
       },
       {
         id: 2,
-        firstName: 'Jane',
-        lastName: 'Smith',
+        name: 'Jane Smith',
         email: 'jane@example.com',
-        dateOfBirth: '1992-05-20',
-        createdAt: '2025-11-20'
+        isActive: false,
+        lastLoginAt: null,
+        createdAt: '2025-11-20',
+        updatedAt: '2025-11-20'
       },
     ];
 
@@ -40,14 +42,14 @@ describe('Users', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('John')).toBeInTheDocument();
-      expect(screen.getByText('Jane')).toBeInTheDocument();
+      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(screen.getByText('Jane Smith')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('Doe')).toBeInTheDocument();
-    expect(screen.getByText('Smith')).toBeInTheDocument();
     expect(screen.getByText('john@example.com')).toBeInTheDocument();
     expect(screen.getByText('jane@example.com')).toBeInTheDocument();
+    expect(screen.getByText('✓ Active')).toBeInTheDocument();
+    expect(screen.getByText('✗ Inactive')).toBeInTheDocument();
   });
 
   it('should show loading state initially', () => {
@@ -94,19 +96,10 @@ describe('Users', () => {
     });
   });
 
-  it('should render email links correctly', async () => {
-    const mockUsers = [
-      {
-        id: 1,
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john@example.com',
-        dateOfBirth: '1990-01-15',
-        createdAt: '2025-11-20'
-      },
-    ];
-
-    vi.mocked(api.fetchUsers).mockResolvedValue(mockUsers);
+  it('should render name links correctly', async () => {
+    vi.mocked(api.fetchUsers).mockResolvedValue([
+      { id: 1, name: 'John Doe', email: 'john@example.com', isActive: true, createdAt: '2025-11-20', updatedAt: '2025-11-20', lastLoginAt: null }
+    ]);
 
     render(
       <MemoryRouter>
@@ -115,9 +108,12 @@ describe('Users', () => {
     );
 
     await waitFor(() => {
-      const emailLink = screen.getByText('john@example.com');
-      expect(emailLink).toBeInTheDocument();
-      expect(emailLink).toHaveAttribute('href', '/users/1');
+      const nameLink = screen.getByText('John Doe');
+      expect(nameLink).toBeInTheDocument();
+      expect(nameLink).toHaveAttribute('href', '/users/1');
+      
+      const email = screen.getByText('john@example.com');
+      expect(email).toBeInTheDocument();
     });
   });
 });

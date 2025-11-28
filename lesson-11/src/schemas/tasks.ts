@@ -3,6 +3,7 @@ import { z } from "zod";
 export enum TaskStatus {
   Todo = "todo",
   InProgress = "in_progress",
+  Review = "review",
   Done = "done",
 }
 
@@ -68,4 +69,12 @@ export const queryTasksSchema = z.object({
         .transform((val) => parseInt(val, 10)),
     ])
     .optional(),
+  groupBy: z
+    .string()
+    .optional()
+    .refine((val) => !val || val === "status", {
+      message: "groupBy must be 'status' if provided",
+    }),
+  dateFrom: z.string().datetime().optional(),
+  dateTo: z.string().datetime().optional(),
 });

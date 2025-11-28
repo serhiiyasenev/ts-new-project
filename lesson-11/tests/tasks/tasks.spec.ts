@@ -225,4 +225,60 @@ describe("Tasks API (comprehensive)", () => {
       await expect(ctrl.deleteTask("999")).rejects.toBeInstanceOf(ApiError);
     });
   });
+
+  describe("groupBy functionality", () => {
+    it("returns tasks grouped by status when groupBy=status", async () => {
+      // Create tasks with different statuses
+      const task1 = await request(app)
+        .post("/tasks")
+        .send({ title: "Todo Task", status: "todo" })
+        .expect(201);
+
+      const task2 = await request(app)
+        .post("/tasks")
+        .send({ title: "In Progress Task", status: "in_progress" })
+        .expect(201);
+
+      const task3 = await request(app)
+        .post("/tasks")
+        .send({ title: "Done Task", status: "done" })
+        .expect(201);
+
+      const taskIds = [task1.body.id, task2.body.id, task3.body.id];
+
+      // Get grouped tasks
+      const res = await request(app).get("/tasks?groupBy=status").expect(200);
+
+      expect(res.body).toHaveProperty("todo");
+      expect(res.body).toHaveProperty("in_progress");
+      expect(res.body).toHaveProperty("done");
+      expect(Array.isArray(res.body.todo)).toBe(true);
+      expect(Array.isArray(res.body.in_progress)).toBe(true);
+      expect(Array.isArray(res.body.done)).toBe(true);
+
+      // Verify our tasks are in the right groups
+      const todoIds = res.body.todo.map((t: TaskResponseDto) => t.id);
+      const inProgressIds = res.body.in_progress.map(
+        (t: TaskResponseDto) => t.id,
+      );
+      const doneIds = res.body.done.map((t: TaskResponseDto) => t.id);
+
+      expect(todoIds).toContain(task1.body.id);
+      expect(inProgressIds).toContain(task2.body.id);
+      expect(doneIds).toContain(task3.body.id);
+
+      // Cleanup - delete in reverse order to avoid FK issues
+      for (const id of taskIds.reverse()) {
+        try {
+          await request(app).delete(`/tasks/${id}`);
+        } catch {
+          // Ignore cleanup errors
+        }
+      }
+    });
+
+    it("rejects invalid groupBy values", async () => {
+      await request(app).get("/tasks?groupBy=invalid").expect(400);
+    });
+  });
 });

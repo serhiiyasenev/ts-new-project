@@ -11,6 +11,8 @@ export interface TaskFilters {
   priority?: TaskPriority[];
   title?: string;
   userId?: number;
+  dateFrom?: string;
+  dateTo?: string;
 }
 
 export interface PostFilters {

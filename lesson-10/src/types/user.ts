@@ -1,10 +1,17 @@
 export type User = {
   id: number;
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
-  dateOfBirth: string;
+  isActive: boolean;
+  lastLoginAt: string | null;
   createdAt: string;
+  updatedAt: string;
 };
 
-export type CreateUserData = Omit<User, 'id'>;
+export type CreateUserData = {
+  name: string;
+  email: string;
+  isActive?: boolean;
+};
+
+export type UpdateUserData = Partial<CreateUserData>;

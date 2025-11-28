@@ -1,39 +1,71 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import type { Task } from '../../types';
+import type { Task, TaskStatus, User } from '../../types';
 import './TasksList.css';
-import { fetchTasks } from '../../api';
+import { fetchTasks, updateTask, fetchUsers } from '../../api';
 
 const TasksList = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+
+  const loadData = async () => {
+    try {
+      const [tasksData, usersData] = await Promise.all([
+        fetchTasks(),
+        fetchUsers()
+      ]);
+      setTasks(tasksData);
+      setUsers(usersData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetchTasks()
-      .then((data) => {
-        setTasks(data);
-      })
-      .catch((err: Error) => {
-        setError(err.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    loadData();
   }, []);
 
+  const handleDragStart = (task: Task) => {
+    setDraggedTask(task);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (newStatus: TaskStatus) => {
+    if (!draggedTask || draggedTask.status === newStatus) {
+      setDraggedTask(null);
+      return;
+    }
+
+    try {
+      const updated = await updateTask(draggedTask.id, { status: newStatus });
+      setTasks(tasks.map(t => t.id === updated.id ? updated : t));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to update task');
+    } finally {
+      setDraggedTask(null);
+    }
+  };
+
   const tasksByStatus = useMemo(() => {
-    return tasks.reduce((acc, task) => {
-      if (!acc[task.status]) {
-        acc[task.status] = [];
+    const statusMap: Record<string, Task[]> = {
+      'todo': [],
+      'in_progress': [],
+      'done': []
+    };
+    tasks.forEach(task => {
+      if (statusMap[task.status]) {
+        statusMap[task.status].push(task);
       }
-      acc[task.status].push(task);
-      return acc;
-    }, {
-      'To Do': [],
-      'In Progress': [],
-      'Done': []
-    } as Record<string, Task[]>);
+    });
+    return statusMap;
   }, [tasks]);
 
   if (loading) return <div>Loading tasks...</div>;
@@ -59,78 +91,71 @@ const TasksList = () => {
     );
   }
 
+  const renderColumn = (status: TaskStatus, title: string, colorClass: string) => (
+    <div 
+      className={`task-column ${draggedTask && draggedTask.status !== status ? 'drag-over' : ''}`}
+      onDragOver={handleDragOver}
+      onDrop={() => handleDrop(status)}
+    >
+      <div className="column-header">
+        <h2 className="column-title">
+          <span className={`status-badge ${colorClass}`}>{title}</span>
+          <span className="task-count">{tasksByStatus[status].length}</span>
+        </h2>
+      </div>
+      <div className="task-cards">
+        {tasksByStatus[status].map((task) => (
+          <div
+            key={task.id}
+            className={`task-card ${draggedTask?.id === task.id ? 'dragging' : ''} priority-${task.priority}`}
+            draggable
+            onDragStart={() => handleDragStart(task)}
+          >
+            <div className="task-card-header">
+              <span className={`priority-badge priority-${task.priority}`}>
+                {task.priority.toUpperCase()}
+              </span>
+            </div>
+            <Link to={`/tasks/${task.id}`} className="task-card-link">
+              <h3 className="task-title">{task.title}</h3>
+              {task.description && (
+                <p className="task-description">{task.description}</p>
+              )}
+            </Link>
+            <div className="task-card-footer">
+              {task.userId ? (
+                <span className="task-assignee">
+                  👤 {users.find(u => u.id === task.userId)?.name || `User #${task.userId}`}
+                </span>
+              ) : (
+                <span className="task-unassigned">Unassigned</span>
+              )}
+            </div>
+          </div>
+        ))}
+        {tasksByStatus[status].length === 0 && (
+          <div className="empty-column">Drop tasks here</div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="tasks-list">
-      <div className="tasks-header">
-        <h1>Tasks</h1>
-        <Link to="/tasks/create" className="create-task-btn">
-          Create Task
+    <div className="tasks-board">
+      <div className="board-header">
+        <div>
+          <h1>Board</h1>
+          <p className="board-subtitle">{tasks.length} tasks</p>
+        </div>
+        <Link to="/tasks/create" className="button-primary">
+          + Create Task
         </Link>
       </div>
       
-      <div className="tasks-columns">
-        <div className="task-column">
-          <h2 className="column-title">
-            <span className="status-badge status-todo">To Do</span>
-            <span className="task-count">{tasksByStatus['To Do'].length}</span>
-          </h2>
-          <div className="task-cards">
-            {tasksByStatus['To Do'].map((task) => (
-              <Link to={`/tasks/${task.id}`} key={task.id} className="task-card">
-                <h3>{task.title}</h3>
-                <p className="task-description">{task.description}</p>
-                <div className="task-meta">
-                  <span className="task-date">📅 {task.dueDate}</span>
-                </div>
-              </Link>
-            ))}
-            {tasksByStatus['To Do'].length === 0 && (
-              <div className="empty-column">No tasks</div>
-            )}
-          </div>
-        </div>
-
-        <div className="task-column">
-          <h2 className="column-title">
-            <span className="status-badge status-in-progress">In Progress</span>
-            <span className="task-count">{tasksByStatus['In Progress'].length}</span>
-          </h2>
-          <div className="task-cards">
-            {tasksByStatus['In Progress'].map((task) => (
-              <Link to={`/tasks/${task.id}`} key={task.id} className="task-card">
-                <h3>{task.title}</h3>
-                <p className="task-description">{task.description}</p>
-                <div className="task-meta">
-                  <span className="task-date">📅 {task.dueDate}</span>
-                </div>
-              </Link>
-            ))}
-            {tasksByStatus['In Progress'].length === 0 && (
-              <div className="empty-column">No tasks</div>
-            )}
-          </div>
-        </div>
-
-        <div className="task-column">
-          <h2 className="column-title">
-            <span className="status-badge status-done">Done</span>
-            <span className="task-count">{tasksByStatus['Done'].length}</span>
-          </h2>
-          <div className="task-cards">
-            {tasksByStatus['Done'].map((task) => (
-              <Link to={`/tasks/${task.id}`} key={task.id} className="task-card">
-                <h3>{task.title}</h3>
-                <p className="task-description">{task.description}</p>
-                <div className="task-meta">
-                  <span className="task-date">📅 {task.dueDate}</span>
-                </div>
-              </Link>
-            ))}
-            {tasksByStatus['Done'].length === 0 && (
-              <div className="empty-column">No tasks</div>
-            )}
-          </div>
-        </div>
+      <div className="board-columns">
+        {renderColumn('todo', 'TO DO', 'status-todo')}
+        {renderColumn('in_progress', 'IN PROGRESS', 'status-in-progress')}
+        {renderColumn('done', 'DONE', 'status-done')}
       </div>
     </div>
   );

@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import TasksList from '../src/pages/TasksList/TasksList';
-import type { Task } from '../src/types/task';
 import * as api from '../src/api';
 import '@testing-library/jest-dom';
 
@@ -19,21 +18,26 @@ describe('TasksList', () => {
         id: 1,
         title: 'Test Task 1',
         description: 'Test description 1',
-        status: 'To Do' as const,
-        dueDate: '2025-12-01',
+        status: 'todo' as const,
+        priority: 'high' as const,
+        userId: null,
         createdAt: '2025-11-15T10:00:00.000Z',
+        updatedAt: '2025-11-15T10:00:00.000Z',
       },
       {
         id: 2,
         title: 'Test Task 2',
         description: 'Test description 2',
-        status: 'In Progress' as const,
-        dueDate: '2025-12-05',
+        status: 'in_progress' as const,
+        priority: 'medium' as const,
+        userId: null,
         createdAt: '2025-11-15T11:00:00.000Z',
+        updatedAt: '2025-11-15T11:00:00.000Z',
       },
     ];
 
     vi.mocked(api.fetchTasks).mockResolvedValue(mockTasks);
+    vi.mocked(api.fetchUsers).mockResolvedValue([]);
 
     render(
       <MemoryRouter>
@@ -48,8 +52,8 @@ describe('TasksList', () => {
 
     expect(screen.getByText('Test description 1')).toBeInTheDocument();
     expect(screen.getByText('Test description 2')).toBeInTheDocument();
-    expect(screen.getByText('To Do')).toBeInTheDocument();
-    expect(screen.getByText('In Progress')).toBeInTheDocument();
+    expect(screen.getByText('TO DO')).toBeInTheDocument();
+    expect(screen.getByText('IN PROGRESS')).toBeInTheDocument();
   });
 
   it('should show empty state when no tasks exist', async () => {
@@ -89,13 +93,16 @@ describe('TasksList', () => {
         id: 3,
         title: 'In Progress Task',
         description: 'Desc',
-        status: 'In Progress' as const,
-        dueDate: '2025-12-10',
-        createdAt: '2025-11-15T10:00:00.000Z'
+        status: 'in_progress' as const,
+        priority: 'medium' as const,
+        userId: null,
+        createdAt: '2025-11-15T10:00:00.000Z',
+        updatedAt: '2025-11-15T10:00:00.000Z'
       }
     ];
 
     vi.mocked(api.fetchTasks).mockResolvedValue(mockTasks);
+    vi.mocked(api.fetchUsers).mockResolvedValue([]);
 
     render(
       <MemoryRouter>
@@ -104,8 +111,8 @@ describe('TasksList', () => {
     );
 
     await waitFor(() => {
-      // The To Do column should show the empty-column element
-      expect(screen.getAllByText(/No tasks/i).length).toBeGreaterThan(0);
+      // The To Do and Done columns should show "Drop tasks here"
+      expect(screen.getAllByText(/Drop tasks here/i).length).toBeGreaterThan(0);
     });
   });
 
@@ -115,13 +122,16 @@ describe('TasksList', () => {
         id: 4,
         title: 'Done Task',
         description: 'Completed',
-        status: 'Done' as const,
-        dueDate: '2025-12-20',
-        createdAt: '2025-11-15T10:00:00.000Z'
+        status: 'done' as const,
+        priority: 'low' as const,
+        userId: null,
+        createdAt: '2025-11-15T10:00:00.000Z',
+        updatedAt: '2025-11-15T10:00:00.000Z'
       }
     ];
 
     vi.mocked(api.fetchTasks).mockResolvedValue(mockTasks);
+    vi.mocked(api.fetchUsers).mockResolvedValue([]);
 
     render(
       <MemoryRouter>
@@ -130,24 +140,27 @@ describe('TasksList', () => {
     );
 
     await waitFor(() => {
-      // There should be an empty placeholder for at least one other column
-      expect(screen.getAllByText(/No tasks/i).length).toBeGreaterThan(0);
+      // There should be "Drop tasks here" for TO DO and IN PROGRESS columns
+      expect(screen.getAllByText(/Drop tasks here/i).length).toBeGreaterThan(0);
     });
   });
 
-  it('handles unknown statuses by creating a new column bucket', async () => {
+  it('renders board with correct title', async () => {
     const mockTasks = [
       {
         id: 5,
-        title: 'Blocked Task',
-        description: 'Needs attention',
-        status: 'Blocked',
-        dueDate: '2025-12-25',
-        createdAt: '2025-11-15T10:00:00.000Z'
+        title: 'Test Task',
+        description: 'Test',
+        status: 'todo' as const,
+        priority: 'medium' as const,
+        userId: null,
+        createdAt: '2025-11-15T10:00:00.000Z',
+        updatedAt: '2025-11-15T10:00:00.000Z'
       }
     ];
 
-    vi.mocked(api.fetchTasks).mockResolvedValue(mockTasks as unknown as Task[]);
+    vi.mocked(api.fetchTasks).mockResolvedValue(mockTasks);
+    vi.mocked(api.fetchUsers).mockResolvedValue([]);
 
     render(
       <MemoryRouter>
@@ -156,7 +169,22 @@ describe('TasksList', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Tasks')).toBeInTheDocument();
+      expect(screen.getByText('Board')).toBeInTheDocument();
+    });
+  });
+
+  it('should handle non-Error exception when loading data fails', async () => {
+    vi.mocked(api.fetchTasks).mockRejectedValue('String error');
+    vi.mocked(api.fetchUsers).mockRejectedValue('String error');
+
+    render(
+      <MemoryRouter>
+        <TasksList />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Failed to load data/i)).toBeInTheDocument();
     });
   });
 });

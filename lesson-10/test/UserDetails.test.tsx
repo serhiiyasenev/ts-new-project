@@ -15,11 +15,12 @@ describe('UserDetails', () => {
   it('should display user details correctly', async () => {
     const mockUser = {
       id: 1,
-      firstName: 'John',
-      lastName: 'Doe',
+      name: 'John Doe',
       email: 'john@example.com',
-      dateOfBirth: '1990-01-15',
-      createdAt: '2025-11-20'
+      isActive: true,
+      lastLoginAt: null,
+      createdAt: '2025-11-20',
+      updatedAt: '2025-11-20'
     };
 
     vi.mocked(api.fetchUserById).mockResolvedValue(mockUser);
@@ -33,13 +34,11 @@ describe('UserDetails', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('User Details')).toBeInTheDocument();
+      expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('John')).toBeInTheDocument();
-    expect(screen.getByText('Doe')).toBeInTheDocument();
     expect(screen.getByText('john@example.com')).toBeInTheDocument();
-    expect(screen.getByText('1990-01-15')).toBeInTheDocument();
+    expect(screen.getByText('Active')).toBeInTheDocument();
   });
 
   it('should show loading state initially', () => {
@@ -80,11 +79,12 @@ describe('UserDetails', () => {
   it('should have back to users link', async () => {
     const mockUser = {
       id: 1,
-      firstName: 'John',
-      lastName: 'Doe',
+      name: 'John Doe',
       email: 'john@example.com',
-      dateOfBirth: '1990-01-15',
-      createdAt: '2025-11-20'
+      isActive: true,
+      lastLoginAt: null,
+      createdAt: '2025-11-20',
+      updatedAt: '2025-11-20'
     };
 
     vi.mocked(api.fetchUserById).mockResolvedValue(mockUser);
@@ -105,8 +105,8 @@ describe('UserDetails', () => {
     expect(backLink).toHaveAttribute('href', '/users');
   });
 
-  it('should show "User not found" when API returns null', async () => {
-    vi.mocked(api.fetchUserById).mockResolvedValue(null);
+  it('should show error when API returns null', async () => {
+    vi.mocked(api.fetchUserById).mockRejectedValue(new Error('User not found'));
 
     render(
       <MemoryRouter initialEntries={['/users/1']}>
@@ -117,7 +117,7 @@ describe('UserDetails', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/User not found/i)).toBeInTheDocument();
+      expect(screen.getByText(/Error:/i)).toBeInTheDocument();
     });
   });
 

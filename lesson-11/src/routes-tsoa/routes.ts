@@ -18,7 +18,7 @@ import type { Request as ExRequest, Response as ExResponse, RequestHandler, Rout
 const models: TsoaRoute.Models = {
     "TaskStatus": {
         "dataType": "refEnum",
-        "enums": ["todo","in_progress","done"],
+        "enums": ["todo","in_progress","review","done"],
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "TaskPriority": {
@@ -88,6 +88,17 @@ const models: TsoaRoute.Models = {
     "UpdateUserDto": {
         "dataType": "refAlias",
         "type": {"ref":"Partial_CreateUserDto_","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "TasksGroupedByStatusDto": {
+        "dataType": "refObject",
+        "properties": {
+            "todo": {"dataType":"array","array":{"dataType":"refObject","ref":"TaskResponseDto"},"required":true},
+            "in_progress": {"dataType":"array","array":{"dataType":"refObject","ref":"TaskResponseDto"},"required":true},
+            "review": {"dataType":"array","array":{"dataType":"refObject","ref":"TaskResponseDto"},"required":true},
+            "done": {"dataType":"array","array":{"dataType":"refObject","ref":"TaskResponseDto"},"required":true},
+        },
+        "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CreateTaskDto": {
@@ -309,6 +320,9 @@ export function RegisterRoutes(app: Router) {
                 priority: {"in":"query","name":"priority","dataType":"string"},
                 title: {"in":"query","name":"title","dataType":"string"},
                 userId: {"in":"query","name":"userId","dataType":"string"},
+                groupBy: {"in":"query","name":"groupBy","dataType":"string"},
+                dateFrom: {"in":"query","name":"dateFrom","dataType":"string"},
+                dateTo: {"in":"query","name":"dateTo","dataType":"string"},
         };
         app.get('/tasks',
             ...(fetchMiddlewares<RequestHandler>(TaskController)),

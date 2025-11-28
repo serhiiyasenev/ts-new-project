@@ -18,7 +18,12 @@ import {
   updateTaskSchema,
 } from "../schemas/tasks";
 import { ApiError } from "../types/errors";
-import { mapTaskModelToDto, TaskResponseDto } from "../dtos/taskResponse.dto";
+import {
+  mapTaskModelToDto,
+  TaskResponseDto,
+  TasksGroupedByStatusDto,
+  groupTasksByStatus,
+} from "../dtos/taskResponse.dto";
 import { validateNumericId, validateWithSchema } from "../helpers/validation";
 import { CreateTaskDto, UpdateTaskDto } from "../dtos/taskRequest.dto";
 import { TaskFilters } from "../types/filters";
@@ -32,10 +37,13 @@ export class TaskController extends Controller {
     @Query() priority?: string,
     @Query() title?: string,
     @Query() userId?: string,
-  ): Promise<TaskResponseDto[]> {
+    @Query() groupBy?: string,
+    @Query() dateFrom?: string,
+    @Query() dateTo?: string,
+  ): Promise<TaskResponseDto[] | TasksGroupedByStatusDto> {
     const query = validateWithSchema(
       queryTasksSchema,
-      { status, priority, title, userId },
+      { status, priority, title, userId, groupBy, dateFrom, dateTo },
       "Invalid task query parameters",
     );
     const filters: TaskFilters = {
@@ -43,8 +51,16 @@ export class TaskController extends Controller {
       priority: query.priority,
       title: query.title,
       userId: query.userId,
+      dateFrom: query.dateFrom,
+      dateTo: query.dateTo,
     };
     const tasks = await taskService.getAllTasks(filters);
+
+    // If groupBy=status, return grouped tasks for Kanban board
+    if (query.groupBy === "status") {
+      return groupTasksByStatus(tasks);
+    }
+
     return tasks.map(mapTaskModelToDto);
   }
 

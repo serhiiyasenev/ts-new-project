@@ -45,29 +45,32 @@ describe('CreateUser', () => {
        </MemoryRouter>
     )
     
-    const firstNameInput = screen.getByLabelText(/First Name/i)
-    const lastNameInput = screen.getByLabelText(/Last Name/i)
+    const nameInput = screen.getByLabelText(/Name/i)
     const emailInput = screen.getByLabelText(/Email/i)
     
-    await user.click(firstNameInput)
-    await user.tab()
-
-    await user.click(lastNameInput)
+    await user.click(nameInput)
     await user.tab()
 
     await user.click(emailInput)
     await user.type(emailInput, "invalid-email")
     await user.tab()
     
-    expect(await screen.findByText("First name is required")).toBeInTheDocument()
-    expect(await screen.findByText("Last name is required")).toBeInTheDocument()
+    expect(await screen.findByText("Name must have at least 2 characters")).toBeInTheDocument()
     expect(await screen.findByText("Invalid email address")).toBeInTheDocument()
   })
 
   it('submits the form and navigates on successful creation', async () => {
     const user = userEvent.setup()
     const createUserMock = vi.mocked(api.createUser)
-    createUserMock.mockResolvedValue({ id: 123, firstName: 'A', lastName: 'B', email: 'a@b.com', dateOfBirth: '2000-01-01', createdAt: '2025-11-20' })
+    createUserMock.mockResolvedValue({ 
+      id: 123, 
+      name: 'Alice Smith', 
+      email: 'alice.smith@example.com', 
+      isActive: true,
+      lastLoginAt: null,
+      createdAt: '2025-11-20',
+      updatedAt: '2025-11-20'
+    })
 
     render(
       <MemoryRouter>
@@ -75,10 +78,8 @@ describe('CreateUser', () => {
       </MemoryRouter>
     )
 
-    await user.type(screen.getByLabelText(/First Name/i), 'Alice')
-    await user.type(screen.getByLabelText(/Last Name/i), 'Smith')
+    await user.type(screen.getByLabelText(/Name/i), 'Alice Smith')
     await user.type(screen.getByLabelText(/Email/i), 'alice.smith@example.com')
-    await user.type(screen.getByLabelText(/Date of Birth/i), '1990-05-05')
 
     const submitButton = screen.getByRole('button', { name: /Create User/i })
     expect(submitButton).not.toBeDisabled()
@@ -103,12 +104,12 @@ describe('CreateUser', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/users');
   })
 
-  it('logs error when createUser fails', async () => {
+  it('handles error when createUser fails', async () => {
     const user = userEvent.setup();
     const createUserMock = vi.mocked(api.createUser);
     createUserMock.mockRejectedValue(new Error('Network error'));
 
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
 
     render(
       <MemoryRouter>
@@ -116,19 +117,44 @@ describe('CreateUser', () => {
       </MemoryRouter>
     );
 
-    await user.type(screen.getByLabelText(/First Name/i), 'Alice')
-    await user.type(screen.getByLabelText(/Last Name/i), 'Smith')
+    await user.type(screen.getByLabelText(/Name/i), 'Alice Smith')
     await user.type(screen.getByLabelText(/Email/i), 'alice.smith@example.com')
-    await user.type(screen.getByLabelText(/Date of Birth/i), '1990-05-05')
 
     const submitButton = screen.getByRole('button', { name: /Create User/i })
     await user.click(submitButton)
 
     await waitFor(() => {
       expect(createUserMock).toHaveBeenCalled();
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(alertSpy).toHaveBeenCalledWith('Network error');
     });
 
-    consoleSpy.mockRestore();
+    alertSpy.mockRestore();
+  })
+
+  it('handles non-Error exception when createUser fails', async () => {
+    const user = userEvent.setup();
+    const createUserMock = vi.mocked(api.createUser);
+    createUserMock.mockRejectedValue('String error');
+
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+
+    render(
+      <MemoryRouter>
+        <CreateUser />
+      </MemoryRouter>
+    );
+
+    await user.type(screen.getByLabelText(/Name/i), 'Alice Smith')
+    await user.type(screen.getByLabelText(/Email/i), 'alice.smith@example.com')
+
+    const submitButton = screen.getByRole('button', { name: /Create User/i })
+    await user.click(submitButton)
+
+    await waitFor(() => {
+      expect(createUserMock).toHaveBeenCalled();
+      expect(alertSpy).toHaveBeenCalledWith('Error creating user');
+    });
+
+    alertSpy.mockRestore();
   })
 })

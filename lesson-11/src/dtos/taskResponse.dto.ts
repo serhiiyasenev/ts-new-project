@@ -12,6 +12,13 @@ export interface TaskResponseDto {
   updatedAt: string;
 }
 
+export interface TasksGroupedByStatusDto {
+  todo: TaskResponseDto[];
+  in_progress: TaskResponseDto[];
+  review: TaskResponseDto[];
+  done: TaskResponseDto[];
+}
+
 export function mapTaskModelToDto(model: TaskModel): TaskResponseDto {
   return {
     id: model.id,
@@ -23,4 +30,23 @@ export function mapTaskModelToDto(model: TaskModel): TaskResponseDto {
     createdAt: model.createdAt.toISOString(),
     updatedAt: model.updatedAt.toISOString(),
   };
+}
+
+export function groupTasksByStatus(
+  tasks: TaskModel[],
+): TasksGroupedByStatusDto {
+  const grouped: TasksGroupedByStatusDto = {
+    todo: [],
+    in_progress: [],
+    review: [],
+    done: [],
+  };
+
+  tasks.forEach((task) => {
+    const dto = mapTaskModelToDto(task);
+    const status = task.status as TaskStatus;
+    grouped[status].push(dto);
+  });
+
+  return grouped;
 }
