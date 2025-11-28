@@ -66,6 +66,12 @@ jobs:
 
             HAS_TEST=$(jq -r '.scripts.test // empty' package.json)
 
+            if echo "$HAS_TEST" | grep -qi "no test specified"; then
+              echo "⚠️ Dummy test script → skipping"
+              cd - > /dev/null
+              continue
+            fi
+            
             if [ -z "$HAS_TEST" ]; then
               echo "⚠️ No test script → skipping"
               cd - > /dev/null
