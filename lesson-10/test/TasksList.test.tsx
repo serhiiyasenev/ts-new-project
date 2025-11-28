@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import TasksList from '../src/pages/TasksList/TasksList';
+import type { Task } from '../src/types/task';
 import * as api from '../src/api';
 import '@testing-library/jest-dom';
 
@@ -146,7 +147,7 @@ describe('TasksList', () => {
       }
     ];
 
-    vi.mocked(api.fetchTasks).mockResolvedValue(mockTasks as Tasks[]);
+    vi.mocked(api.fetchTasks).mockResolvedValue(mockTasks as unknown as Task[]);
 
     render(
       <MemoryRouter>
