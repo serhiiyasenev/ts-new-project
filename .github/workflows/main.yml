@@ -47,11 +47,10 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Run tests in all subprojects
+            - name: Run tests in all subprojects
         run: |
+          echo "" > $GITHUB_WORKSPACE/test-output.log
           echo "🔍 Searching for TypeScript projects..."
-
-          rm -f test-output.log
 
           for pkg in $(find . -type f -name package.json); do
             project_dir=$(dirname "$pkg")
@@ -62,75 +61,57 @@ jobs:
                 ;;
             esac
 
-            echo ""
-            echo "=============================="
-            echo "📦 Project: $project_dir"
-            echo "=============================="
+            echo "==============================" | tee -a $GITHUB_WORKSPACE/test-output.log
+            echo "📦 Project: $project_dir" | tee -a $GITHUB_WORKSPACE/test-output.log
+            echo "==============================" | tee -a $GITHUB_WORKSPACE/test-output.log
 
             cd "$project_dir"
 
             HAS_TEST=$(jq -r '.scripts.test // empty' package.json)
 
             if echo "$HAS_TEST" | grep -qi "no test specified"; then
-              echo "⚠️ Dummy test script → skipping"
+              echo "⚠️ Dummy test script → skipping" | tee -a $GITHUB_WORKSPACE/test-output.log
               cd - > /dev/null
               continue
             fi
 
             if [ -z "$HAS_TEST" ]; then
-              echo "⚠️ No test script → skipping"
+              echo "⚠️ No test script → skipping" | tee -a $GITHUB_WORKSPACE/test-output.log
               cd - > /dev/null
               continue
             fi
 
-            echo "➡ Installing dependencies..."
             npm install --silent
-
-            echo "➡ Running tests..."
-            # Збираємо stdout у загальний файл
-            npm test | tee -a ../../test-output.log
+            npm test 2>&1 | tee -a $GITHUB_WORKSPACE/test-output.log
 
             cd - > /dev/null
           done
-
+          
       - name: Extract test results
         id: test_info
         run: |
-          echo "📊 Extracting total tests from all logs..."
+          LOG="$GITHUB_WORKSPACE/test-output.log"
 
           TOTAL=0
 
-          # Vitest: "Tests 56 passed."
-          VITEST_COUNT=$(grep -Rho 'Tests [0-9]\+ passed' . | awk '{sum+=$2} END {print sum}')
-          if [ -n "$VITEST_COUNT" ]; then TOTAL=$((TOTAL + VITEST_COUNT)); fi
+          # Vitest: "Tests 56 passed"
+          VITEST1=$(grep -o 'Tests [0-9]\+ passed' "$LOG" | awk '{sum+=$2} END{print sum+0}')
+          TOTAL=$((TOTAL + VITEST1))
 
           # Vitest alt: "(8 tests)"
-          VITEST_PAREN=$(grep -Rho '([0-9]\+ tests)' . | grep -o '[0-9]\+')
-          if [ -n "$VITEST_PAREN" ]; then
-            SUM=$(echo "$VITEST_PAREN" | awk '{sum+=$1} END {print sum}')
-            TOTAL=$((TOTAL + SUM))
-          fi
+          VITEST2=$(grep -o '([0-9]\+ tests)' "$LOG" | grep -o '[0-9]\+' | awk '{sum+=$1} END{print sum+0}')
+          TOTAL=$((TOTAL + VITEST2))
 
-          # Jest: "Ran 12 tests" або "12 tests passed."
-          JEST_COUNT=$(grep -Rho '[0-9]\+ tests' . | grep -o '^[0-9]\+')
-          if [ -n "$JEST_COUNT" ]; then
-            SUM=$(echo "$JEST_COUNT" | awk '{sum+=$1} END {print sum}')
-            TOTAL=$((TOTAL + SUM))
-          fi
+          # Jest: "12 tests passed" / "Ran 12 tests"
+          JEST=$(grep -o '[0-9]\+ tests' "$LOG" | grep -o '^[0-9]\+' | awk '{sum+=$1} END{print sum+0}')
+          TOTAL=$((TOTAL + JEST))
 
           # Mocha: "12 passing"
-          MOCHA_COUNT=$(grep -Rho '[0-9]\+ passing' . | grep -o '^[0-9]\+')
-          if [ -n "$MOCHA_COUNT" ]; then
-            SUM=$(echo "$MOCHA_COUNT" | awk '{sum+=$1} END {print sum}')
-            TOTAL=$((TOTAL + SUM))
-          fi
-
-          # If nothing is found → 0
-          if [ -z "$TOTAL" ]; then TOTAL=0; fi
+          MOCHA=$(grep -o '[0-9]\+ passing' "$LOG" | grep -o '^[0-9]\+' | awk '{sum+=$1} END{print sum+0}')
+          TOTAL=$((TOTAL + MOCHA))
 
           echo "total_tests=$TOTAL" >> $GITHUB_OUTPUT
           echo "✔ Total tests found: $TOTAL"
-
 
       - name: Update README.md with test badge
         if: github.ref == 'refs/heads/main'
