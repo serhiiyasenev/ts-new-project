@@ -47,7 +47,7 @@ jobs:
           node-version: 20
           cache: npm
 
-            - name: Run tests in all subprojects
+      - name: Run tests in all subprojects
         run: |
           echo "" > $GITHUB_WORKSPACE/test-output.log
           echo "🔍 Searching for TypeScript projects..."
@@ -94,7 +94,7 @@ jobs:
 
           TOTAL=0
 
-          # Vitest: "Tests 56 passed"
+          # Vitest: "Tests 56 passed."
           VITEST1=$(grep -o 'Tests [0-9]\+ passed' "$LOG" | awk '{sum+=$2} END{print sum+0}')
           TOTAL=$((TOTAL + VITEST1))
 
