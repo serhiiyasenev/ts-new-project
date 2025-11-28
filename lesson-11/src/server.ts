@@ -1,12 +1,12 @@
-import express, { NextFunction, Request, Response } from "express";
+import express, { Request, Response } from "express";
 import { RegisterRoutes } from "./routes-tsoa/routes";
-import { ApiError, EmailAlreadyExistsError } from "./types/errors";
-import { ValidateError } from "tsoa";
 import morgan from "morgan";
 import cors from "cors";
 import "./config/database";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./swagger/swagger.json";
+import { errorHandler } from "./helpers/errorHandler";
+import { logger } from "./helpers/logger";
 
 const app = express();
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
@@ -24,9 +24,25 @@ app.use(cors());
 // Swagger UI setup http://localhost:3000/swagger
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// simple request logger
-app.use((req, _res, next) => {
-  console.log(`Request: ${req.method} ${req.url}`);
+// Request logging middleware
+app.use((req, res, next) => {
+  const startTime = Date.now();
+  logger.info("Incoming request", {
+    method: req.method,
+    path: req.path,
+    ip: req.ip,
+  });
+
+  res.on("finish", () => {
+    const duration = Date.now() - startTime;
+    logger.info("Request completed", {
+      method: req.method,
+      path: req.path,
+      statusCode: res.statusCode,
+      duration: `${duration}ms`,
+    });
+  });
+
   next();
 });
 
@@ -46,33 +62,16 @@ app.use((req: Request, res: Response) => {
 });
 
 // Error handler (must be last)
-app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
-  console.error("Error:", err);
-
-  if (err instanceof ValidateError) {
-    const messages = Object.values(err.fields ?? {}).map(
-      (field) => field.message,
-    );
-    const details = messages.length ? messages.join("; ") : "Validation failed";
-    return res.status(400).json({ message: details });
-  }
-
-  if (err instanceof EmailAlreadyExistsError) {
-    return res.status(409).json({ message: err.message });
-  }
-
-  if (err instanceof ApiError) {
-    return res.status(err.statusCode).json({ message: err.message });
-  }
-
-  res.status(500).json({ message: "Internal server error" });
-});
+app.use(errorHandler);
 
 // Start server
 if (process.env.NODE_ENV !== "test") {
   app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-    console.log(`Swagger UI: http://localhost:${port}/swagger`);
+    logger.info("Server started", {
+      port,
+      environment: process.env.NODE_ENV || "development",
+      swaggerUrl: `http://localhost:${port}/swagger`,
+    });
   });
 }
 

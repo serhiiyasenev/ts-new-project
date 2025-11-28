@@ -26,3 +26,13 @@ export const validateNumericId = (value: unknown, label: string): number => {
   }
   return parsed.data;
 };
+
+export const ensureNotEmpty = <T extends Record<string, unknown>>(
+  payload: T,
+  errorMessage = "Update payload cannot be empty",
+): T => {
+  if (!Object.keys(payload).length) {
+    throw new ApiError(errorMessage, 400);
+  }
+  return payload;
+};

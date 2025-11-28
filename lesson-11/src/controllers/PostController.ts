@@ -19,9 +19,13 @@ import {
 } from "../schemas/posts";
 import { ApiError } from "../types/errors";
 import { PostResponseDto, mapPostModelToDto } from "../dtos/postResponse.dto";
-import { validateNumericId, validateWithSchema } from "../helpers/validation";
+import {
+  validateNumericId,
+  validateWithSchema,
+  ensureNotEmpty,
+} from "../helpers/validation";
 import { CreatePostDto, UpdatePostDto } from "../dtos/postRequest.dto";
-import { PostFilters } from "../types/filters";
+import { buildPostFilter } from "../services/filters/buildPostFilter";
 
 @Route("posts")
 @Tags("Posts")
@@ -30,18 +34,18 @@ export class PostController extends Controller {
   public async getAllPosts(
     @Query() title?: string,
     @Query() content?: string,
-    @Query() userId?: string
+    @Query() userId?: string,
   ): Promise<PostResponseDto[]> {
     const query = validateWithSchema(
       queryPostsSchema,
       { title, content, userId },
-      "Invalid post query parameters"
+      "Invalid post query parameters",
     );
-    const filters: PostFilters = {
+    const filters = buildPostFilter({
       title: query.title,
       content: query.content,
       userId: query.userId,
-    };
+    });
     const posts = await postService.getAllPosts(filters);
     return posts.map(mapPostModelToDto);
   }
@@ -59,12 +63,12 @@ export class PostController extends Controller {
   @Post()
   @SuccessResponse("201", "Created")
   public async createPost(
-    @Body() data: CreatePostDto
+    @Body() data: CreatePostDto,
   ): Promise<PostResponseDto> {
     const payload = validateWithSchema(
       createPostSchema,
       data,
-      "Invalid post payload"
+      "Invalid post payload",
     );
     const post = await postService.createPost(payload);
     this.setStatus(201);
@@ -74,18 +78,16 @@ export class PostController extends Controller {
   @Put("{id}")
   public async updatePost(
     @Path() id: string,
-    @Body() data: UpdatePostDto
+    @Body() data: UpdatePostDto,
   ): Promise<PostResponseDto> {
     const postId = validateNumericId(id, "Post id");
     const payload = validateWithSchema(
       updatePostSchema,
       data,
-      "Invalid post update payload"
+      "Invalid post update payload",
     );
     const { actorUserId, ...changes } = payload;
-    if (!Object.keys(changes).length) {
-      throw new ApiError("Update payload cannot be empty", 400);
-    }
+    ensureNotEmpty(changes);
     const updated = await postService.updatePost(postId, changes, actorUserId);
     if (!updated) {
       throw new ApiError("Post not found", 404);
