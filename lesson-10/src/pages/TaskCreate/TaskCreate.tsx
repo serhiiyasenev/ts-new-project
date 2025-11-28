@@ -100,7 +100,6 @@ const TaskCreate = () => {
               <option key={user.id} value={user.id}>{user.name}</option>
             ))}
           </select>
-          {errors.userId?.message && <div className="error">{String(errors.userId.message)}</div>}
         </div>
 
         <div className="form-actions">

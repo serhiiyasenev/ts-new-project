@@ -184,8 +184,7 @@ describe('TaskCreate', () => {
     });
   });
 
-  it('renders userId error when present', async () => {
-    const user = userEvent.setup();
+  it('renders userId select with users', async () => {
     const mockUsers = [
       { id: 1, name: 'User 1', email: 'user1@test.com', isActive: true, lastLoginAt: null, createdAt: '2025-11-20', updatedAt: '2025-11-20' },
     ];
@@ -198,13 +197,8 @@ describe('TaskCreate', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/Assign to User/i)).toBeInTheDocument();
+      const userSelect = screen.getByLabelText(/Assign to User/i);
+      expect(userSelect).toBeInTheDocument();
     });
-
-    const titleInput = screen.getByLabelText(/Title/i);
-    await user.type(titleInput, 'Test Task');
-
-    const userSelect = screen.getByLabelText(/Assign to User/i);
-    expect(userSelect).toBeInTheDocument();
   });
 });

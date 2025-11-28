@@ -24,7 +24,9 @@ const UserDetails = () => {
           fetchUserById(Number(id))
             .then((data) => {
               setUser(data);
-              reset({ name: data.name, email: data.email, isActive: data.isActive });
+              if (data) {
+                reset({ name: data.name, email: data.email, isActive: data.isActive });
+              }
             })
             .catch((err) => {
               setError(err.message);

@@ -133,4 +133,46 @@ describe('UserDetails', () => {
     expect(screen.getByText(/Loading/i)).toBeInTheDocument();
   });
 
+  it('renders user not found when API returns null', async () => {
+    vi.mocked(api.fetchUserById).mockResolvedValue(null as any);
+
+    render(
+      <MemoryRouter initialEntries={['/users/999']}>
+        <Routes>
+          <Route path="/users/:id" element={<UserDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/User not found/i)).toBeInTheDocument();
+    });
+  });
+
+  it('renders inactive user status correctly', async () => {
+    const mockUser = {
+      id: 1,
+      name: 'Inactive User',
+      email: 'inactive@example.com',
+      isActive: false,
+      lastLoginAt: null,
+      createdAt: '2025-11-20',
+      updatedAt: '2025-11-20'
+    };
+
+    vi.mocked(api.fetchUserById).mockResolvedValue(mockUser);
+
+    render(
+      <MemoryRouter initialEntries={['/users/1']}>
+        <Routes>
+          <Route path="/users/:id" element={<UserDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Inactive')).toBeInTheDocument();
+    });
+  });
+
 });

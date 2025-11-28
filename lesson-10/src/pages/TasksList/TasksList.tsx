@@ -46,7 +46,10 @@ const TasksList = () => {
 
     try {
       const updated = await updateTask(draggedTask.id, { status: newStatus });
-      setTasks(tasks.map(t => t.id === updated.id ? updated : t));
+      setTasks(tasks.map(t => {
+        if (t.id === updated.id) return updated;
+        return t;
+      }));
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to update task');
     } finally {

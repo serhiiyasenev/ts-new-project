@@ -111,7 +111,7 @@ const KanbanBoard = () => {
         <h1>Task Board</h1>
         <div className="header-actions">
           <button onClick={() => window.location.href = '/board/create'} className="button-primary">
-            + Create Task
+            Create Task
           </button>
           <button onClick={loadTasks} className="button-secondary">
             Refresh

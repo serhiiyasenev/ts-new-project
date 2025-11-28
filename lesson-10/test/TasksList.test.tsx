@@ -188,6 +188,35 @@ describe('TasksList', () => {
     });
   });
 
+  it('should display user name fallback when user not found', async () => {
+    const mockTasks = [
+      {
+        id: 1,
+        title: 'Task with unknown user',
+        description: 'Description',
+        status: 'todo' as const,
+        priority: 'high' as const,
+        userId: 999,
+        createdAt: '2025-11-15T10:00:00.000Z',
+        updatedAt: '2025-11-15T10:00:00.000Z',
+      },
+    ];
+
+    vi.mocked(api.fetchTasks).mockResolvedValue(mockTasks);
+    vi.mocked(api.fetchUsers).mockResolvedValue([]);
+
+    render(
+      <MemoryRouter>
+        <TasksList />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Task with unknown user')).toBeInTheDocument();
+      expect(screen.getByText(/User #999/)).toBeInTheDocument();
+    });
+  });
+
   it('should filter tasks by status correctly with unknown status', async () => {
     const mockTasks = [
       {
@@ -209,6 +238,16 @@ describe('TasksList', () => {
         userId: null,
         createdAt: '2025-11-15T11:00:00.000Z',
         updatedAt: '2025-11-15T11:00:00.000Z',
+      },
+      {
+        id: 3,
+        title: 'Unknown Status Task',
+        description: 'Description',
+        status: 'unknown_status' as any,
+        priority: 'medium' as const,
+        userId: null,
+        createdAt: '2025-11-15T12:00:00.000Z',
+        updatedAt: '2025-11-15T12:00:00.000Z',
       },
     ];
 

@@ -29,13 +29,15 @@ const TaskDetails = () => {
         .then(([taskData, usersData]) => {
           setTask(taskData);
           setUsers(usersData);
-          reset({
-            title: taskData.title,
-            description: taskData.description,
-            status: taskData.status,
-            priority: taskData.priority,
-            userId: taskData.userId,
-          });
+          if (taskData) {
+            reset({
+              title: taskData.title,
+              description: taskData.description,
+              status: taskData.status,
+              priority: taskData.priority,
+              userId: taskData.userId,
+            });
+          }
         })
         .catch((err: Error) => {
           setError(err.message);
@@ -115,7 +117,6 @@ const TaskDetails = () => {
                 <option key={user.id} value={user.id}>{user.name}</option>
               ))}
             </select>
-            {errors.userId?.message && <div className="error">{String(errors.userId.message)}</div>}
           </div>
           
           <div className="form-actions">

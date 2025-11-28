@@ -194,6 +194,52 @@ describe('TaskDetails', () => {
   });
 
 
+  it('renders task not found when API returns null', async () => {
+    vi.mocked(api.fetchTaskById).mockResolvedValue(null as any);
+    vi.mocked(api.fetchUsers).mockResolvedValue([]);
+
+    render(
+      <MemoryRouter initialEntries={['/tasks/999']}>
+        <Routes>
+          <Route path="/tasks/:id" element={<TaskDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Task not found/i)).toBeInTheDocument();
+    });
+  });
+
+  it('renders user name fallback when user not found', async () => {
+    const mockTask: Task = {
+      id: 1,
+      title: 'Test Task',
+      description: 'Description',
+      status: 'todo',
+      priority: 'high',
+      userId: 999,
+      createdAt: '2025-11-17T10:00:00.000Z',
+      updatedAt: '2025-11-17T10:00:00.000Z',
+    };
+
+    vi.mocked(api.fetchTaskById).mockResolvedValue(mockTask);
+    vi.mocked(api.fetchUsers).mockResolvedValue([]);
+
+    render(
+      <MemoryRouter initialEntries={['/tasks/1']}>
+        <Routes>
+          <Route path="/tasks/:id" element={<TaskDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Test Task')).toBeInTheDocument();
+      expect(screen.getByText(/User #999/)).toBeInTheDocument();
+    });
+  });
+
   it('renders userId error message when present in edit mode', async () => {
     const mockTask: Task = {
       id: 1,
