@@ -1,4 +1,8 @@
 # Architecture Overview
+<!-- TEST_BADGES_START -->
+![Tests](https://img.shields.io/badge/tests-0-brightgreen) ![Coverage](https://img.shields.io/badge/coverage-0%25-blue)
+<!-- TEST_BADGES_END -->
+
 
 This document contains a high-level architecture diagram for a typical web application platform.
 
@@ -117,3 +121,13 @@ flowchart LR
 - **Workers**: Background processors for long-running jobs, retries, and batch work.
 - **Data**: Primary relational database with read replicas, Redis cache for hot data, and object storage for files.
 - **Observability**: Central logging, metrics, and tracing to monitor health and diagnose issues.
+
+---
+
+## 📊 Test Summary
+
+![Tests](https://img.shields.io/badge/tests-0-brightgreen) ![Coverage](https://img.shields.io/badge/coverage-0%25-blue)
+
+- **Total tests:** 0
+- **Coverage:** 0%
+
