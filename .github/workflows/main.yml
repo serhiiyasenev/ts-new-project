@@ -1,0 +1,46 @@
+name: CI - Run tests in all projects
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Run tests in all subprojects
+        run: |
+          echo "Searching for TypeScript projects..."
+          for pkg in $(find . -type f -name package.json); do
+            project_dir=$(dirname "$pkg")
+
+            echo ""
+            echo "=============================="
+            echo "Project: $project_dir"
+            echo "=============================="
+
+            cd "$project_dir"
+
+            if [ -f package.json ]; then
+              echo "Installing dependencies..."
+              npm install
+
+              echo "Running tests..."
+              npm test || exit 1
+            fi
+
+            cd - > /dev/null
+          done
