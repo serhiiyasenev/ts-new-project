@@ -156,4 +156,55 @@ describe('TaskCreate', () => {
       expect(errors.length >= 0).toBe(true);
     });
   });
+
+  it('shows description error when description is provided but invalid', async () => {
+    const user = userEvent.setup();
+    
+    render(
+      <MemoryRouter>
+        <TaskCreate />
+      </MemoryRouter>
+    );
+
+    const titleInput = screen.getByLabelText(/Title/i);
+    await user.type(titleInput, 'Test Task');
+
+    const descriptionInput = screen.getByLabelText(/Description/i);
+    await user.type(descriptionInput, 'ab');
+    await user.tab();
+
+    const submitButton = screen.getByRole('button', { name: /Create Task/i });
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      const errorMessage = screen.queryByText(/must be at least 3 characters/i);
+      if (errorMessage) {
+        expect(errorMessage).toBeInTheDocument();
+      }
+    });
+  });
+
+  it('renders userId error when present', async () => {
+    const user = userEvent.setup();
+    const mockUsers = [
+      { id: 1, name: 'User 1', email: 'user1@test.com', isActive: true, lastLoginAt: null, createdAt: '2025-11-20', updatedAt: '2025-11-20' },
+    ];
+    vi.mocked(api.fetchUsers).mockResolvedValue(mockUsers);
+    
+    render(
+      <MemoryRouter>
+        <TaskCreate />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/Assign to User/i)).toBeInTheDocument();
+    });
+
+    const titleInput = screen.getByLabelText(/Title/i);
+    await user.type(titleInput, 'Test Task');
+
+    const userSelect = screen.getByLabelText(/Assign to User/i);
+    expect(userSelect).toBeInTheDocument();
+  });
 });

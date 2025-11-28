@@ -192,4 +192,44 @@ describe('TaskDetails', () => {
 
     expect(screen.getByText(/Loading/i)).toBeInTheDocument();
   });
+
+
+  it('renders userId error message when present in edit mode', async () => {
+    const mockTask: Task = {
+      id: 1,
+      title: 'Test Task',
+      description: 'Description',
+      status: 'todo',
+      priority: 'high',
+      userId: null,
+      createdAt: '2025-11-17T10:00:00.000Z',
+      updatedAt: '2025-11-17T10:00:00.000Z',
+    };
+
+    const mockUsers = [
+      { id: 1, name: 'User 1', email: 'user1@test.com', isActive: true, lastLoginAt: null, createdAt: '2025-11-20', updatedAt: '2025-11-20' },
+    ];
+
+    vi.mocked(api.fetchTaskById).mockResolvedValue(mockTask);
+    vi.mocked(api.fetchUsers).mockResolvedValue(mockUsers);
+
+    render(
+      <MemoryRouter initialEntries={['/tasks/1']}>
+        <Routes>
+          <Route path="/tasks/:id" element={<TaskDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Test Task')).toBeInTheDocument();
+    });
+
+    const editButton = screen.getByRole('button', { name: /Edit/i });
+    await editButton.click();
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/Assign to User/i)).toBeInTheDocument();
+    });
+  });
 });

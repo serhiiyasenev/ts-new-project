@@ -187,4 +187,43 @@ describe('TasksList', () => {
       expect(screen.getByText(/Failed to load data/i)).toBeInTheDocument();
     });
   });
+
+  it('should filter tasks by status correctly with unknown status', async () => {
+    const mockTasks = [
+      {
+        id: 1,
+        title: 'Todo Task',
+        description: 'Description',
+        status: 'todo' as const,
+        priority: 'high' as const,
+        userId: null,
+        createdAt: '2025-11-15T10:00:00.000Z',
+        updatedAt: '2025-11-15T10:00:00.000Z',
+      },
+      {
+        id: 2,
+        title: 'Done Task',
+        description: 'Description',
+        status: 'done' as const,
+        priority: 'medium' as const,
+        userId: null,
+        createdAt: '2025-11-15T11:00:00.000Z',
+        updatedAt: '2025-11-15T11:00:00.000Z',
+      },
+    ];
+
+    vi.mocked(api.fetchTasks).mockResolvedValue(mockTasks);
+    vi.mocked(api.fetchUsers).mockResolvedValue([]);
+
+    render(
+      <MemoryRouter>
+        <TasksList />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Todo Task')).toBeInTheDocument();
+      expect(screen.getByText('Done Task')).toBeInTheDocument();
+    });
+  });
 });

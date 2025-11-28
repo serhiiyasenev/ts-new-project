@@ -132,4 +132,5 @@ describe('UserDetails', () => {
 
     expect(screen.getByText(/Loading/i)).toBeInTheDocument();
   });
+
 });
