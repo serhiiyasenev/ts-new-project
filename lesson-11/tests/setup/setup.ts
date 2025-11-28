@@ -1,11 +1,13 @@
-import { afterAll, beforeAll } from 'vitest';
-import sequelize from '../../src/config/database';
+import { afterAll, beforeAll } from "vitest";
+import sequelize from "../../src/config/database";
 
 // Single place for DB clean-up: runs once before the whole test suite.
 beforeAll(async () => {
   // Ensure we're running against the test database
-  if (process.env.NODE_ENV !== 'test') {
-    throw new Error('Tests must run with NODE_ENV=test to avoid wiping non-test DB');
+  if (process.env.NODE_ENV !== "test") {
+    throw new Error(
+      "Tests must run with NODE_ENV=test to avoid wiping non-test DB",
+    );
   }
 
   // Connect and reset schema (drops and recreates tables)

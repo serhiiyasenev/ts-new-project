@@ -1,7 +1,13 @@
 const { exec } = require("child_process");
 const path = require("path");
 
-const coverageFile = path.join(__dirname, "..", "coverage", "lcov-report", "index.html");
+const coverageFile = path.join(
+  __dirname,
+  "..",
+  "coverage",
+  "lcov-report",
+  "index.html",
+);
 
 const command = `start "" "${coverageFile.replace(/\\/g, "\\\\")}"`;
 

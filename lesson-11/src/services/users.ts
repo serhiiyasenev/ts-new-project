@@ -7,7 +7,9 @@ import { EmailAlreadyExistsError } from "../types/errors";
 import { UserFilters } from "../types/filters";
 import { mapCreateUserDtoToPayload } from "../helpers/user";
 
-export const getAllUsers = async (filters?: UserFilters): Promise<UserModel[]> => {
+export const getAllUsers = async (
+  filters?: UserFilters,
+): Promise<UserModel[]> => {
   const where: Record<string, unknown> = {};
   if (filters?.email) {
     where.email = { [Op.iLike]: `%${filters.email}%` };
@@ -46,12 +48,15 @@ export const getUserById = async (id: number): Promise<UserModel | null> => {
       },
       {
         model: PostModel,
-      }
-    ]
+      },
+    ],
   });
 };
 
-export const updateUser = async (id: number, updatedData: UpdateUserDto): Promise<UserModel | null> => {
+export const updateUser = async (
+  id: number,
+  updatedData: UpdateUserDto,
+): Promise<UserModel | null> => {
   const user = await UserModel.findByPk(id);
   if (!user) return null;
   if (updatedData.email) {

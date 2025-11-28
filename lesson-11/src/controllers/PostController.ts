@@ -1,8 +1,24 @@
-import { Route, Get, Post, Put, Delete, Query, Path, Body, SuccessResponse, Tags, Controller } from "tsoa";
+import {
+  Route,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Query,
+  Path,
+  Body,
+  SuccessResponse,
+  Tags,
+  Controller,
+} from "tsoa";
 import * as postService from "../services/posts";
-import { queryPostsSchema, createPostSchema, updatePostSchema } from "../schemas/posts";
+import {
+  queryPostsSchema,
+  createPostSchema,
+  updatePostSchema,
+} from "../schemas/posts";
 import { ApiError } from "../types/errors";
-import {  PostResponseDto, mapPostModelToDto } from "../dtos/postResponse.dto";
+import { PostResponseDto, mapPostModelToDto } from "../dtos/postResponse.dto";
 import { validateNumericId, validateWithSchema } from "../helpers/validation";
 import { CreatePostDto, UpdatePostDto } from "../dtos/postRequest.dto";
 import { PostFilters } from "../types/filters";
@@ -14,12 +30,12 @@ export class PostController extends Controller {
   public async getAllPosts(
     @Query() title?: string,
     @Query() content?: string,
-    @Query() userId?: string
+    @Query() userId?: string,
   ): Promise<PostResponseDto[]> {
     const query = validateWithSchema(
       queryPostsSchema,
       { title, content, userId },
-      "Invalid post query parameters"
+      "Invalid post query parameters",
     );
     const filters: PostFilters = {
       title: query.title,
@@ -31,9 +47,7 @@ export class PostController extends Controller {
   }
 
   @Get("{id}")
-  public async getPostById(
-    @Path() id: string
-  ): Promise<PostResponseDto> {
+  public async getPostById(@Path() id: string): Promise<PostResponseDto> {
     const postId = validateNumericId(id, "Post id");
     const post = await postService.getPostById(postId);
     if (!post) {
@@ -45,9 +59,13 @@ export class PostController extends Controller {
   @Post()
   @SuccessResponse("201", "Created")
   public async createPost(
-    @Body() data: CreatePostDto
+    @Body() data: CreatePostDto,
   ): Promise<PostResponseDto> {
-    const payload = validateWithSchema(createPostSchema, data, "Invalid post payload");
+    const payload = validateWithSchema(
+      createPostSchema,
+      data,
+      "Invalid post payload",
+    );
     const post = await postService.createPost(payload);
     this.setStatus(201);
     return mapPostModelToDto(post);
@@ -56,10 +74,14 @@ export class PostController extends Controller {
   @Put("{id}")
   public async updatePost(
     @Path() id: string,
-    @Body() data: UpdatePostDto
+    @Body() data: UpdatePostDto,
   ): Promise<PostResponseDto> {
     const postId = validateNumericId(id, "Post id");
-    const payload = validateWithSchema(updatePostSchema, data, "Invalid post update payload");
+    const payload = validateWithSchema(
+      updatePostSchema,
+      data,
+      "Invalid post update payload",
+    );
     const { actorUserId, ...changes } = payload;
     if (!Object.keys(changes).length) {
       throw new ApiError("Update payload cannot be empty", 400);
@@ -73,9 +95,7 @@ export class PostController extends Controller {
 
   @Delete("{id}")
   @SuccessResponse("204", "No Content")
-  public async deletePost(
-    @Path() id: string
-  ): Promise<void> {
+  public async deletePost(@Path() id: string): Promise<void> {
     const postId = validateNumericId(id, "Post id");
     const deleted = await postService.deletePost(postId);
     if (!deleted) {

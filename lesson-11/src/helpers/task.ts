@@ -3,7 +3,7 @@ import { CreateTaskDto } from "../dtos/taskRequest.dto";
 import { TaskModel } from "../models/task.model";
 
 export const mapCreateTaskDtoToPayload = (
-  data: CreateTaskDto
+  data: CreateTaskDto,
 ): CreationAttributes<TaskModel> => {
   const payload: CreationAttributes<TaskModel> = {
     title: data.title,

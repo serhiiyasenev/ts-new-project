@@ -3,13 +3,13 @@ import { z } from "zod";
 export enum TaskStatus {
   Todo = "todo",
   InProgress = "in_progress",
-  Done = "done"
+  Done = "done",
 }
 
 export enum TaskPriority {
   Low = "low",
   Medium = "medium",
-  High = "high"
+  High = "high",
 }
 
 const baseTaskSchema = z.object({
@@ -31,36 +31,41 @@ export const createTaskSchema = baseTaskSchema.extend({
 export const updateTaskSchema = baseTaskSchema.partial();
 
 export const queryTasksSchema = z.object({
-  status: z.string().optional()
+  status: z
+    .string()
+    .optional()
     .transform((val) =>
       val
         ?.split(",")
         .map((item) => item.trim())
-        .filter((item) => item.length > 0)
+        .filter((item) => item.length > 0),
     )
-    .pipe(
-      z.array(z.nativeEnum(TaskStatus)).optional()
-    ),
+    .pipe(z.array(z.nativeEnum(TaskStatus)).optional()),
 
-  priority: z.string().optional()
+  priority: z
+    .string()
+    .optional()
     .transform((val) =>
       val
         ?.split(",")
         .map((item) => item.trim())
-        .filter((item) => item.length > 0)
+        .filter((item) => item.length > 0),
     )
-    .pipe(
-      z.array(z.nativeEnum(TaskPriority)).optional()
-    ),
+    .pipe(z.array(z.nativeEnum(TaskPriority)).optional()),
 
-  title: z.string().trim().min(1).transform((val) => val.trim()).optional(),
+  title: z
+    .string()
+    .trim()
+    .min(1)
+    .transform((val) => val.trim())
+    .optional(),
   userId: z
     .union([
       z.number().int().positive(),
       z
         .string()
         .regex(/^\d+$/, "userId must be numeric")
-        .transform((val) => parseInt(val, 10))
+        .transform((val) => parseInt(val, 10)),
     ])
-    .optional()
+    .optional(),
 });

@@ -1,6 +1,22 @@
-import { Route, Get, Post, Put, Delete, Query, Path, Body, SuccessResponse, Tags, Controller } from "tsoa";
+import {
+  Route,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Query,
+  Path,
+  Body,
+  SuccessResponse,
+  Tags,
+  Controller,
+} from "tsoa";
 import * as userService from "../services/users";
-import { createUserSchema, queryUsersSchema, updateUserSchema } from "../schemas/users";
+import {
+  createUserSchema,
+  queryUsersSchema,
+  updateUserSchema,
+} from "../schemas/users";
 import { ApiError } from "../types/errors";
 import { UserResponseDto, mapUserModelToDto } from "../dtos/userResponse.dto";
 import { validateNumericId, validateWithSchema } from "../helpers/validation";
@@ -14,12 +30,12 @@ export class UserController extends Controller {
   public async getAllUsers(
     @Query() name?: string,
     @Query() email?: string,
-    @Query() isActive?: string
+    @Query() isActive?: string,
   ): Promise<UserResponseDto[]> {
     const query = validateWithSchema(
       queryUsersSchema,
       { name, email, isActive },
-      "Invalid user query parameters"
+      "Invalid user query parameters",
     );
     const filters: UserFilters = {
       name: query.name,
@@ -31,9 +47,7 @@ export class UserController extends Controller {
   }
 
   @Get("{id}")
-  public async getUserById(
-    @Path() id: string
-  ): Promise<UserResponseDto> {
+  public async getUserById(@Path() id: string): Promise<UserResponseDto> {
     const userId = validateNumericId(id, "User id");
     const user = await userService.getUserById(userId);
     if (!user) {
@@ -45,9 +59,13 @@ export class UserController extends Controller {
   @Post()
   @SuccessResponse("201", "Created")
   public async createUser(
-    @Body() data: CreateUserDto
+    @Body() data: CreateUserDto,
   ): Promise<UserResponseDto> {
-    const payload = validateWithSchema(createUserSchema, data, "Invalid user payload");
+    const payload = validateWithSchema(
+      createUserSchema,
+      data,
+      "Invalid user payload",
+    );
     const user = await userService.createUser(payload);
     this.setStatus(201);
     return mapUserModelToDto(user);
@@ -56,10 +74,14 @@ export class UserController extends Controller {
   @Put("{id}")
   public async updateUser(
     @Path() id: string,
-    @Body() data: UpdateUserDto
+    @Body() data: UpdateUserDto,
   ): Promise<UserResponseDto> {
     const userId = validateNumericId(id, "User id");
-    const payload = validateWithSchema(updateUserSchema, data, "Invalid user update payload");
+    const payload = validateWithSchema(
+      updateUserSchema,
+      data,
+      "Invalid user update payload",
+    );
     if (!Object.keys(payload).length) {
       throw new ApiError("Update payload cannot be empty", 400);
     }
@@ -72,9 +94,7 @@ export class UserController extends Controller {
 
   @Delete("{id}")
   @SuccessResponse("204", "No Content")
-  public async deleteUser(
-    @Path() id: string
-  ): Promise<void> {
+  public async deleteUser(@Path() id: string): Promise<void> {
     const userId = validateNumericId(id, "User id");
     const deleted = await userService.deleteUser(userId);
     if (!deleted) {

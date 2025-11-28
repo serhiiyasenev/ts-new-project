@@ -3,7 +3,7 @@ import { CreatePostDto } from "../dtos/postRequest.dto";
 import { PostModel } from "../models/post.model";
 
 export const mapCreatePostDtoToPayload = (
-  data: CreatePostDto
+  data: CreatePostDto,
 ): CreationAttributes<PostModel> => {
   return {
     title: data.title,

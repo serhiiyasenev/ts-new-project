@@ -18,4 +18,3 @@ export interface PostFilters {
   content?: string;
   userId?: number;
 }
-

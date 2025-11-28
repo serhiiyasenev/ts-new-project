@@ -7,7 +7,9 @@ import { ApiError } from "../types/errors";
 import { assertUserExists } from "../helpers/user";
 import { mapCreatePostDtoToPayload } from "../helpers/post";
 
-export const getAllPosts = async (filters?: PostFilters) : Promise<PostModel[]> => {
+export const getAllPosts = async (
+  filters?: PostFilters,
+): Promise<PostModel[]> => {
   const where: Record<string, unknown> = {};
   if (filters?.title) {
     where.title = { [Op.iLike]: `%${filters.title}%` };
@@ -21,10 +23,11 @@ export const getAllPosts = async (filters?: PostFilters) : Promise<PostModel[]> 
   return await PostModel.findAll({
     where,
     include: [
-        { 
-        model: UserModel, 
-        attributes: ["id", "name", "email"], required: true 
-        }
+      {
+        model: UserModel,
+        attributes: ["id", "name", "email"],
+        required: true,
+      },
     ],
   });
 };
@@ -46,7 +49,7 @@ export const getPostById = async (id: number) => {
 export const updatePost = async (
   id: number,
   changes: Partial<Pick<PostModel, "title" | "content">>,
-  actorUserId: number
+  actorUserId: number,
 ) => {
   const post = await PostModel.findByPk(id);
   if (!post) return null;

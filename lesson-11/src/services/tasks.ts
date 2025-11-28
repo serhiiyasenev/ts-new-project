@@ -6,7 +6,9 @@ import { CreateTaskDto, UpdateTaskDto } from "../dtos/taskRequest.dto";
 import { assertUserExists } from "../helpers/user";
 import { mapCreateTaskDtoToPayload } from "../helpers/task";
 
-export const getAllTasks = async (filters?: TaskFilters): Promise<TaskModel[]> => {
+export const getAllTasks = async (
+  filters?: TaskFilters,
+): Promise<TaskModel[]> => {
   const where: Record<string, unknown> = {};
   if (filters?.status?.length) {
     where.status = { [Op.in]: filters.status };
@@ -26,7 +28,7 @@ export const getAllTasks = async (filters?: TaskFilters): Promise<TaskModel[]> =
       {
         model: UserModel,
         attributes: ["id", "name", "email"],
-        required: false
+        required: false,
       },
     ],
   });
@@ -39,7 +41,13 @@ export const createTask = async (data: CreateTaskDto) => {
   const payload = mapCreateTaskDtoToPayload(data);
   const created = await TaskModel.create(payload);
   await created.reload({
-    include: [{ model: UserModel, attributes: ["id", "name", "email"], required: false }],
+    include: [
+      {
+        model: UserModel,
+        attributes: ["id", "name", "email"],
+        required: false,
+      },
+    ],
   });
   return created;
 };
@@ -49,15 +57,16 @@ export const getTaskById = async (id: number): Promise<TaskModel | null> => {
     include: [
       {
         model: UserModel,
-        attributes: ["id", "name", "email"], required: false
-      }
+        attributes: ["id", "name", "email"],
+        required: false,
+      },
     ],
   });
-}
+};
 
 export const updateTask = async (
   id: number,
-  updatedData: UpdateTaskDto
+  updatedData: UpdateTaskDto,
 ): Promise<TaskModel | null> => {
   const task = await TaskModel.findByPk(id);
   if (!task) return null;
@@ -66,7 +75,13 @@ export const updateTask = async (
   }
   await task.update(updatedData);
   return await TaskModel.findByPk(id, {
-    include: [{ model: UserModel, attributes: ["id", "name", "email"], required: false }],
+    include: [
+      {
+        model: UserModel,
+        attributes: ["id", "name", "email"],
+        required: false,
+      },
+    ],
   });
 };
 

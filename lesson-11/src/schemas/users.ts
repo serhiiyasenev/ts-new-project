@@ -3,7 +3,7 @@ import { z } from "zod";
 export const createUserSchema = z.object({
   name: z.string().min(2, "Name must have at least 2 characters"),
   email: z.email("Email must be valid"),
-  isActive: z.boolean().optional()
+  isActive: z.boolean().optional(),
 });
 
 export const updateUserSchema = createUserSchema.partial();
@@ -22,5 +22,5 @@ const isActiveQuerySchema = z.union([z.boolean(), isActiveStringSchema]);
 export const queryUsersSchema = z.object({
   name: z.string().trim().min(1).optional(),
   email: z.string().trim().min(1).optional(),
-  isActive: isActiveQuerySchema.optional()
+  isActive: isActiveQuerySchema.optional(),
 });

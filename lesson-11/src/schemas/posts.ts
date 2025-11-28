@@ -24,7 +24,7 @@ export const queryPostsSchema = z.object({
       z
         .string()
         .regex(/^\d+$/, "userId must be numeric")
-        .transform((val) => parseInt(val, 10))
+        .transform((val) => parseInt(val, 10)),
     ])
-    .optional()
+    .optional(),
 });

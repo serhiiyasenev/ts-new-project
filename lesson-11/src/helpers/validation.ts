@@ -7,11 +7,14 @@ const formatZodError = (error: ZodError) =>
 export const validateWithSchema = <T>(
   schema: ZodSchema<T>,
   payload: unknown,
-  contextMessage: string
+  contextMessage: string,
 ): T => {
   const parsed = schema.safeParse(payload);
   if (!parsed.success) {
-    throw new ApiError(`${contextMessage}: ${formatZodError(parsed.error)}`, 400);
+    throw new ApiError(
+      `${contextMessage}: ${formatZodError(parsed.error)}`,
+      400,
+    );
   }
   return parsed.data;
 };
@@ -23,4 +26,3 @@ export const validateNumericId = (value: unknown, label: string): number => {
   }
   return parsed.data;
 };
-

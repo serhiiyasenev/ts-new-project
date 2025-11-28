@@ -4,7 +4,7 @@ import { UserModel } from "../models/user.model";
 import { ApiError } from "../types/errors";
 
 export const mapCreateUserDtoToPayload = (
-  data: CreateUserDto
+  data: CreateUserDto,
 ): CreationAttributes<UserModel> => {
   const payload: CreationAttributes<UserModel> = {
     name: data.name,
@@ -21,4 +21,3 @@ export const assertUserExists = async (userId: number): Promise<UserModel> => {
   }
   return user;
 };
-

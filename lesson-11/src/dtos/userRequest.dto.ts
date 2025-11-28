@@ -5,4 +5,3 @@ export interface CreateUserDto {
 }
 
 export type UpdateUserDto = Partial<CreateUserDto>;
-
