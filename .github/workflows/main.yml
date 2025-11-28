@@ -93,15 +93,44 @@ jobs:
             cd - > /dev/null
           done
 
-      - name: Extract test results (Vitest only)
+      - name: Extract test results
         id: test_info
         run: |
-          # Шукаємо всі лінії типу "56 passed" або "10 passed"
-          TOTAL=$(grep -o '[0-9]\+ passed' test-output.log | awk '{sum += $1} END {print sum}')
+          echo "📊 Extracting total tests from all logs..."
 
+          TOTAL=0
+
+          # Vitest: "Tests 56 passed."
+          VITEST_COUNT=$(grep -Rho 'Tests [0-9]\+ passed' . | awk '{sum+=$2} END {print sum}')
+          if [ -n "$VITEST_COUNT" ]; then TOTAL=$((TOTAL + VITEST_COUNT)); fi
+
+          # Vitest alt: "(8 tests)"
+          VITEST_PAREN=$(grep -Rho '([0-9]\+ tests)' . | grep -o '[0-9]\+')
+          if [ -n "$VITEST_PAREN" ]; then
+            SUM=$(echo "$VITEST_PAREN" | awk '{sum+=$1} END {print sum}')
+            TOTAL=$((TOTAL + SUM))
+          fi
+
+          # Jest: "Ran 12 tests" або "12 tests passed."
+          JEST_COUNT=$(grep -Rho '[0-9]\+ tests' . | grep -o '^[0-9]\+')
+          if [ -n "$JEST_COUNT" ]; then
+            SUM=$(echo "$JEST_COUNT" | awk '{sum+=$1} END {print sum}')
+            TOTAL=$((TOTAL + SUM))
+          fi
+
+          # Mocha: "12 passing"
+          MOCHA_COUNT=$(grep -Rho '[0-9]\+ passing' . | grep -o '^[0-9]\+')
+          if [ -n "$MOCHA_COUNT" ]; then
+            SUM=$(echo "$MOCHA_COUNT" | awk '{sum+=$1} END {print sum}')
+            TOTAL=$((TOTAL + SUM))
+          fi
+
+          # If nothing is found → 0
           if [ -z "$TOTAL" ]; then TOTAL=0; fi
 
           echo "total_tests=$TOTAL" >> $GITHUB_OUTPUT
+          echo "✔ Total tests found: $TOTAL"
+
 
       - name: Update README.md with test badge
         if: github.ref == 'refs/heads/main'
