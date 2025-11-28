@@ -132,14 +132,6 @@ jobs:
             sed -i "1a <!-- TEST_BADGES_START -->\n${HEADER_SECTION}\n<!-- TEST_BADGES_END -->\n" README.md
           fi
 
-          # Update bottom summary
-          if grep -q "## 📊 Test Summary" README.md; then
-            sed -i "/## 📊 Test Summary/,\$d" README.md
-            echo -e "\n---\n\n${SUMMARY_SECTION}" >> README.md
-          else
-            echo -e "\n---\n\n${SUMMARY_SECTION}" >> README.md
-          fi
-
       - name: Commit & Push README.md
         if: github.ref == 'refs/heads/main'
         run: |
