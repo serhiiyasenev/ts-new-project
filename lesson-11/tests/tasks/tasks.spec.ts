@@ -281,4 +281,72 @@ describe("Tasks API (comprehensive)", () => {
       await request(app).get("/tasks?groupBy=invalid").expect(400);
     });
   });
+
+  describe("date filtering", () => {
+    it("filters tasks by dateFrom", async () => {
+      const task = await request(app)
+        .post("/tasks")
+        .send({ title: "Date Filter Task" })
+        .expect(201);
+
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const res = await request(app)
+        .get("/tasks")
+        .query({ dateFrom: yesterday.toISOString() })
+        .expect(200);
+
+      const taskIds = (res.body as TaskResponseDto[]).map((t) => t.id);
+      expect(taskIds).toContain(task.body.id);
+
+      await request(app).delete(`/tasks/${task.body.id}`).expect(204);
+    });
+
+    it("filters tasks by dateTo", async () => {
+      const task = await request(app)
+        .post("/tasks")
+        .send({ title: "Date Filter Task 2" })
+        .expect(201);
+
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const res = await request(app)
+        .get("/tasks")
+        .query({ dateTo: tomorrow.toISOString() })
+        .expect(200);
+
+      const taskIds = (res.body as TaskResponseDto[]).map((t) => t.id);
+      expect(taskIds).toContain(task.body.id);
+
+      await request(app).delete(`/tasks/${task.body.id}`).expect(204);
+    });
+
+    it("filters tasks by date range (dateFrom and dateTo)", async () => {
+      const task = await request(app)
+        .post("/tasks")
+        .send({ title: "Date Range Task" })
+        .expect(201);
+
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const res = await request(app)
+        .get("/tasks")
+        .query({
+          dateFrom: yesterday.toISOString(),
+          dateTo: tomorrow.toISOString(),
+        })
+        .expect(200);
+
+      const taskIds = (res.body as TaskResponseDto[]).map((t) => t.id);
+      expect(taskIds).toContain(task.body.id);
+
+      await request(app).delete(`/tasks/${task.body.id}`).expect(204);
+    });
+  });
 });

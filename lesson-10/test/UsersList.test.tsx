@@ -48,8 +48,8 @@ describe('Users', () => {
 
     expect(screen.getByText('john@example.com')).toBeInTheDocument();
     expect(screen.getByText('jane@example.com')).toBeInTheDocument();
-    expect(screen.getByText('✓ Active')).toBeInTheDocument();
-    expect(screen.getByText('✗ Inactive')).toBeInTheDocument();
+    expect(screen.getByText('Active')).toBeInTheDocument();
+    expect(screen.getByText('Inactive')).toBeInTheDocument();
   });
 
   it('should show loading state initially', () => {

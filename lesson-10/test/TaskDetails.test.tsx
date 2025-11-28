@@ -105,8 +105,8 @@ describe('TaskDetails', () => {
       expect(screen.getByText(/Back to Board/i)).toBeInTheDocument();
     });
 
-    const backLink = screen.getByText(/Back to Tasks/i);
-    expect(backLink).toHaveAttribute('href', '/tasks');
+    const backLink = screen.getByText(/Back to Board/i);
+    expect(backLink).toHaveAttribute('href', '/board');
   });
 
   it('should show "Task not found" when API returns null', async () => {

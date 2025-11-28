@@ -60,7 +60,11 @@ const Users = () => {
                 <Link to={`/users/${user.id}`}>{user.name}</Link>
               </td>
               <td>{user.email}</td>
-              <td>{user.isActive ? '✓ Active' : '✗ Inactive'}</td>
+              <td>
+                <span className={`status-badge ${user.isActive ? 'active' : 'inactive'}`}>
+                  {user.isActive ? 'Active' : 'Inactive'}
+                </span>
+              </td>
               <td>{new Date(user.createdAt).toLocaleDateString()}</td>
               <td className="actions-cell">
                 <Link to={`/users/${user.id}`} className="button-secondary">Edit</Link>
