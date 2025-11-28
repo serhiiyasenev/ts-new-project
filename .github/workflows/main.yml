@@ -11,8 +11,28 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: db_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: admin
+        options: >-
+          --health-cmd="pg_isready -U postgres -d db_test"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
     env:
       HUSKY: 0
+      NODE_ENV: test
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: admin
+      PGDATABASE: db_test
 
     steps:
       - name: Checkout repository
@@ -31,7 +51,6 @@ jobs:
           for pkg in $(find . -type f -name package.json); do
             project_dir=$(dirname "$pkg")
 
-            echo "Skipping unnecessary directories..."
             case "$project_dir" in
               *node_modules*|*dist*|*build*)
                 continue
@@ -45,11 +64,10 @@ jobs:
 
             cd "$project_dir"
 
-            echo "Check if tests are present..."
             HAS_TEST=$(jq -r '.scripts.test // empty' package.json)
 
             if [ -z "$HAS_TEST" ]; then
-              echo "⚠️ No test script found → skipping"
+              echo "⚠️ No test script → skipping"
               cd - > /dev/null
               continue
             fi
