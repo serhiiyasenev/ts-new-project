@@ -29,13 +29,13 @@ export const createUser = async (data: CreateUserData): Promise<User> => {
     return response.json();
 };
 
-export const fetchUserById = async (id: number): Promise<User> => {
-  const response = await fetch(`/api/users/${id}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch user');
-  }
-  const user = await response.json();
-  return user;
+export const fetchUserById = async (id: number): Promise<User | null> => {
+    const response = await fetch(`/api/users/${id}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch user');
+    }
+    const user = await response.json();
+    return user;
 };
 
 export const updateUser = async (id: number, data: Partial<User>): Promise<User> => {

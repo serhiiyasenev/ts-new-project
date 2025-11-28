@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import TaskDetails from '../src/pages/TaskDetails/TaskDetails';
+import type { Task } from '../src/types/task';
 import * as api from '../src/api';
 
 vi.mock('../src/api');
@@ -42,7 +43,7 @@ describe('TaskDetails', () => {
 
   it('should show loading state initially', () => {
     vi.mocked(api.fetchTaskById).mockImplementation(
-      () => new Promise(() => {}) // Never resolves
+      () => new Promise(() => {})
     );
 
     render(
@@ -104,7 +105,7 @@ describe('TaskDetails', () => {
   });
 
   it('should show "Task not found" when API returns null', async () => {
-    vi.mocked(api.fetchTaskById).mockResolvedValue(null as TaskDetails);
+    vi.mocked(api.fetchTaskById).mockResolvedValue(null);
 
     render(
       <MemoryRouter initialEntries={['/tasks/1']}>
@@ -120,15 +121,15 @@ describe('TaskDetails', () => {
   });
 
   it('renders fallbacks for missing fields', async () => {
-    const mockTask = {
+    const mockTask: Task = {
       id: 2,
       title: '',
       description: '',
-      status: '',
+      status: 'To Do',
       dueDate: '',
       createdAt: '',
     };
-    vi.mocked(api.fetchTaskById).mockResolvedValue(mockTask as TaskDetails);
+    vi.mocked(api.fetchTaskById).mockResolvedValue(mockTask);
 
     render(
       <MemoryRouter initialEntries={['/tasks/2']}>
@@ -140,6 +141,33 @@ describe('TaskDetails', () => {
 
     await waitFor(() => {
       expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+    });
+  });
+
+  it('renders unknown status class when status is empty', async () => {
+    const mockTask: Task = {
+      id: 3,
+      title: 'Empty Status',
+      description: 'No status here',
+      status: '' as unknown as Task['status'],
+      dueDate: '2025-12-31',
+      createdAt: '2025-11-17T10:00:00.000Z',
+    };
+    vi.mocked(api.fetchTaskById).mockResolvedValue(mockTask);
+
+    const { container } = render(
+      <MemoryRouter initialEntries={['/tasks/3']}>
+        <Routes>
+          <Route path="/tasks/:id" element={<TaskDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      const statusEl = container.querySelector('.task-status');
+      expect(statusEl).toBeTruthy();
+      expect(statusEl?.className).toContain('status-unknown');
+      expect(statusEl?.textContent).toBe('—');
     });
   });
 

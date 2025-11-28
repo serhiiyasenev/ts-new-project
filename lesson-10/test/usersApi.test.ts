@@ -7,7 +7,7 @@ describe('usersApi', () => {
   });
 
   it('fetchUsers returns list', async () => {
-    const users = [{ id: '1', name: 'A', createdAt: '2025-01-01' }];
+    const users = [{ id: 1, firstName: 'A', lastName: 'B', email: 'a@b.com', dateOfBirth: '1990-01-01', createdAt: '2025-01-01' }];
     const fetchMock = vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve(users) }));
     vi.stubGlobal('fetch', fetchMock as unknown as typeof globalThis.fetch);
 
@@ -24,12 +24,11 @@ describe('usersApi', () => {
   });
 
   it('createUser posts and returns created object', async () => {
-    const existing: Array<{ id: string }> = [{ id: '1' }];
+    const existing: Array<{ id: number }> = [{ id: 1 }];
     const fetchMock = vi.fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(existing) })
-      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ id: '2', name: 'new' }) });
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ id: 2, firstName: 'New', lastName: 'User', email: 'new@a.com', dateOfBirth: '1990-01-01', createdAt: '2025-01-01' }) });
     vi.stubGlobal('fetch', fetchMock as unknown as typeof globalThis.fetch);
-
     const res = await api.createUser({ firstName: 'New', lastName: 'User', email: 'a@b.com', dateOfBirth: '1990-01-01', createdAt: '2025-01-01' });
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
@@ -38,17 +37,17 @@ describe('usersApi', () => {
     const postOptions = calls[1][1] as Record<string, unknown>;
     const body = JSON.parse(postOptions.body as string);
     expect(typeof body.id).toBe('string');
-    expect(res).toEqual({ id: '2', name: 'new' });
+    expect(res).toEqual({ id: 2, firstName: 'New', lastName: 'User', email: 'new@a.com', dateOfBirth: '1990-01-01', createdAt: '2025-01-01' });
   });
 
   it('createUser works when no existing users', async () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve([]) })
-      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ id: '1', name: 'new' }) });
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ id: 1, firstName: 'new', lastName: 'User', email: 'a@b.com', dateOfBirth: '1990-01-01', createdAt: '2025-01-01' }) });
     vi.stubGlobal('fetch', fetchMock as unknown as typeof globalThis.fetch);
 
-    const res = await api.createUser({ name: 'new', email: 'a@b.com' });
-    expect(res).toEqual({ id: '1', name: 'new' });
+    const res = await api.createUser({ firstName: 'new', lastName: 'User', email: 'a@b.com', dateOfBirth: '1990-01-01', createdAt: '2025-01-01' });
+    expect(res).toEqual({ id: 1, firstName: 'new', lastName: 'User', email: 'a@b.com', dateOfBirth: '1990-01-01', createdAt: '2025-01-01' });
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
@@ -71,22 +70,21 @@ describe('usersApi', () => {
 
   it('fetchUserById returns object and handles 404', async () => {
     const fetchMock = vi.fn()
-      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ id: '5', name: 'hey' }) })
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ id: 5, firstName: 'hey', lastName: 'User', email: 'hey@a.com', dateOfBirth: '1990-01-01', createdAt: '2025-01-01' }) })
       .mockResolvedValueOnce({ ok: false });
     vi.stubGlobal('fetch', fetchMock as unknown as typeof globalThis.fetch);
-
     const res = await api.fetchUserById(5);
-    expect(res).toEqual({ id: '5', name: 'hey' });
+    expect(res).toEqual({ id: 5, firstName: 'hey', lastName: 'User', email: 'hey@a.com', dateOfBirth: '1990-01-01', createdAt: '2025-01-01' });
 
     await expect(api.fetchUserById(6)).rejects.toThrow('Failed to fetch user');
   });
 
   it('updateUser sends PUT and returns updated', async () => {
-    const fetchMock = vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ id: '9', name: 'Updated' }) }));
+    const fetchMock = vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ id: 9, firstName: 'Updated', lastName: 'User', email: 'u@a.com', dateOfBirth: '1990-01-01', createdAt: '2025-01-01' }) }));
     vi.stubGlobal('fetch', fetchMock as unknown as typeof globalThis.fetch);
 
     const res = await api.updateUser(9, { firstName: 'Updated' });
     expect(fetchMock).toHaveBeenCalledWith('/api/users/9', expect.objectContaining({ method: 'PUT' }));
-    expect(res).toEqual({ id: '9', name: 'Updated' });
+    expect(res).toEqual({ id: 9, firstName: 'Updated', lastName: 'User', email: 'u@a.com', dateOfBirth: '1990-01-01', createdAt: '2025-01-01' });
   });
 });

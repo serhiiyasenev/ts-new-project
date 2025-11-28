@@ -36,7 +36,8 @@ describe('tasksApi', () => {
 
     // first call to /api/tasks, second call to POST /api/tasks
     expect(fetchMock).toHaveBeenCalledTimes(2);
-    const postCall = (fetchMock.mock as Task).calls[1];
+    const calls = (fetchMock.mock as { calls: unknown[][] }).calls;
+    const postCall = calls[1] as [string, { body: string }];
     expect(postCall[0]).toEqual('/api/tasks');
     const body = JSON.parse(postCall[1].body);
     expect(typeof body.id).toBe('string');

@@ -29,7 +29,7 @@ export const createTask = async (data: CreateTaskData): Promise<Task> => {
     return response.json();
 };
 
-export const fetchTaskById = async (id: number): Promise<Task> => {
+export const fetchTaskById = async (id: number): Promise<Task | null> => {
   const response = await fetch(`/api/tasks/${id}`);
   if (!response.ok) {
     throw new Error('Failed to fetch task');

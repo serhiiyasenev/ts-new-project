@@ -106,7 +106,7 @@ describe('UserDetails', () => {
   });
 
   it('should show "User not found" when API returns null', async () => {
-    vi.mocked(api.fetchUserById).mockResolvedValue(null as UserDetails);
+    vi.mocked(api.fetchUserById).mockResolvedValue(null);
 
     render(
       <MemoryRouter initialEntries={['/users/1']}>
