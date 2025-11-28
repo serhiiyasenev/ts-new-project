@@ -34,7 +34,7 @@ const models: TsoaRoute.Models = {
             "description": {"dataType":"string"},
             "status": {"ref":"TaskStatus","required":true},
             "priority": {"ref":"TaskPriority","required":true},
-            "userId": {"dataType":"double"},
+            "userId": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "createdAt": {"dataType":"string","required":true},
             "updatedAt": {"dataType":"string","required":true},
         },
@@ -80,14 +80,14 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Partial_CreateUserDto_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"name":{"dataType":"string"},"email":{"dataType":"string"},"isActive":{"dataType":"boolean"}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "UpdateUserDto": {
-        "dataType": "refObject",
-        "properties": {
-            "name": {"dataType":"string"},
-            "email": {"dataType":"string"},
-            "isActive": {"dataType":"boolean"},
-        },
-        "additionalProperties": false,
+        "dataType": "refAlias",
+        "type": {"ref":"Partial_CreateUserDto_","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CreateTaskDto": {
@@ -97,7 +97,7 @@ const models: TsoaRoute.Models = {
             "description": {"dataType":"string"},
             "status": {"ref":"TaskStatus"},
             "priority": {"ref":"TaskPriority"},
-            "userId": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"undefined"}]},
+            "userId": {"dataType":"double"},
         },
         "additionalProperties": false,
     },
@@ -109,7 +109,7 @@ const models: TsoaRoute.Models = {
             "description": {"dataType":"string"},
             "status": {"ref":"TaskStatus"},
             "priority": {"ref":"TaskPriority"},
-            "userId": {"dataType":"double"},
+            "userId": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}]},
         },
         "additionalProperties": false,
     },
@@ -129,7 +129,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "title": {"dataType":"string"},
             "content": {"dataType":"string"},
-            "userId": {"dataType":"double"},
+            "actorUserId": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -184,7 +184,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsUserController_getUserById: Record<string, TsoaRoute.ParameterSchema> = {
-                id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
         };
         app.get('/users/:id',
             ...(fetchMiddlewares<RequestHandler>(UserController)),
@@ -244,7 +244,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsUserController_updateUser: Record<string, TsoaRoute.ParameterSchema> = {
-                id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
                 data: {"in":"body","name":"data","required":true,"ref":"UpdateUserDto"},
         };
         app.put('/users/:id',
@@ -275,7 +275,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsUserController_deleteUser: Record<string, TsoaRoute.ParameterSchema> = {
-                id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
         };
         app.delete('/users/:id',
             ...(fetchMiddlewares<RequestHandler>(UserController)),
@@ -297,7 +297,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: undefined,
+                successStatus: 204,
               });
             } catch (err) {
                 return next(err);
@@ -308,6 +308,7 @@ export function RegisterRoutes(app: Router) {
                 status: {"in":"query","name":"status","dataType":"string"},
                 priority: {"in":"query","name":"priority","dataType":"string"},
                 title: {"in":"query","name":"title","dataType":"string"},
+                userId: {"in":"query","name":"userId","dataType":"string"},
         };
         app.get('/tasks',
             ...(fetchMiddlewares<RequestHandler>(TaskController)),
@@ -337,7 +338,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsTaskController_getTaskById: Record<string, TsoaRoute.ParameterSchema> = {
-                id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
         };
         app.get('/tasks/:id',
             ...(fetchMiddlewares<RequestHandler>(TaskController)),
@@ -397,7 +398,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsTaskController_updateTask: Record<string, TsoaRoute.ParameterSchema> = {
-                id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
                 data: {"in":"body","name":"data","required":true,"ref":"UpdateTaskDto"},
         };
         app.put('/tasks/:id',
@@ -428,7 +429,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsTaskController_deleteTask: Record<string, TsoaRoute.ParameterSchema> = {
-                id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
         };
         app.delete('/tasks/:id',
             ...(fetchMiddlewares<RequestHandler>(TaskController)),
@@ -450,7 +451,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: undefined,
+                successStatus: 204,
               });
             } catch (err) {
                 return next(err);
@@ -490,7 +491,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsPostController_getPostById: Record<string, TsoaRoute.ParameterSchema> = {
-                id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
         };
         app.get('/posts/:id',
             ...(fetchMiddlewares<RequestHandler>(PostController)),
@@ -550,7 +551,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsPostController_updatePost: Record<string, TsoaRoute.ParameterSchema> = {
-                id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
                 data: {"in":"body","name":"data","required":true,"ref":"UpdatePostDto"},
         };
         app.put('/posts/:id',
@@ -581,7 +582,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsPostController_deletePost: Record<string, TsoaRoute.ParameterSchema> = {
-                id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
         };
         app.delete('/posts/:id',
             ...(fetchMiddlewares<RequestHandler>(PostController)),
@@ -603,7 +604,7 @@ export function RegisterRoutes(app: Router) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: undefined,
+                successStatus: 204,
               });
             } catch (err) {
                 return next(err);

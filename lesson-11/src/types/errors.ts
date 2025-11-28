@@ -7,9 +7,9 @@ export class ApiError extends Error {
   }
 }
 
-export class EmailAlreadyExistsError extends Error {
+export class EmailAlreadyExistsError extends ApiError {
   constructor() {
-    super("Email already exists");
+    super("Email already exists", 409);
     this.name = "EmailAlreadyExistsError";
   }
 }

@@ -43,7 +43,8 @@
 					},
 					"userId": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"nullable": true
 					},
 					"createdAt": {
 						"type": "string"
@@ -57,6 +58,7 @@
 					"title",
 					"status",
 					"priority",
+					"userId",
 					"createdAt",
 					"updatedAt"
 				],
@@ -166,7 +168,7 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"UpdateUserDto": {
+			"Partial_CreateUserDto_": {
 				"properties": {
 					"name": {
 						"type": "string"
@@ -179,7 +181,10 @@
 					}
 				},
 				"type": "object",
-				"additionalProperties": false
+				"description": "Make all properties in T optional"
+			},
+			"UpdateUserDto": {
+				"$ref": "#/components/schemas/Partial_CreateUserDto_"
 			},
 			"CreateTaskDto": {
 				"properties": {
@@ -222,7 +227,8 @@
 					},
 					"userId": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"nullable": true
 					}
 				},
 				"type": "object",
@@ -257,11 +263,14 @@
 					"content": {
 						"type": "string"
 					},
-					"userId": {
+					"actorUserId": {
 						"type": "number",
 						"format": "double"
 					}
 				},
+				"required": [
+					"actorUserId"
+				],
 				"type": "object",
 				"additionalProperties": false
 			}
@@ -382,8 +391,7 @@
 						"name": "id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				]
@@ -412,8 +420,7 @@
 						"name": "id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				],
@@ -432,7 +439,7 @@
 				"operationId": "DeleteUser",
 				"responses": {
 					"204": {
-						"description": "No content"
+						"description": "No Content"
 					}
 				},
 				"tags": [
@@ -445,8 +452,7 @@
 						"name": "id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				]
@@ -498,6 +504,14 @@
 						"schema": {
 							"type": "string"
 						}
+					},
+					{
+						"in": "query",
+						"name": "userId",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				]
 			},
@@ -509,7 +523,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/TaskResponseDto"
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/TaskResponseDto"
+										}
+									],
+									"nullable": true
 								}
 							}
 						}
@@ -557,8 +576,7 @@
 						"name": "id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				]
@@ -587,8 +605,7 @@
 						"name": "id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				],
@@ -607,7 +624,7 @@
 				"operationId": "DeleteTask",
 				"responses": {
 					"204": {
-						"description": "No content"
+						"description": "No Content"
 					}
 				},
 				"tags": [
@@ -620,8 +637,7 @@
 						"name": "id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				]
@@ -732,8 +748,7 @@
 						"name": "id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				]
@@ -762,8 +777,7 @@
 						"name": "id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				],
@@ -782,7 +796,7 @@
 				"operationId": "DeletePost",
 				"responses": {
 					"204": {
-						"description": "No content"
+						"description": "No Content"
 					}
 				},
 				"tags": [
@@ -795,8 +809,7 @@
 						"name": "id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				]

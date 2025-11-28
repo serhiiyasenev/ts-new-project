@@ -19,6 +19,7 @@ describe('Users', () => {
         lastName: 'Doe',
         email: 'john@example.com',
         dateOfBirth: '1990-01-15',
+        createdAt: '2025-11-20'
       },
       {
         id: 2,
@@ -26,6 +27,7 @@ describe('Users', () => {
         lastName: 'Smith',
         email: 'jane@example.com',
         dateOfBirth: '1992-05-20',
+        createdAt: '2025-11-20'
       },
     ];
 
@@ -77,6 +79,21 @@ describe('Users', () => {
     });
   });
 
+  it('shows default error text when rejection is not an Error instance', async () => {
+    // provide a non-Error rejection at runtime but keep TypeScript happy
+    vi.mocked(api.fetchUsers).mockRejectedValue('oops' as unknown as Error);
+
+    render(
+      <MemoryRouter>
+        <Users />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Failed to fetch users')).toBeInTheDocument();
+    });
+  });
+
   it('should render email links correctly', async () => {
     const mockUsers = [
       {
@@ -85,6 +102,7 @@ describe('Users', () => {
         lastName: 'Doe',
         email: 'john@example.com',
         dateOfBirth: '1990-01-15',
+        createdAt: '2025-11-20'
       },
     ];
 

@@ -29,10 +29,21 @@ export const createTask = async (data: CreateTaskData): Promise<Task> => {
     return response.json();
 };
 
-export const fetchTaskById = async (id: number): Promise<Task> => {
+export const fetchTaskById = async (id: number): Promise<Task | null> => {
   const response = await fetch(`/api/tasks/${id}`);
   if (!response.ok) {
     throw new Error('Failed to fetch task');
   }
   return await response.json();
+};
+export const updateTask = async (id: number, data: Partial<Task>): Promise<Task> => {
+  const response = await fetch(`/api/tasks/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to update task');
+  }
+  return response.json();
 };

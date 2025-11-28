@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import UserDetails from '../src/pages/UserDetails/UserDetails';
 import * as api from '../src/api';
@@ -18,6 +19,7 @@ describe('UserDetails', () => {
       lastName: 'Doe',
       email: 'john@example.com',
       dateOfBirth: '1990-01-15',
+      createdAt: '2025-11-20'
     };
 
     vi.mocked(api.fetchUserById).mockResolvedValue(mockUser);
@@ -82,6 +84,7 @@ describe('UserDetails', () => {
       lastName: 'Doe',
       email: 'john@example.com',
       dateOfBirth: '1990-01-15',
+      createdAt: '2025-11-20'
     };
 
     vi.mocked(api.fetchUserById).mockResolvedValue(mockUser);
@@ -100,5 +103,33 @@ describe('UserDetails', () => {
 
     const backLink = screen.getByText('Back to Users');
     expect(backLink).toHaveAttribute('href', '/users');
+  });
+
+  it('should show "User not found" when API returns null', async () => {
+    vi.mocked(api.fetchUserById).mockResolvedValue(null);
+
+    render(
+      <MemoryRouter initialEntries={['/users/1']}>
+        <Routes>
+          <Route path="/users/:id" element={<UserDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/User not found/i)).toBeInTheDocument();
+    });
+  });
+
+  it('does nothing when no id param is provided (loading stays true)', () => {
+    render(
+      <MemoryRouter initialEntries={['/users']}>
+        <Routes>
+          <Route path="/users" element={<UserDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText(/Loading/i)).toBeInTheDocument();
   });
 });

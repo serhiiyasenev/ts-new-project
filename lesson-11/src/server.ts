@@ -1,13 +1,12 @@
 import express, { NextFunction, Request, Response } from "express";
 import { RegisterRoutes } from "./routes-tsoa/routes";
 import { ApiError, EmailAlreadyExistsError } from "./types/errors";
+import { ValidateError } from "tsoa";
 import morgan from "morgan";
 import cors from "cors";
 import "./config/database";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./swagger/swagger.json";
-import open from "open";
-import fs from "fs";
 
 const app = express();
 const port = 3000;
@@ -31,7 +30,9 @@ RegisterRoutes(app);
 
 // Root route
 app.get("/", (_req: Request, res: Response) => {
-  res.json({ message: "API root. Use /users, /posts and /tasks for operations." });
+  res.json({
+    message: "API root. Use /users, /posts and /tasks for operations.",
+  });
 });
 
 // 404 handler
@@ -40,8 +41,16 @@ app.use((req: Request, res: Response) => {
 });
 
 // Error handler (must be last)
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
   console.error("Error:", err);
+
+  if (err instanceof ValidateError) {
+    const messages = Object.values(err.fields ?? {}).map(
+      (field) => field.message,
+    );
+    const details = messages.length ? messages.join("; ") : "Validation failed";
+    return res.status(400).json({ message: details });
+  }
 
   if (err instanceof EmailAlreadyExistsError) {
     return res.status(409).json({ message: err.message });
@@ -54,17 +63,12 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ message: "Internal server error" });
 });
 
-const firstRunFlag = ".first-run";;
-
+// Start server
 if (process.env.NODE_ENV !== "test") {
-if (!fs.existsSync(firstRunFlag)) {
-  fs.writeFileSync(firstRunFlag, "initialized");
-  open(`http://localhost:${port}/swagger`);
+  app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+    console.log(`Swagger UI: http://localhost:${port}/swagger`);
+  });
 }
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
-}
-    
 export default app;

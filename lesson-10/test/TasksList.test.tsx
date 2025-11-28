@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import TasksList from '../src/pages/TasksList/TasksList';
+import type { Task } from '../src/types/task';
 import * as api from '../src/api';
 import '@testing-library/jest-dom';
 
@@ -79,6 +80,83 @@ describe('TasksList', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Failed to fetch tasks/i)).toBeInTheDocument();
+    });
+  });
+
+  it('shows empty column when a status has no tasks', async () => {
+    const mockTasks = [
+      {
+        id: 3,
+        title: 'In Progress Task',
+        description: 'Desc',
+        status: 'In Progress' as const,
+        dueDate: '2025-12-10',
+        createdAt: '2025-11-15T10:00:00.000Z'
+      }
+    ];
+
+    vi.mocked(api.fetchTasks).mockResolvedValue(mockTasks);
+
+    render(
+      <MemoryRouter>
+        <TasksList />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      // The To Do column should show the empty-column element
+      expect(screen.getAllByText(/No tasks/i).length).toBeGreaterThan(0);
+    });
+  });
+
+  it('shows empty columns for other statuses when only Done tasks exist', async () => {
+    const mockTasks = [
+      {
+        id: 4,
+        title: 'Done Task',
+        description: 'Completed',
+        status: 'Done' as const,
+        dueDate: '2025-12-20',
+        createdAt: '2025-11-15T10:00:00.000Z'
+      }
+    ];
+
+    vi.mocked(api.fetchTasks).mockResolvedValue(mockTasks);
+
+    render(
+      <MemoryRouter>
+        <TasksList />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      // There should be an empty placeholder for at least one other column
+      expect(screen.getAllByText(/No tasks/i).length).toBeGreaterThan(0);
+    });
+  });
+
+  it('handles unknown statuses by creating a new column bucket', async () => {
+    const mockTasks = [
+      {
+        id: 5,
+        title: 'Blocked Task',
+        description: 'Needs attention',
+        status: 'Blocked',
+        dueDate: '2025-12-25',
+        createdAt: '2025-11-15T10:00:00.000Z'
+      }
+    ];
+
+    vi.mocked(api.fetchTasks).mockResolvedValue(mockTasks as unknown as Task[]);
+
+    render(
+      <MemoryRouter>
+        <TasksList />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Tasks')).toBeInTheDocument();
     });
   });
 });

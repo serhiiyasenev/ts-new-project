@@ -1,30 +1,43 @@
+import { Op } from "sequelize";
 import { PostModel } from "../models/post.model";
 import { TaskModel } from "../models/task.model";
 import { UserModel } from "../models/user.model";
-import { UserFilters } from "../schemas/users";
+import { CreateUserDto, UpdateUserDto } from "../dtos/userRequest.dto";
 import { EmailAlreadyExistsError } from "../types/errors";
-import { Op } from "sequelize";
+import { UserFilters } from "../types/filters";
+import { mapCreateUserDtoToPayload } from "../helpers/user";
 
-export const getAllUsers = async (filters?: UserFilters): Promise<UserModel[]> => { const where: any = {};
+export const getAllUsers = async (
+  filters?: UserFilters,
+): Promise<UserModel[]> => {
+  const where: Record<string, unknown> = {};
   if (filters?.email) {
     where.email = { [Op.iLike]: `%${filters.email}%` };
   }
   if (filters?.name) {
     where.name = { [Op.iLike]: `%${filters.name}%` };
   }
+  if (filters?.isActive) {
+    where.isActive = filters.isActive;
+  }
   return await UserModel.findAll({ where });
 };
 
-export const createUser = async (data: Partial<UserModel>) => {
-  try {
-    return await UserModel.create(data);
-  } catch (err: any) {
-    if (err.name === "SequelizeUniqueConstraintError") {
-      throw new EmailAlreadyExistsError();
-    }
-    console.error("DB error:", err);
-    throw err;
+const ensureEmailUnique = async (email: string, excludeUserId?: number) => {
+  const where: Record<string, unknown> = { email };
+  if (excludeUserId) {
+    where.id = { [Op.ne]: excludeUserId };
   }
+  const existing = await UserModel.findOne({ where });
+  if (existing) {
+    throw new EmailAlreadyExistsError();
+  }
+};
+
+export const createUser = async (data: CreateUserDto): Promise<UserModel> => {
+  await ensureEmailUnique(data.email);
+  const payload = mapCreateUserDtoToPayload(data);
+  return await UserModel.create(payload);
 };
 
 export const getUserById = async (id: number): Promise<UserModel | null> => {
@@ -35,22 +48,21 @@ export const getUserById = async (id: number): Promise<UserModel | null> => {
       },
       {
         model: PostModel,
-      }
-    ]
+      },
+    ],
   });
 };
 
-export const updateUser = async (id: number, updatedData: Partial<UserModel>): Promise<UserModel | null> => {
+export const updateUser = async (
+  id: number,
+  updatedData: UpdateUserDto,
+): Promise<UserModel | null> => {
   const user = await UserModel.findByPk(id);
   if (!user) return null;
-  try {
-    return await user.update(updatedData);
-  } catch (err: any) {
-    if (err.name === "SequelizeUniqueConstraintError") {
-      throw new EmailAlreadyExistsError();
-    }
-    throw err;
+  if (updatedData.email) {
+    await ensureEmailUnique(updatedData.email, id);
   }
+  return await user.update(updatedData);
 };
 
 export const deleteUser = async (id: number): Promise<boolean> => {
