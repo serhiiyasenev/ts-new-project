@@ -17,7 +17,7 @@ import {
   createTaskSchema,
   updateTaskSchema,
 } from "../schemas/tasks";
-import { ApiError } from "../types/errors";
+import { ApiError } from "@shared/api.types";
 import {
   mapTaskModelToDto,
   TaskResponseDto,

@@ -1,4 +1,4 @@
-import { TaskPriority, TaskStatus } from "../schemas/tasks";
+import { TaskPriority, TaskStatus } from "./task.types";
 
 export interface UserFilters {
   name?: string;

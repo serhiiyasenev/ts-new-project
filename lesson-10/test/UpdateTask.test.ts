@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { TaskStatus, TaskPriority } from "../src/types";
+import { TaskStatus, TaskPriority } from "@shared/task.types";
 import { createMockResponse } from "./helpers/mockResponse";
 import { updateTask } from "../src/api/tasks.api";
 

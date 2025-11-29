@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { TaskStatus, TaskPriority } from "../types";
+import { TaskStatus, TaskPriority } from "@shared/task.types";
 
 export const taskSchema = z.object({
   title: z.string().min(1, "Title is required"),

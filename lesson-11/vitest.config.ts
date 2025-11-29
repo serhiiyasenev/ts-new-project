@@ -4,8 +4,9 @@ import path from "path";
 export default defineConfig({
   resolve: {
     alias: {
-      "@shared": path.resolve(__dirname, "../shared/types"),
+      "@shared": path.resolve(__dirname, "../shared"),
     },
+    extensions: [".ts", ".tsx", ".js", ".json"],
   },
   test: {
     globals: true,

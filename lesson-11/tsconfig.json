@@ -5,7 +5,6 @@
     "moduleResolution": "node",
     "types": ["vitest", "node"],
 
-    "rootDir": ".",
     "outDir": "./dist",
 
     "strict": true,
@@ -24,9 +23,9 @@
 
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["shared/*"]
+      "@shared/*": ["../shared/*"]
     }
   },
-  "include": ["src", "tests", "shared"],
+  "include": ["src", "tests", "../shared"],
   "exclude": ["dist", "node_modules"]
 }

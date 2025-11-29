@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import './PostDetails.css';
-import type { Post, User } from "../../types";
+import type { Post } from "@shared/post.types";
 import { fetchPostById, updatePost, deletePost, fetchUsers } from "../../api";
 import { postSchema, type PostFormFields } from "../../schema/postSchema";
+import type { User } from "@shared/user.types";
 
 const PostDetails = () => {
   const { id } = useParams<{ id: string }>();

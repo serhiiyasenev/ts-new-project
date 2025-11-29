@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { ApiError } from "../types/errors";
+import { ApiError, sendError } from "@shared/api.types";
 import { logger } from "./logger";
 import { ZodError } from "zod";
-import { sendError } from "../utils/apiResponse";
 
 /**
  * Global error handling middleware

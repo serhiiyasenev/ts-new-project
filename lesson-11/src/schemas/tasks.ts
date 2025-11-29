@@ -37,8 +37,8 @@ const baseTaskSchema = z.object({
     .max(5000, "Description must not exceed 5000 characters")
     .trim()
     .optional(),
-  status: z.nativeEnum(TaskStatus).optional(),
-  priority: z.nativeEnum(TaskPriority).optional(),
+  status: z.enum(TaskStatus).optional(),
+  priority: z.enum(TaskPriority).optional(),
   userId: z
     .union([z.number().int().positive("User ID must be positive"), z.null()])
     .optional()
@@ -46,8 +46,8 @@ const baseTaskSchema = z.object({
 });
 
 export const createTaskSchema = baseTaskSchema.extend({
-  status: z.nativeEnum(TaskStatus).default(TaskStatus.Todo),
-  priority: z.nativeEnum(TaskPriority).default(TaskPriority.Medium),
+  status: z.enum(TaskStatus).default(TaskStatus.Todo),
+  priority: z.enum(TaskPriority).default(TaskPriority.Medium),
 });
 
 export const updateTaskSchema = baseTaskSchema.partial().refine(
@@ -70,8 +70,8 @@ export function validateStatusTransition(
 
 export const statusTransitionSchema = z
   .object({
-    currentStatus: z.nativeEnum(TaskStatus),
-    newStatus: z.nativeEnum(TaskStatus),
+    currentStatus: z.enum(TaskStatus),
+    newStatus: z.enum(TaskStatus),
   })
   .refine(
     (data) => validateStatusTransition(data.currentStatus, data.newStatus),

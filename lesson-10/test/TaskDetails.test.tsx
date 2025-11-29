@@ -2,8 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import TaskDetails from '../src/pages/TaskDetails/TaskDetails';
-import type { Task } from '../src/types/task';
-import { TaskStatus, TaskPriority } from '../src/types';
+import { TaskStatus, TaskPriority, Task } from '@shared/task.types';
 import * as api from '../src/api';
 
 vi.mock('../src/api');

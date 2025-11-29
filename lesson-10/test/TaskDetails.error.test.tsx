@@ -4,7 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import * as api from '../src/api'
-import { TaskStatus, TaskPriority } from '../src/types'
+import { TaskStatus, TaskPriority } from '@shared/task.types';
 
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async () => {

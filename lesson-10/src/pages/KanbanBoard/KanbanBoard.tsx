@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { fetchTasksGrouped, updateTask, TasksByStatus, fetchUsers } from '../../api';
-import { Task, TaskStatus, User } from '../../types';
+import { Task, TaskStatus } from '@shared/task.types';
+import { User } from '@shared/user.types';
 import './KanbanBoard.css';
 
 const KanbanBoard = () => {

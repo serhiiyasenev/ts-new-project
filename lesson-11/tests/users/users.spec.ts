@@ -5,7 +5,7 @@ import { UserController } from "../../src/controllers/UserController";
 import * as userService from "../../src/services/users";
 import { UserModel } from "../../src/models/user.model";
 import { CreateUserDto } from "../../src/dtos/userRequest.dto";
-import { ApiError } from "../../src/types/errors";
+import { ApiError } from "@shared/api.types";
 import { UserResponseDto } from "../../src/dtos/userResponse.dto";
 
 describe("Users API (comprehensive)", () => {

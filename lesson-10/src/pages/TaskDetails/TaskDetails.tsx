@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { Task, User } from '../../types';
+import type { Task } from '@shared/task.types';
 import './TaskDetails.css';
 import { fetchTaskById, updateTask, deleteTask, fetchUsers } from '../../api';
 import { taskSchema, type TaskFormFields } from '../../schema/taskSchema';
+import { User } from '@shared/user.types';
 
 const TaskDetails = () => {
   const { id } = useParams<{ id: string }>();

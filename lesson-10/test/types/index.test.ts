@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { Task, TaskStatus, TaskPriority, User, Post } from "../../src/types";
+import { Task, TaskStatus, TaskPriority } from "@shared/task.types";
+import { User } from "@shared/user.types";
+import { Post } from "@shared/post.types";
 
 describe("Type exports", () => {
   it("should export Task types", () => {

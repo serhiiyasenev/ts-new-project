@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import './PostCreate.css';
 import { createPost, fetchUsers } from "../../api";
 import { postSchema, type PostFormFields } from "../../schema/postSchema";
-import type { User } from "../../types";
+import type { User } from "@shared/user.types";
 
 const PostCreate = () => {
   const [users, setUsers] = useState<User[]>([]);

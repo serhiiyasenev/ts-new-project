@@ -1,4 +1,4 @@
-import { PostFilters } from "../../types/filters";
+import { PostFilters } from "@shared/filters";
 
 export const buildPostFilter = (params: {
   title?: string;

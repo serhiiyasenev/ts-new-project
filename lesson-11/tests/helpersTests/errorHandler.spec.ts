@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { Request, Response, NextFunction } from "express";
 import { errorHandler } from "../../src/helpers/errorHandler";
-import { ApiError } from "../../src/types/errors";
+import { ApiError } from "@shared/api.types";
 import { ZodError, z } from "zod";
 
 describe("errorHandler", () => {

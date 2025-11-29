@@ -17,7 +17,7 @@ import {
   createPostSchema,
   updatePostSchema,
 } from "../schemas/posts";
-import { ApiError } from "../types/errors";
+import { ApiError } from "@shared/api.types";
 import { PostResponseDto, mapPostModelToDto } from "../dtos/postResponse.dto";
 import {
   validateNumericId,

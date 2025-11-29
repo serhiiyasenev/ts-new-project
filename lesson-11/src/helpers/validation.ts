@@ -1,5 +1,5 @@
 import { ZodError, z } from "zod";
-import { ApiError } from "../types/errors";
+import { ApiError } from "@shared/api.types";
 
 const formatZodError = (error: ZodError) =>
   error.issues.map((issue) => issue.message).join("; ");

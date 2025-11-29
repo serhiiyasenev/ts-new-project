@@ -1,9 +1,9 @@
 import { Op } from "sequelize";
 import { PostModel } from "../models/post.model";
 import { UserModel } from "../models/user.model";
-import { PostFilters } from "../types/filters";
+import { PostFilters } from "@shared/filters";
 import { CreatePostDto } from "../dtos/postRequest.dto";
-import { ApiError } from "../types/errors";
+import { ApiError } from "@shared/api.types";
 import { assertUserExists } from "../helpers/user";
 import { mapCreatePostDtoToPayload } from "../helpers/post";
 

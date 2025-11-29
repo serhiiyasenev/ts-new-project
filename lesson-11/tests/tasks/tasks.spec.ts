@@ -3,7 +3,7 @@ import app from "../../src/server";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { TaskController } from "../../src/controllers/TaskController";
 import * as taskService from "../../src/services/tasks";
-import { ApiError } from "../../src/types/errors";
+import { ApiError } from "@shared/api.types";
 import { TaskResponseDto } from "../../src/dtos/taskResponse.dto";
 
 describe("Tasks API (comprehensive)", () => {

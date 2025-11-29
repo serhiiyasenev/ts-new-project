@@ -17,7 +17,7 @@ import {
   queryUsersSchema,
   updateUserSchema,
 } from "../schemas/users";
-import { ApiError } from "../types/errors";
+import { ApiError } from "@shared/api.types";
 import { UserResponseDto, mapUserModelToDto } from "../dtos/userResponse.dto";
 import {
   validateNumericId,

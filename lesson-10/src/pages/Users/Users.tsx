@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Users.css";
-import type { User } from "../../types";
+import type { User } from "@shared/user.types";
 import { fetchUsers, deleteUser } from "../../api";
 
 const Users = () => {

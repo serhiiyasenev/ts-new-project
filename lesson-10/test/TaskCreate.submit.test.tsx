@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import TaskCreate from '../src/pages/TaskCreate/TaskCreate'
 import * as api from '../src/api'
-import { TaskStatus, TaskPriority } from '../src/types'
+import { TaskStatus, TaskPriority } from '@shared/task.types';
 
 vi.mock('../src/api')
 const mockNavigate = vi.fn()

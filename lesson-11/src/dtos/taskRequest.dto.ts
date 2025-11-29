@@ -1,4 +1,3 @@
-// Import enums from response DTO to avoid duplication
 import { TaskPriority, TaskStatus } from "./taskResponse.dto";
 
 export interface CreateTaskDto {

@@ -1,7 +1,7 @@
 import { Op } from "sequelize";
 import { TaskModel } from "../models/task.model";
 import { UserModel } from "../models/user.model";
-import { TaskFilters } from "../types/filters";
+import { TaskFilters } from "@shared/filters";
 import { CreateTaskDto, UpdateTaskDto } from "../dtos/taskRequest.dto";
 import { assertUserExists } from "../helpers/user";
 import { mapCreateTaskDtoToPayload } from "../helpers/task";

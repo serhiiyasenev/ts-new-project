@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import './UserDetails.css';
-import type { User } from "../../types";
+import type { User } from "@shared/user.types";
 import { fetchUserById, updateUser, deleteUser } from "../../api";
 import { userSchema, type UserFormFields } from "../../schema/userSchema";
 

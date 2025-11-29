@@ -1,4 +1,4 @@
-import { TaskFilters } from "../../types/filters";
+import { TaskFilters } from "@shared/filters";
 import { TaskPriority, TaskStatus } from "../../schemas/tasks";
 
 export interface TaskQueryParams {

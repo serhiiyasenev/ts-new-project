@@ -1,4 +1,4 @@
-import { UserFilters } from "../../types/filters";
+import { UserFilters } from "@shared/filters";
 
 export const buildUserFilter = (params: {
   name?: string;

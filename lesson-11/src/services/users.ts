@@ -3,8 +3,8 @@ import { PostModel } from "../models/post.model";
 import { TaskModel } from "../models/task.model";
 import { UserModel } from "../models/user.model";
 import { CreateUserDto, UpdateUserDto } from "../dtos/userRequest.dto";
-import { EmailAlreadyExistsError } from "../types/errors";
-import { UserFilters } from "../types/filters";
+import { EmailAlreadyExistsError } from "@shared/api.types";
+import { UserFilters } from "@shared/filters";
 import { mapCreateUserDtoToPayload } from "../helpers/user";
 
 export const getAllUsers = async (

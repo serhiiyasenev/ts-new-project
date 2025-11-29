@@ -1,15 +1,7 @@
-/**
- * Base API Client
- * Provides type-safe HTTP methods with standardized error handling
- */
-
-import { ApiSuccess, ApiError } from "@shared/api.types";
+import { ApiSuccess, ApiErrorResponse } from "@shared/api.types";
 
 const API_BASE = "/api";
 
-/**
- * Custom API Error class
- */
 export class ApiRequestError extends Error {
   constructor(
     message: string,
@@ -21,21 +13,17 @@ export class ApiRequestError extends Error {
   }
 }
 
-/**
- * Handle API response and extract data
- */
 async function handleResponse<T>(response: Response): Promise<T> {
   const contentType = response.headers.get("content-type");
   const isJson = contentType?.includes("application/json");
 
-  // Handle 204 No Content
   if (response.status === 204) {
     return undefined as T;
   }
 
   if (!response.ok) {
     if (isJson) {
-      const errorData = (await response.json()) as ApiError;
+      const errorData = (await response.json()) as ApiErrorResponse;
       throw new ApiRequestError(
         errorData.message || `HTTP ${response.status}`,
         response.status,
@@ -54,14 +42,13 @@ async function handleResponse<T>(response: Response): Promise<T> {
 
   const jsonData = await response.json();
 
-  // Handle standardized API response format
   if (
     typeof jsonData === "object" &&
     jsonData !== null &&
     "success" in jsonData
   ) {
-    const apiResponse = jsonData as ApiSuccess<T> | ApiError;
-    if (apiResponse.success) {
+    const apiResponse = jsonData as ApiSuccess<T> | ApiErrorResponse;
+    if (apiResponse.success === true) {
       return apiResponse.data;
     } else {
       throw new ApiRequestError(
@@ -72,13 +59,9 @@ async function handleResponse<T>(response: Response): Promise<T> {
     }
   }
 
-  // Fallback for non-standardized responses
   return jsonData as T;
 }
 
-/**
- * GET request
- */
 export async function get<T>(
   endpoint: string,
   params?: Record<string, string | number | boolean | undefined>
@@ -97,9 +80,6 @@ export async function get<T>(
   return handleResponse<T>(response);
 }
 
-/**
- * POST request
- */
 export async function post<T, D = unknown>(
   endpoint: string,
   data?: D
@@ -112,9 +92,6 @@ export async function post<T, D = unknown>(
   return handleResponse<T>(response);
 }
 
-/**
- * PUT request
- */
 export async function put<T, D = unknown>(
   endpoint: string,
   data: D
@@ -127,9 +104,6 @@ export async function put<T, D = unknown>(
   return handleResponse<T>(response);
 }
 
-/**
- * DELETE request
- */
 export async function del<T = void>(endpoint: string): Promise<T> {
   const response = await fetch(`${API_BASE}${endpoint}`, {
     method: "DELETE",

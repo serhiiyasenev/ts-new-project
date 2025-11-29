@@ -6,8 +6,8 @@ import './TaskCreate.css';
 import { createTask, fetchUsers } from '../../api';
 import { taskSchema } from '../../schema/taskSchema';
 import type { TaskFormFields } from '../../schema/taskSchema';
-import type { User } from '../../types';
-import { TaskStatus, TaskPriority } from '../../types';
+import type { User } from '@shared/user.types';
+import { TaskStatus, TaskPriority } from '@shared/task.types';
 
 const TaskCreate = () => {
   const [users, setUsers] = useState<User[]>([]);
