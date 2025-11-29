@@ -14,15 +14,11 @@ const CreateUser = () => {
     const navigate = useNavigate();
     
     const onSubmit = async (data: UserFormFields) => {
-      const payload = {
-        ...data,
-      createdAt: new Date().toISOString()
-      };
       try {
-        await createUser(payload);
+        await createUser(data);
         navigate("/users");
       } catch (error) {
-        console.error("Error creating user:", error);
+        alert(error instanceof Error ? error.message : "Error creating user");
       }
     }
 
@@ -31,15 +27,9 @@ const CreateUser = () => {
       <h1>Create New User</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="user-form">
         <div className="form-group">
-          <label htmlFor="firstName">First Name:</label>
-          <input id="firstName" type="text" {...register("firstName")} />
-          <div className="error">{errors.firstName?.message}</div>
-        </div>
-        
-        <div className="form-group">
-          <label htmlFor="lastName">Last Name:</label>
-          <input id="lastName" type="text" {...register("lastName")} />
-          <div className="error">{errors.lastName?.message}</div>
+          <label htmlFor="name">Name:</label>
+          <input id="name" type="text" {...register("name")} />
+          <div className="error">{errors.name?.message}</div>
         </div>
         
         <div className="form-group">
@@ -49,9 +39,10 @@ const CreateUser = () => {
         </div>
         
         <div className="form-group">
-          <label htmlFor="dateOfBirth">Date of Birth:</label>
-          <input id="dateOfBirth" type="date" {...register("dateOfBirth")} />
-          <div className="error">{errors.dateOfBirth?.message}</div>
+          <label htmlFor="isActive">
+            <input id="isActive" type="checkbox" {...register("isActive")} defaultChecked />
+            Active
+          </label>
         </div>
         
         <div className="form-actions">

@@ -1,7 +1,7 @@
 import { CreationAttributes } from "sequelize";
 import { CreateUserDto } from "../dtos/userRequest.dto";
 import { UserModel } from "../models/user.model";
-import { ApiError } from "../types/errors";
+import { ApiError } from "@shared/api.types";
 
 export const mapCreateUserDtoToPayload = (
   data: CreateUserDto,

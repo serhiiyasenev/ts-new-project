@@ -17,11 +17,15 @@ import {
   queryUsersSchema,
   updateUserSchema,
 } from "../schemas/users";
-import { ApiError } from "../types/errors";
+import { ApiError } from "@shared/api.types";
 import { UserResponseDto, mapUserModelToDto } from "../dtos/userResponse.dto";
-import { validateNumericId, validateWithSchema } from "../helpers/validation";
+import {
+  validateNumericId,
+  validateWithSchema,
+  ensureNotEmpty,
+} from "../helpers/validation";
 import { CreateUserDto, UpdateUserDto } from "../dtos/userRequest.dto";
-import { UserFilters } from "../types/filters";
+import { buildUserFilter } from "../services/filters/buildUserFilter";
 
 @Route("users")
 @Tags("Users")
@@ -37,11 +41,11 @@ export class UserController extends Controller {
       { name, email, isActive },
       "Invalid user query parameters",
     );
-    const filters: UserFilters = {
+    const filters = buildUserFilter({
       name: query.name,
       email: query.email,
       isActive: query.isActive,
-    };
+    });
     const users = await userService.getAllUsers(filters);
     return users.map(mapUserModelToDto);
   }
@@ -77,14 +81,9 @@ export class UserController extends Controller {
     @Body() data: UpdateUserDto,
   ): Promise<UserResponseDto> {
     const userId = validateNumericId(id, "User id");
-    const payload = validateWithSchema(
-      updateUserSchema,
-      data,
-      "Invalid user update payload",
+    const payload = ensureNotEmpty(
+      validateWithSchema(updateUserSchema, data, "Invalid user update payload"),
     );
-    if (!Object.keys(payload).length) {
-      throw new ApiError("Update payload cannot be empty", 400);
-    }
     const updated = await userService.updateUser(userId, payload);
     if (!updated) {
       throw new ApiError("User not found", 404);

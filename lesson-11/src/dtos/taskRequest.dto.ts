@@ -1,13 +1,17 @@
-import { TaskPriority, TaskStatus } from "../schemas/tasks";
+import { TaskPriority, TaskStatus } from "./taskResponse.dto";
 
 export interface CreateTaskDto {
   title: string;
   description?: string;
   status?: TaskStatus;
   priority?: TaskPriority;
-  userId?: number;
+  userId?: number | null;
 }
 
-export interface UpdateTaskDto extends Partial<Omit<CreateTaskDto, "userId">> {
+export interface UpdateTaskDto {
+  title?: string;
+  description?: string;
+  status?: TaskStatus;
+  priority?: TaskPriority;
   userId?: number | null;
 }

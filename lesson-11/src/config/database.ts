@@ -25,7 +25,7 @@ sequelize
 
 if (process.env.NODE_ENV !== "test") {
   sequelize
-    .sync({ alter: true })
+    .sync({ force: true }) // TEMPORARY: force recreate to fix enum - WILL DELETE ALL DATA!
     .then(() => {
       console.log("Database synchronized successfully.");
     })

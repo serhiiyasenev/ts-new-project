@@ -1,4 +1,4 @@
-import { TaskPriority, TaskStatus } from "../schemas/tasks";
+import { TaskPriority, TaskStatus } from "./task.types";
 
 export interface UserFilters {
   name?: string;
@@ -11,6 +11,8 @@ export interface TaskFilters {
   priority?: TaskPriority[];
   title?: string;
   userId?: number;
+  dateFrom?: string;
+  dateTo?: string;
 }
 
 export interface PostFilters {

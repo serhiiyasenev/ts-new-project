@@ -1,7 +1,7 @@
 import { Op } from "sequelize";
 import { TaskModel } from "../models/task.model";
 import { UserModel } from "../models/user.model";
-import { TaskFilters } from "../types/filters";
+import { TaskFilters } from "@shared/filters";
 import { CreateTaskDto, UpdateTaskDto } from "../dtos/taskRequest.dto";
 import { assertUserExists } from "../helpers/user";
 import { mapCreateTaskDtoToPayload } from "../helpers/task";
@@ -21,6 +21,16 @@ export const getAllTasks = async (
   }
   if (filters?.userId) {
     where.userId = filters.userId;
+  }
+  if (filters?.dateFrom || filters?.dateTo) {
+    const dateFilter: Record<symbol, Date> = {};
+    if (filters.dateFrom) {
+      dateFilter[Op.gte] = new Date(filters.dateFrom);
+    }
+    if (filters.dateTo) {
+      dateFilter[Op.lte] = new Date(filters.dateTo);
+    }
+    where.createdAt = dateFilter;
   }
   return await TaskModel.findAll({
     where,

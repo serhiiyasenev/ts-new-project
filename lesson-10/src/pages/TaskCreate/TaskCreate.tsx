@@ -1,32 +1,44 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import './TaskCreate.css';
-import { createTask } from '../../api';
+import { createTask, fetchUsers } from '../../api';
 import { taskSchema } from '../../schema/taskSchema';
 import type { TaskFormFields } from '../../schema/taskSchema';
+import type { User } from '@shared/user.types';
+import { TaskStatus, TaskPriority } from '@shared/task.types';
 
 const TaskCreate = () => {
-  const { register, handleSubmit, formState: { isValid, errors } } = useForm<TaskFormFields>({
-    mode: 'onTouched',
+  const [users, setUsers] = useState<User[]>([]);
+  const { register, handleSubmit, formState: { errors } } = useForm<TaskFormFields>({
+    mode: 'onChange',
     resolver: zodResolver(taskSchema),
     defaultValues: {
-      status: 'To Do',
+      title: '',
+      description: '',
+      status: TaskStatus.Todo,
+      priority: TaskPriority.Medium,
+      userId: '',
     },
   });
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    fetchUsers().then(setUsers).catch(console.error);
+  }, []);
+
   const onSubmit = async (data: TaskFormFields) => {
-    const payload = {
-      ...data,
-    createdAt: new Date().toISOString()
-    };
     try {
-      await createTask(payload);
-      navigate("/tasks");
+      const taskData = {
+        ...data,
+        userId: data.userId && data.userId !== "" ? Number(data.userId) : undefined
+      };
+      await createTask(taskData);
+      navigate("/board");
     } catch (error) {
-      console.error("Error creating task:", error);
+      alert(error instanceof Error ? error.message : "Error creating task");
     }
   }
 
@@ -64,30 +76,39 @@ const TaskCreate = () => {
         <div className="form-group">
           <label htmlFor="status">Status:</label>
           <select id="status" {...register('status')}>
-            <option value="To Do">To Do</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Done">Done</option>
+            <option value="todo">To Do</option>
+            <option value="in_progress">In Progress</option>
+            <option value="review">Review</option>
+            <option value="done">Done</option>
           </select>
           <div className="error">{errors.status?.message}</div>
         </div>
 
         <div className="form-group">
-          <label htmlFor="dueDate">Due Date:</label>
-          <input
-            id="dueDate"
-            type="date"
-            {...register('dueDate')}
-          />
-          {errors.dueDate && (
-            <div className="error">{errors.dueDate.message}</div>
-          )}
+          <label htmlFor="priority">Priority:</label>
+          <select id="priority" {...register('priority')}>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+          <div className="error">{errors.priority?.message}</div>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="userId">Assign to User (optional):</label>
+          <select id="userId" {...register('userId')}>
+            <option value="">None</option>
+            {users.map(user => (
+              <option key={user.id} value={user.id}>{user.name}</option>
+            ))}
+          </select>
         </div>
 
         <div className="form-actions">
-          <button type="button" onClick={() => navigate('/tasks')} className="button-secondary">
+          <button type="button" onClick={() => navigate('/board')} className="button-secondary">
             Cancel
           </button>
-          <button type="submit" disabled={!isValid} className="button-primary">
+          <button type="submit" className="button-primary">
             Create Task
           </button>
         </div>
