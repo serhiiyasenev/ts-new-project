@@ -1,29 +1,13 @@
-export type TaskStatus = "todo" | "in_progress" | "review" | "done";
-export type TaskPriority = "low" | "medium" | "high";
+/**
+ * @deprecated Use shared types from @shared/task.types instead
+ */
 
-export type Task = {
-  id: number;
-  title: string;
-  description?: string;
-  status: TaskStatus;
-  priority: TaskPriority;
-  userId: number | null;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type CreateTaskData = {
-  title: string;
-  description?: string;
-  status?: TaskStatus;
-  priority?: TaskPriority;
-  userId?: number | null;
-};
-
-export type UpdateTaskData = {
-  title?: string;
-  description?: string;
-  status?: TaskStatus;
-  priority?: TaskPriority;
-  userId?: number | null;
-};
+// Re-export shared types for backward compatibility
+export {
+  TaskStatus,
+  TaskPriority,
+  type Task,
+  type CreateTaskDto as CreateTaskData,
+  type UpdateTaskDto as UpdateTaskData,
+  type TasksGroupedByStatus,
+} from "@shared/task.types";

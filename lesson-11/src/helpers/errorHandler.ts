@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { ApiError } from "../types/errors";
 import { logger } from "./logger";
 import { ZodError } from "zod";
+import { sendError } from "../utils/apiResponse";
 
 /**
  * Global error handling middleware
@@ -33,16 +34,12 @@ export const errorHandler = (
       errors: err.issues,
       path: req.path,
     });
-    return res.status(400).json({
-      message: messages,
-    });
+    return sendError(res, messages, 400, { errors: err.issues });
   }
 
   // Handle ApiError (custom application errors)
   if (err instanceof ApiError) {
-    return res.status(err.statusCode).json({
-      message: err.message,
-    });
+    return sendError(res, err.message, err.statusCode);
   }
 
   // Handle validation errors from TSOA/Zod
@@ -51,9 +48,7 @@ export const errorHandler = (
       error: err.message,
       path: req.path,
     });
-    return res.status(400).json({
-      message: err.message,
-    });
+    return sendError(res, err.message, 400);
   }
 
   // Handle unexpected errors
@@ -63,9 +58,7 @@ export const errorHandler = (
     path: req.path,
   });
 
-  return res.status(500).json({
-    message: "Internal server error",
-  });
+  return sendError(res, "Internal server error", 500);
 };
 
 /**

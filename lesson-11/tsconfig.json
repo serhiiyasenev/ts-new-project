@@ -20,8 +20,13 @@
     "declarationMap": false,
 
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["shared/*"]
+    }
   },
-  "include": ["src", "tests"],
+  "include": ["src", "tests", "shared"],
   "exclude": ["dist", "node_modules"]
 }

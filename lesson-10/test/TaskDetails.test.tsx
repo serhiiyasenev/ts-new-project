@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import TaskDetails from '../src/pages/TaskDetails/TaskDetails';
 import type { Task } from '../src/types/task';
+import { TaskStatus, TaskPriority } from '../src/types';
 import * as api from '../src/api';
 
 vi.mock('../src/api');
@@ -17,8 +18,8 @@ describe('TaskDetails', () => {
       id: 1,
       title: 'Test Task',
       description: 'This is a test task description',
-      status: 'todo',
-      priority: 'high',
+      status: TaskStatus.Todo,
+      priority: TaskPriority.High,
       userId: null,
       createdAt: '2025-11-17T10:00:00.000Z',
       updatedAt: '2025-11-17T10:00:00.000Z',
@@ -83,8 +84,8 @@ describe('TaskDetails', () => {
       id: 1,
       title: 'Test Task',
       description: 'Test description',
-      status: 'todo',
-      priority: 'medium',
+      status: TaskStatus.Todo,
+      priority: TaskPriority.Medium,
       userId: null,
       createdAt: '2025-11-17T10:00:00.000Z',
       updatedAt: '2025-11-17T10:00:00.000Z',
@@ -130,8 +131,8 @@ describe('TaskDetails', () => {
       id: 2,
       title: '',
       description: '',
-      status: 'todo',
-      priority: 'medium',
+      status: TaskStatus.Todo,
+      priority: TaskPriority.Medium,
       userId: null,
       createdAt: '',
       updatedAt: '',
@@ -157,8 +158,8 @@ describe('TaskDetails', () => {
       id: 3,
       title: 'Test Task',
       description: 'Test Description',
-      status: 'in_progress',
-      priority: 'high',
+      status: TaskStatus.InProgress,
+      priority: TaskPriority.High,
       userId: null,
       createdAt: '2025-11-17T10:00:00.000Z',
       updatedAt: '2025-11-17T10:00:00.000Z',
@@ -195,7 +196,24 @@ describe('TaskDetails', () => {
 
 
   it('renders task not found when API returns null', async () => {
-    vi.mocked(api.fetchTaskById).mockResolvedValue(null as any);
+    vi.mocked(api.fetchTaskById).mockRejectedValue(new Error('Task not found'));
+    vi.mocked(api.fetchUsers).mockResolvedValue([]);
+
+    render(
+      <MemoryRouter initialEntries={['/tasks/999']}>
+        <Routes>
+          <Route path="/tasks/:id" element={<TaskDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Task not found/i)).toBeInTheDocument();
+    });
+  });
+
+  it('renders task not found when API resolves to null', async () => {
+    vi.mocked(api.fetchTaskById).mockResolvedValue(null as unknown as Task);
     vi.mocked(api.fetchUsers).mockResolvedValue([]);
 
     render(
@@ -216,8 +234,8 @@ describe('TaskDetails', () => {
       id: 1,
       title: 'Test Task',
       description: 'Description',
-      status: 'todo',
-      priority: 'high',
+      status: TaskStatus.Todo,
+      priority: TaskPriority.High,
       userId: 999,
       createdAt: '2025-11-17T10:00:00.000Z',
       updatedAt: '2025-11-17T10:00:00.000Z',
@@ -245,8 +263,8 @@ describe('TaskDetails', () => {
       id: 1,
       title: 'Test Task',
       description: 'Description',
-      status: 'todo',
-      priority: 'high',
+      status: TaskStatus.Todo,
+      priority: TaskPriority.High,
       userId: null,
       createdAt: '2025-11-17T10:00:00.000Z',
       updatedAt: '2025-11-17T10:00:00.000Z',

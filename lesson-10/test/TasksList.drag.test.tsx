@@ -3,6 +3,7 @@ import TasksList from '../src/pages/TasksList/TasksList'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import * as api from '../src/api'
+import { TaskStatus, TaskPriority } from '../src/types'
 
 vi.mock('../src/api')
 
@@ -17,8 +18,8 @@ describe('TasksList - Drag and Drop', () => {
         id: 1,
         title: 'Task 1',
         description: 'Description 1',
-        status: 'todo' as const,
-        priority: 'medium' as const,
+        status: TaskStatus.Todo,
+        priority: TaskPriority.Medium,
         userId: 1,
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01'
@@ -31,7 +32,7 @@ describe('TasksList - Drag and Drop', () => {
 
     fetchTasksMock.mockResolvedValue(mockTasks)
     fetchUsersMock.mockResolvedValue(mockUsers)
-    updateTaskMock.mockResolvedValue({ ...mockTasks[0], status: 'done' })
+    updateTaskMock.mockResolvedValue({ ...mockTasks[0], status: TaskStatus.Done })
 
     render(
       <MemoryRouter>
@@ -51,7 +52,7 @@ describe('TasksList - Drag and Drop', () => {
     fireEvent.drop(doneColumn!)
 
     await waitFor(() => {
-      expect(updateTaskMock).toHaveBeenCalledWith(1, { status: 'done' })
+      expect(updateTaskMock).toHaveBeenCalledWith(1, { status: TaskStatus.Done })
     })
   })
 
@@ -65,8 +66,8 @@ describe('TasksList - Drag and Drop', () => {
         id: 1,
         title: 'Task 1',
         description: 'Description 1',
-        status: 'todo' as const,
-        priority: 'medium' as const,
+        status: TaskStatus.Todo,
+        priority: TaskPriority.Medium,
         userId: 1,
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01'
@@ -116,8 +117,8 @@ describe('TasksList - Drag and Drop', () => {
         id: 1,
         title: 'Task 1',
         description: 'Description 1',
-        status: 'todo' as const,
-        priority: 'medium' as const,
+        status: TaskStatus.Todo,
+        priority: TaskPriority.Medium,
         userId: 1,
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01'
@@ -169,8 +170,8 @@ describe('TasksList - Drag and Drop', () => {
         id: 1,
         title: 'Task 1',
         description: 'Description 1',
-        status: 'todo' as const,
-        priority: 'medium' as const,
+        status: TaskStatus.Todo,
+        priority: TaskPriority.Medium,
         userId: 1,
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01'
@@ -179,8 +180,8 @@ describe('TasksList - Drag and Drop', () => {
         id: 2,
         title: 'Task 2',
         description: 'Description 2',
-        status: 'todo' as const,
-        priority: 'high' as const,
+        status: TaskStatus.Todo,
+        priority: TaskPriority.High,
         userId: 1,
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01'
@@ -193,7 +194,7 @@ describe('TasksList - Drag and Drop', () => {
 
     fetchTasksMock.mockResolvedValue(mockTasks)
     fetchUsersMock.mockResolvedValue(mockUsers)
-    updateTaskMock.mockResolvedValue({ ...mockTasks[0], status: 'done' })
+    updateTaskMock.mockResolvedValue({ ...mockTasks[0], status: TaskStatus.Done })
 
     render(
       <MemoryRouter>
@@ -214,7 +215,7 @@ describe('TasksList - Drag and Drop', () => {
     fireEvent.drop(doneColumn!)
 
     await waitFor(() => {
-      expect(updateTaskMock).toHaveBeenCalledWith(1, { status: 'done' })
+      expect(updateTaskMock).toHaveBeenCalledWith(1, { status: TaskStatus.Done })
     })
   })
 
@@ -228,8 +229,8 @@ describe('TasksList - Drag and Drop', () => {
         id: 1,
         title: 'Task 1',
         description: 'Description 1',
-        status: 'todo' as const,
-        priority: 'medium' as const,
+        status: TaskStatus.Todo,
+        priority: TaskPriority.Medium,
         userId: 1,
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01'

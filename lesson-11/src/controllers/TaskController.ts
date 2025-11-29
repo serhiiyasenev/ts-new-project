@@ -50,6 +50,7 @@ export class TaskController extends Controller {
       { status, priority, title, userId, groupBy, dateFrom, dateTo },
       "Invalid task query parameters",
     );
+
     const filters = buildTaskFilter({
       status: query.status,
       priority: query.priority,
@@ -105,6 +106,7 @@ export class TaskController extends Controller {
     const payload = ensureNotEmpty(
       validateWithSchema(updateTaskSchema, data, "Invalid task update payload"),
     );
+
     const updated = await taskService.updateTask(taskId, payload);
     if (!updated) {
       throw new ApiError("Task not found", 404);

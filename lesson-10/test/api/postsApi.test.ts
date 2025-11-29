@@ -5,7 +5,8 @@ import {
   createPost,
   updatePost,
   deletePost,
-} from "../../src/api/postsApi";
+} from "../../src/api/posts.api";
+import { createMockResponse } from "../helpers/mockResponse";
 
 describe("postsApi", () => {
   beforeEach(() => {
@@ -17,25 +18,29 @@ describe("postsApi", () => {
       const mockPosts = [{ id: 1, title: "Test" }];
       vi.stubGlobal(
         "fetch",
-        vi.fn().mockResolvedValue({
-          ok: true,
-          json: async () => mockPosts,
-        })
+        vi.fn().mockResolvedValue(
+          createMockResponse({
+            ok: true,
+            json: async () => mockPosts,
+          })
+        )
       );
 
       const result = await fetchPosts();
       expect(result).toEqual(mockPosts);
-      expect(fetch).toHaveBeenCalledWith("/api/posts");
+      expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/posts");
     });
 
     it("should handle error response with json", async () => {
       vi.stubGlobal(
         "fetch",
-        vi.fn().mockResolvedValue({
-          ok: false,
-          status: 404,
-          json: async () => ({ message: "Not found" }),
-        })
+        vi.fn().mockResolvedValue(
+          createMockResponse({
+            ok: false,
+            status: 404,
+            json: async () => ({ message: "Not found" }),
+          })
+        )
       );
 
       await expect(fetchPosts()).rejects.toThrow("Not found");
@@ -44,26 +49,30 @@ describe("postsApi", () => {
     it("should handle error response without json", async () => {
       vi.stubGlobal(
         "fetch",
-        vi.fn().mockResolvedValue({
-          ok: false,
-          status: 500,
-          json: async () => {
-            throw new Error("Invalid JSON");
-          },
-        })
+        vi.fn().mockResolvedValue(
+          createMockResponse({
+            ok: false,
+            status: 500,
+            json: async () => {
+              throw new Error("Invalid JSON");
+            },
+          })
+        )
       );
 
-      await expect(fetchPosts()).rejects.toThrow("Request failed");
+      await expect(fetchPosts()).rejects.toThrow("Invalid JSON");
     });
 
     it("should handle 204 no content response", async () => {
       vi.stubGlobal(
         "fetch",
-        vi.fn().mockResolvedValue({
-          ok: true,
-          status: 204,
-          json: async () => ({}),
-        })
+        vi.fn().mockResolvedValue(
+          createMockResponse({
+            ok: true,
+            status: 204,
+            json: async () => ({}),
+          })
+        )
       );
 
       const result = await fetchPosts();
@@ -73,11 +82,13 @@ describe("postsApi", () => {
     it("should handle error with empty message", async () => {
       vi.stubGlobal(
         "fetch",
-        vi.fn().mockResolvedValue({
-          ok: false,
-          status: 500,
-          json: async () => ({ message: "" }),
-        })
+        vi.fn().mockResolvedValue(
+          createMockResponse({
+            ok: false,
+            status: 500,
+            json: async () => ({ message: "" }),
+          })
+        )
       );
 
       await expect(fetchPosts()).rejects.toThrow("HTTP 500");
@@ -89,15 +100,17 @@ describe("postsApi", () => {
       const mockPost = { id: 1, title: "Test" };
       vi.stubGlobal(
         "fetch",
-        vi.fn().mockResolvedValue({
-          ok: true,
-          json: async () => mockPost,
-        })
+        vi.fn().mockResolvedValue(
+          createMockResponse({
+            ok: true,
+            json: async () => mockPost,
+          })
+        )
       );
 
       const result = await fetchPostById(1);
       expect(result).toEqual(mockPost);
-      expect(fetch).toHaveBeenCalledWith("/api/posts/1");
+      expect(fetch).toHaveBeenCalledWith("http://localhost:3000/api/posts/1");
     });
   });
 
@@ -113,10 +126,12 @@ describe("postsApi", () => {
 
       vi.stubGlobal(
         "fetch",
-        vi.fn().mockResolvedValue({
-          ok: true,
-          json: async () => createdPost,
-        })
+        vi.fn().mockResolvedValue(
+          createMockResponse({
+            ok: true,
+            json: async () => createdPost,
+          })
+        )
       );
 
       const result = await createPost(newPost);
@@ -143,18 +158,20 @@ describe("postsApi", () => {
 
       vi.stubGlobal(
         "fetch",
-        vi.fn().mockResolvedValue({
-          ok: true,
-          json: async () => updatedPost,
-        })
+        vi.fn().mockResolvedValue(
+          createMockResponse({
+            ok: true,
+            json: async () => updatedPost,
+          })
+        )
       );
 
-      const result = await updatePost(1, updateData, 123);
+      const result = await updatePost(1, updateData);
       expect(result).toEqual(updatedPost);
       expect(fetch).toHaveBeenCalledWith("/api/posts/1", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...updateData, actorUserId: 123 }),
+        body: JSON.stringify(updateData),
       });
     });
   });
@@ -163,10 +180,12 @@ describe("postsApi", () => {
     it("should delete a post", async () => {
       vi.stubGlobal(
         "fetch",
-        vi.fn().mockResolvedValue({
-          ok: true,
-          status: 204,
-        })
+        vi.fn().mockResolvedValue(
+          createMockResponse({
+            ok: true,
+            status: 204,
+          })
+        )
       );
 
       const result = await deletePost(1);

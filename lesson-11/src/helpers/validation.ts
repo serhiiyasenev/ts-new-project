@@ -1,11 +1,11 @@
-import { ZodError, ZodSchema, z } from "zod";
+import { ZodError, z } from "zod";
 import { ApiError } from "../types/errors";
 
 const formatZodError = (error: ZodError) =>
   error.issues.map((issue) => issue.message).join("; ");
 
 export const validateWithSchema = <T>(
-  schema: ZodSchema<T>,
+  schema: z.ZodSchema<T>,
   payload: unknown,
   contextMessage: string,
 ): T => {

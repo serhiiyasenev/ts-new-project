@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "npm run tsoa && tsx watch src/server.ts",
-    "tsoa": "tsoa spec && tsoa routes",
+    "tsoa": "tsoa spec --configuration tsoa.config.json && tsoa routes --configuration tsoa.config.json",
     "build": "tsc -p tsconfig.json",
     "test": "cross-env NODE_ENV=test vitest run",
     "test:watch": "cross-env NODE_ENV=test vitest",

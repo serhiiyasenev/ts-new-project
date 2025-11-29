@@ -26,7 +26,28 @@ const KanbanBoard = () => {
         fetchTasksGrouped(),
         fetchUsers()
       ]);
-      setTasks(grouped);
+      
+      // Handle if API returns flat array instead of grouped object
+      let tasksData: TasksByStatus;
+      if (Array.isArray(grouped)) {
+        // If it's an array, group it manually on the frontend
+        tasksData = {
+          todo: (grouped as Task[]).filter(t => t.status === TaskStatus.Todo),
+          in_progress: (grouped as Task[]).filter(t => t.status === TaskStatus.InProgress),
+          review: (grouped as Task[]).filter(t => t.status === TaskStatus.Review),
+          done: (grouped as Task[]).filter(t => t.status === TaskStatus.Done),
+        };
+      } else {
+        // Use grouped data from API
+        tasksData = {
+          todo: grouped.todo || [],
+          in_progress: grouped.in_progress || [],
+          review: grouped.review || [],
+          done: grouped.done || [],
+        };
+      }
+      
+      setTasks(tasksData);
       setUsers(usersData);
       setError(null);
     } catch (err) {
@@ -40,7 +61,26 @@ const KanbanBoard = () => {
     try {
       setLoading(true);
       const grouped = await fetchTasksGrouped();
-      setTasks(grouped);
+      
+      // Handle if API returns flat array instead of grouped object
+      let tasksData: TasksByStatus;
+      if (Array.isArray(grouped)) {
+        tasksData = {
+          todo: (grouped as Task[]).filter(t => t.status === TaskStatus.Todo),
+          in_progress: (grouped as Task[]).filter(t => t.status === TaskStatus.InProgress),
+          review: (grouped as Task[]).filter(t => t.status === TaskStatus.Review),
+          done: (grouped as Task[]).filter(t => t.status === TaskStatus.Done),
+        };
+      } else {
+        tasksData = {
+          todo: grouped.todo || [],
+          in_progress: grouped.in_progress || [],
+          review: grouped.review || [],
+          done: grouped.done || [],
+        };
+      }
+      
+      setTasks(tasksData);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load tasks');
@@ -81,11 +121,13 @@ const KanbanBoard = () => {
         [newStatusKey]: prev[newStatusKey].filter((t: Task) => t.id !== task.id),
         [oldStatus]: [...prev[oldStatus], task],
       }));
-      alert(err instanceof Error ? err.message : 'Failed to update task');
+      console.error('Failed to update task:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update task';
+      alert(`Failed to update task: ${errorMessage}`);
     }
   };
 
-  const handleDrop = async (newStatus: 'todo' | 'in_progress' | 'review' | 'done') => {
+  const handleDrop = async (newStatus: TaskStatus) => {
     if (!draggedTask || draggedTask.status === newStatus) {
       setDraggedTask(null);
       return;
@@ -98,11 +140,11 @@ const KanbanBoard = () => {
   if (loading) return <div className="loading">Loading tasks...</div>;
   if (error) return <div className="error-message">Error: {error}</div>;
 
-  const columns: Array<{ key: keyof TasksByStatus; title: string }> = [
-    { key: 'todo', title: 'To Do' },
-    { key: 'in_progress', title: 'In Progress' },
-    { key: 'review', title: 'Review' },
-    { key: 'done', title: 'Done' },
+  const columns: Array<{ key: TaskStatus; title: string }> = [
+    { key: TaskStatus.Todo, title: 'To Do' },
+    { key: TaskStatus.InProgress, title: 'In Progress' },
+    { key: TaskStatus.Review, title: 'Review' },
+    { key: TaskStatus.Done, title: 'Done' },
   ];
 
   return (

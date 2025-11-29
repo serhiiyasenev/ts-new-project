@@ -9,7 +9,7 @@ import { errorHandler } from "./helpers/errorHandler";
 import { logger } from "./helpers/logger";
 
 const app = express();
-const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
+const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 // parse JSON bodies
 app.use(express.json());
@@ -45,6 +45,9 @@ app.use((req, res, next) => {
 
   next();
 });
+
+// Response wrapper middleware is removed - TSOA controllers return data directly
+// The frontend client handles both wrapped and unwrapped responses
 
 // TSOA auto-generated routes
 RegisterRoutes(app);

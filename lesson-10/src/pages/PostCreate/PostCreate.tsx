@@ -47,7 +47,9 @@ const PostCreate = () => {
         
         <div className="form-group">
           <label htmlFor="userId">Author (User):</label>
-          <select id="userId" {...register("userId", { valueAsNumber: true })}>
+          <select id="userId" {...register("userId", { 
+            setValueAs: (value) => value === "" ? undefined : Number(value)
+          })}>
             <option value="">Select a user</option>
             {users.map(user => (
               <option key={user.id} value={user.id}>{user.name}</option>

@@ -32,7 +32,11 @@ describe("errorHandler", () => {
     errorHandler(error, req, res, mockNext);
 
     expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.json).toHaveBeenCalledWith({ message: "Test error" });
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      message: "Test error",
+      code: 404,
+    });
   });
 
   it("handles ZodError correctly", () => {
@@ -63,7 +67,9 @@ describe("errorHandler", () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
+      success: false,
       message: "Validation failed",
+      code: 400,
     });
   });
 
@@ -76,7 +82,9 @@ describe("errorHandler", () => {
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
+      success: false,
       message: "Internal server error",
+      code: 500,
     });
   });
 });

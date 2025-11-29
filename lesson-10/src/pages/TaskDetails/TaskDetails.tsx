@@ -94,6 +94,7 @@ const TaskDetails = () => {
             <select id="status" {...register('status')}>
               <option value="todo">To Do</option>
               <option value="in_progress">In Progress</option>
+              <option value="review">Review</option>
               <option value="done">Done</option>
             </select>
             <div className="error">{errors.status?.message}</div>

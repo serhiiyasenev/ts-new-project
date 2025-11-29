@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import TaskCreate from '../src/pages/TaskCreate/TaskCreate'
 import * as api from '../src/api'
+import { TaskStatus, TaskPriority } from '../src/types'
 
 vi.mock('../src/api')
 const mockNavigate = vi.fn()
@@ -73,8 +74,8 @@ describe('TaskCreate - Submit Error Handling', () => {
       id: 1,
       title: 'New Task',
       description: 'Test description',
-      status: 'todo',
-      priority: 'medium',
+      status: TaskStatus.Todo,
+      priority: TaskPriority.Medium,
       userId: null,
       createdAt: '2025-11-28',
       updatedAt: '2025-11-28'
@@ -106,8 +107,8 @@ describe('TaskCreate - Submit Error Handling', () => {
       id: 1,
       title: 'New Task',
       description: 'Test description',
-      status: 'todo',
-      priority: 'medium',
+      status: TaskStatus.Todo,
+      priority: TaskPriority.Medium,
       userId: 1,
       createdAt: '2025-11-28',
       updatedAt: '2025-11-28'

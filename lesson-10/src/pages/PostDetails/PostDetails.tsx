@@ -48,7 +48,7 @@ const PostDetails = () => {
     if (!id || !post) return;
     try {
       const updateData = { title: data.title, content: data.content };
-      const updated = await updatePost(Number(id), updateData, post.userId);
+      const updated = await updatePost(Number(id), updateData);
       setPost(updated);
       setIsEditing(false);
     } catch (err) {

@@ -4,6 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import * as api from '../src/api'
+import { TaskStatus, TaskPriority } from '../src/types'
 
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async () => {
@@ -26,8 +27,8 @@ describe('TaskDetails - Additional Coverage', () => {
       id: 1,
       title: 'Test Task',
       description: 'Description',
-      status: 'todo' as const,
-      priority: 'medium' as const,
+      status: TaskStatus.Todo,
+      priority: TaskPriority.Medium,
       userId: 1,
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01'
@@ -85,8 +86,8 @@ describe('TaskDetails - Additional Coverage', () => {
       id: 1,
       title: 'Test Task',
       description: 'Description',
-      status: 'todo' as const,
-      priority: 'medium' as const,
+      status: TaskStatus.Todo,
+      priority: TaskPriority.Medium,
       userId: 1,
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01'
@@ -128,8 +129,8 @@ describe('TaskDetails - Additional Coverage', () => {
       id: 1,
       title: 'Test Task',
       description: 'Description',
-      status: 'todo' as const,
-      priority: 'medium' as const,
+      status: TaskStatus.Todo,
+      priority: TaskPriority.Medium,
       userId: 1,
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01'
@@ -177,8 +178,8 @@ describe('TaskDetails - Additional Coverage', () => {
       id: 1,
       title: 'Test Task',
       description: 'Description',
-      status: 'todo' as const,
-      priority: 'medium' as const,
+      status: TaskStatus.Todo,
+      priority: TaskPriority.Medium,
       userId: 1,
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01'
@@ -237,8 +238,8 @@ describe('TaskDetails - Additional Coverage', () => {
       id: 1,
       title: 'Test Task',
       description: 'Description',
-      status: 'todo' as const,
-      priority: 'medium' as const,
+      status: TaskStatus.Todo,
+      priority: TaskPriority.Medium,
       userId: 1,
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01'
@@ -286,8 +287,8 @@ describe('TaskDetails - Additional Coverage', () => {
       id: 1,
       title: 'Test Task',
       description: 'Description',
-      status: 'todo' as const,
-      priority: 'medium' as const,
+      status: TaskStatus.Todo,
+      priority: TaskPriority.Medium,
       userId: 1,
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01'
@@ -347,8 +348,8 @@ describe('TaskDetails - Additional Coverage', () => {
       id: 1,
       title: 'Test Task',
       description: 'Description',
-      status: 'todo' as const,
-      priority: 'medium' as const,
+      status: TaskStatus.Todo,
+      priority: TaskPriority.Medium,
       userId: 1,
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01'
@@ -392,8 +393,8 @@ describe('TaskDetails - Additional Coverage', () => {
       id: 1,
       title: 'Test Task',
       description: 'Description',
-      status: 'todo' as const,
-      priority: 'medium' as const,
+      status: TaskStatus.Todo,
+      priority: TaskPriority.Medium,
       userId: 1,
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01'

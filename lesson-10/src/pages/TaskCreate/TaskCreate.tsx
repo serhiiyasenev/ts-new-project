@@ -7,6 +7,7 @@ import { createTask, fetchUsers } from '../../api';
 import { taskSchema } from '../../schema/taskSchema';
 import type { TaskFormFields } from '../../schema/taskSchema';
 import type { User } from '../../types';
+import { TaskStatus, TaskPriority } from '../../types';
 
 const TaskCreate = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -16,8 +17,8 @@ const TaskCreate = () => {
     defaultValues: {
       title: '',
       description: '',
-      status: 'todo',
-      priority: 'medium',
+      status: TaskStatus.Todo,
+      priority: TaskPriority.Medium,
       userId: '',
     },
   });
@@ -77,6 +78,7 @@ const TaskCreate = () => {
           <select id="status" {...register('status')}>
             <option value="todo">To Do</option>
             <option value="in_progress">In Progress</option>
+            <option value="review">Review</option>
             <option value="done">Done</option>
           </select>
           <div className="error">{errors.status?.message}</div>
