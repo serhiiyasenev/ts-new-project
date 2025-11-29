@@ -1,11 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import { createMockResponse } from "../helpers/mockResponse";
 import {
   fetchUsers,
   fetchUserById,
   createUser,
   updateUser,
   deleteUser,
-} from "../../src/api/usersApi";
+} from "../../src/api/users.api";
 
 describe("usersApi", () => {
   beforeEach(() => {
@@ -16,10 +17,12 @@ describe("usersApi", () => {
     const mockUsers = [{ id: 1, name: "User 1" }];
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockUsers,
-      })
+      vi.fn().mockResolvedValue(
+        createMockResponse({
+          ok: true,
+          json: async () => mockUsers,
+        })
+      )
     );
 
     const result = await fetchUsers();
@@ -30,10 +33,12 @@ describe("usersApi", () => {
     const mockUser = { id: 1, name: "User 1" };
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockUser,
-      })
+      vi.fn().mockResolvedValue(
+        createMockResponse({
+          ok: true,
+          json: async () => mockUser,
+        })
+      )
     );
 
     const result = await fetchUserById(1);
@@ -56,10 +61,12 @@ describe("usersApi", () => {
 
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => createdUser,
-      })
+      vi.fn().mockResolvedValue(
+        createMockResponse({
+          ok: true,
+          json: async () => createdUser,
+        })
+      )
     );
 
     const result = await createUser(newUser);
@@ -80,10 +87,12 @@ describe("usersApi", () => {
 
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => updatedUser,
-      })
+      vi.fn().mockResolvedValue(
+        createMockResponse({
+          ok: true,
+          json: async () => updatedUser,
+        })
+      )
     );
 
     const result = await updateUser(1, updateData);
@@ -93,10 +102,12 @@ describe("usersApi", () => {
   it("should delete a user", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 204,
-      })
+      vi.fn().mockResolvedValue(
+        createMockResponse({
+          ok: true,
+          status: 204,
+        })
+      )
     );
 
     const result = await deleteUser(1);
@@ -106,11 +117,13 @@ describe("usersApi", () => {
   it("should handle error response", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: false,
-        status: 404,
-        json: async () => ({ message: "User not found" }),
-      })
+      vi.fn().mockResolvedValue(
+        createMockResponse({
+          ok: false,
+          status: 404,
+          json: async () => ({ message: "User not found" }),
+        })
+      )
     );
 
     await expect(fetchUsers()).rejects.toThrow("User not found");
@@ -119,25 +132,29 @@ describe("usersApi", () => {
   it("should handle error without json", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: false,
-        status: 500,
-        json: async () => {
-          throw new Error("Invalid JSON");
-        },
-      })
+      vi.fn().mockResolvedValue(
+        createMockResponse({
+          ok: false,
+          status: 500,
+          json: async () => {
+            throw new Error("Invalid JSON");
+          },
+        })
+      )
     );
 
-    await expect(fetchUsers()).rejects.toThrow("Request failed");
+    await expect(fetchUsers()).rejects.toThrow("Invalid JSON");
   });
 
   it("should handle 204 response", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 204,
-      })
+      vi.fn().mockResolvedValue(
+        createMockResponse({
+          ok: true,
+          status: 204,
+        })
+      )
     );
 
     const result = await fetchUsers();
@@ -147,11 +164,13 @@ describe("usersApi", () => {
   it("should handle error with empty message", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({
-        ok: false,
-        status: 500,
-        json: async () => ({ message: "" }),
-      })
+      vi.fn().mockResolvedValue(
+        createMockResponse({
+          ok: false,
+          status: 500,
+          json: async () => ({ message: "" }),
+        })
+      )
     );
 
     await expect(fetchUsers()).rejects.toThrow("HTTP 500");

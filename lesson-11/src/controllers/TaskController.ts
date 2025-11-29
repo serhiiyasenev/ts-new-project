@@ -24,9 +24,13 @@ import {
   TasksGroupedByStatusDto,
   groupTasksByStatus,
 } from "../dtos/taskResponse.dto";
-import { validateNumericId, validateWithSchema } from "../helpers/validation";
+import {
+  validateNumericId,
+  validateWithSchema,
+  ensureNotEmpty,
+} from "../helpers/validation";
 import { CreateTaskDto, UpdateTaskDto } from "../dtos/taskRequest.dto";
-import { TaskFilters } from "../types/filters";
+import { buildTaskFilter } from "../services/filters/buildTaskFilter";
 
 @Route("tasks")
 @Tags("Tasks")
@@ -46,14 +50,15 @@ export class TaskController extends Controller {
       { status, priority, title, userId, groupBy, dateFrom, dateTo },
       "Invalid task query parameters",
     );
-    const filters: TaskFilters = {
+
+    const filters = buildTaskFilter({
       status: query.status,
       priority: query.priority,
       title: query.title,
       userId: query.userId,
       dateFrom: query.dateFrom,
       dateTo: query.dateTo,
-    };
+    });
     const tasks = await taskService.getAllTasks(filters);
 
     // If groupBy=status, return grouped tasks for Kanban board
@@ -98,14 +103,10 @@ export class TaskController extends Controller {
     @Body() data: UpdateTaskDto,
   ): Promise<TaskResponseDto> {
     const taskId = validateNumericId(id, "Task id");
-    const payload = validateWithSchema(
-      updateTaskSchema,
-      data,
-      "Invalid task update payload",
+    const payload = ensureNotEmpty(
+      validateWithSchema(updateTaskSchema, data, "Invalid task update payload"),
     );
-    if (!Object.keys(payload).length) {
-      throw new ApiError("Update payload cannot be empty", 400);
-    }
+
     const updated = await taskService.updateTask(taskId, payload);
     if (!updated) {
       throw new ApiError("Task not found", 404);

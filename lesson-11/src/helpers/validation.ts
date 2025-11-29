@@ -1,11 +1,11 @@
-import { ZodError, ZodSchema, z } from "zod";
+import { ZodError, z } from "zod";
 import { ApiError } from "../types/errors";
 
 const formatZodError = (error: ZodError) =>
   error.issues.map((issue) => issue.message).join("; ");
 
 export const validateWithSchema = <T>(
-  schema: ZodSchema<T>,
+  schema: z.ZodSchema<T>,
   payload: unknown,
   contextMessage: string,
 ): T => {
@@ -25,4 +25,14 @@ export const validateNumericId = (value: unknown, label: string): number => {
     throw new ApiError(`${label} must be a positive integer`, 400);
   }
   return parsed.data;
+};
+
+export const ensureNotEmpty = <T extends Record<string, unknown>>(
+  payload: T,
+  errorMessage = "Update payload cannot be empty",
+): T => {
+  if (!Object.keys(payload).length) {
+    throw new ApiError(errorMessage, 400);
+  }
+  return payload;
 };

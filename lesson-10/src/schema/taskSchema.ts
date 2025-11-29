@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TaskStatus, TaskPriority } from "../types";
 
 export const taskSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -7,8 +8,8 @@ export const taskSchema = z.object({
     .min(3, "Description must be at least 3 characters")
     .optional()
     .or(z.literal("")),
-  status: z.enum(["todo", "in_progress", "review", "done"]).optional(),
-  priority: z.enum(["low", "medium", "high"]).optional(),
+  status: z.enum(TaskStatus).optional(),
+  priority: z.enum(TaskPriority).optional(),
   userId: z.any().optional(),
 });
 

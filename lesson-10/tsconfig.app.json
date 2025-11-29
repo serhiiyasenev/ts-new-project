@@ -10,7 +10,12 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "strict": true
+    "strict": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["../shared/types/*"]
+    }
   },
-  "include": ["src", "test"]
+  "include": ["src", "test", "../shared/types"]
 }

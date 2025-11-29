@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import type { Task, TaskStatus, User } from '../../types';
+import type { Task, User } from '../../types';
+import { TaskStatus } from '../../types';
 import './TasksList.css';
 import { fetchTasks, updateTask, fetchUsers } from '../../api';
 
@@ -156,9 +157,9 @@ const TasksList = () => {
       </div>
       
       <div className="board-columns">
-        {renderColumn('todo', 'TO DO', 'status-todo')}
-        {renderColumn('in_progress', 'IN PROGRESS', 'status-in-progress')}
-        {renderColumn('done', 'DONE', 'status-done')}
+        {renderColumn(TaskStatus.Todo, 'TO DO', 'status-todo')}
+        {renderColumn(TaskStatus.InProgress, 'IN PROGRESS', 'status-in-progress')}
+        {renderColumn(TaskStatus.Done, 'DONE', 'status-done')}
       </div>
     </div>
   );

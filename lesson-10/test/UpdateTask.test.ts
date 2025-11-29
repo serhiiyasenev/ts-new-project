@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { updateTask } from "../src/api/tasksApi";
+import { TaskStatus, TaskPriority } from "../src/types";
+import { createMockResponse } from "./helpers/mockResponse";
+import { updateTask } from "../src/api/tasks.api";
 
 describe("updateTask API", () => {
   beforeEach(() => {
@@ -11,14 +13,16 @@ describe("updateTask API", () => {
       id: 12,
       title: "Updated Task",
       description: "Updated",
-      status: "in_progress" as const,
-      priority: "high" as const,
+      status: TaskStatus.InProgress,
+      priority: TaskPriority.High,
       userId: null,
       createdAt: "2025-11-20",
       updatedAt: "2025-11-20",
     };
     const fetchMockFn = vi.fn(() =>
-      Promise.resolve({ ok: true, json: () => Promise.resolve(mockResp) })
+      Promise.resolve(
+        createMockResponse({ ok: true, json: async () => mockResp })
+      )
     );
     vi.stubGlobal("fetch", fetchMockFn as unknown as typeof globalThis.fetch);
 

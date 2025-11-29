@@ -1,5 +1,18 @@
 import { TaskModel } from "../models/task.model";
-import { TaskPriority, TaskStatus } from "../schemas/tasks";
+
+// Define enums locally for TSOA
+export enum TaskStatus {
+  Todo = "todo",
+  InProgress = "in_progress",
+  Review = "review",
+  Done = "done",
+}
+
+export enum TaskPriority {
+  Low = "low",
+  Medium = "medium",
+  High = "high",
+}
 
 export interface TaskResponseDto {
   id: number;
@@ -23,7 +36,7 @@ export function mapTaskModelToDto(model: TaskModel): TaskResponseDto {
   return {
     id: model.id,
     title: model.title,
-    description: model.description,
+    description: model.description ?? undefined,
     status: model.status as TaskStatus,
     priority: model.priority as TaskPriority,
     userId: model.userId ?? null,

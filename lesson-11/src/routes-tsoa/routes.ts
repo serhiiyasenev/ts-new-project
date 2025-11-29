@@ -108,7 +108,7 @@ const models: TsoaRoute.Models = {
             "description": {"dataType":"string"},
             "status": {"ref":"TaskStatus"},
             "priority": {"ref":"TaskPriority"},
-            "userId": {"dataType":"double"},
+            "userId": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}]},
         },
         "additionalProperties": false,
     },

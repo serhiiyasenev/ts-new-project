@@ -4,6 +4,7 @@ import '@testing-library/jest-dom';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import UserDetails from '../src/pages/UserDetails/UserDetails';
 import * as api from '../src/api';
+import { User } from '@shared/user.types';
 
 vi.mock('../src/api');
 
@@ -134,7 +135,7 @@ describe('UserDetails', () => {
   });
 
   it('renders user not found when API returns null', async () => {
-    vi.mocked(api.fetchUserById).mockResolvedValue(null as any);
+    vi.mocked(api.fetchUserById).mockResolvedValue(null as unknown as User);
 
     render(
       <MemoryRouter initialEntries={['/users/999']}>

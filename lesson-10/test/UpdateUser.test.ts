@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { updateUser } from "../src/api/usersApi";
+import { createMockResponse } from "./helpers/mockResponse";
+import { updateUser } from "../src/api/users.api";
 
 describe("updateUser API", () => {
   beforeEach(() => {
@@ -17,7 +18,9 @@ describe("updateUser API", () => {
       updatedAt: "2025-11-20",
     };
     const fetchMockFn = vi.fn(() =>
-      Promise.resolve({ ok: true, json: () => Promise.resolve(mockResp) })
+      Promise.resolve(
+        createMockResponse({ ok: true, json: async () => mockResp })
+      )
     );
     vi.stubGlobal("fetch", fetchMockFn as unknown as typeof globalThis.fetch);
 
