@@ -1,6 +1,6 @@
 # Architecture Overview
 <!-- TEST_BADGES_START -->
-![Tests](https://img.shields.io/badge/tests-264-brightgreen)
+![Tests](https://img.shields.io/badge/tests-415-brightgreen)
 <!-- TEST_BADGES_END -->
 
 
