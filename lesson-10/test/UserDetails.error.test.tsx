@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import UserDetails from '../src/pages/UserDetails/UserDetails'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from './utils/test-utils'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import * as api from '../src/api'
@@ -34,7 +34,7 @@ describe('UserDetails - Additional Coverage', () => {
     fetchUserByIdMock.mockResolvedValue(mockUser)
     updateUserMock.mockRejectedValue(new Error('Update failed'))
 
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
+    
 
     render(
       <MemoryRouter initialEntries={['/users/1']}>
@@ -64,10 +64,10 @@ describe('UserDetails - Additional Coverage', () => {
 
     await waitFor(() => {
       expect(updateUserMock).toHaveBeenCalled()
-      expect(alertSpy).toHaveBeenCalledWith('Update failed')
+      expect(screen.getByText('Update failed')).toBeInTheDocument()
     })
 
-    alertSpy.mockRestore()
+    
   })
 
   it('should handle delete cancellation', async () => {
@@ -127,7 +127,7 @@ describe('UserDetails - Additional Coverage', () => {
     deleteUserMock.mockRejectedValue(new Error('Delete failed'))
 
     vi.spyOn(window, 'confirm').mockReturnValue(true)
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
+    
 
     render(
       <MemoryRouter initialEntries={['/users/1']}>
@@ -146,10 +146,10 @@ describe('UserDetails - Additional Coverage', () => {
 
     await waitFor(() => {
       expect(deleteUserMock).toHaveBeenCalled()
-      expect(alertSpy).toHaveBeenCalledWith('Delete failed')
+      expect(screen.getByText('Delete failed')).toBeInTheDocument()
     })
 
-    alertSpy.mockRestore()
+    
   })
 
   it('should display user with lastLoginAt as Never when null', async () => {
@@ -198,7 +198,7 @@ describe('UserDetails - Additional Coverage', () => {
     fetchUserByIdMock.mockResolvedValue(mockUser)
     updateUserMock.mockRejectedValue('String error')
 
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
+    
 
     render(
       <MemoryRouter initialEntries={['/users/1']}>
@@ -229,10 +229,10 @@ describe('UserDetails - Additional Coverage', () => {
 
     await waitFor(() => {
       expect(updateUserMock).toHaveBeenCalled()
-      expect(alertSpy).toHaveBeenCalledWith('Failed to update user')
+      expect(screen.getByText('Failed to update user')).toBeInTheDocument()
     })
 
-    alertSpy.mockRestore()
+    
   })
 
   it('should handle non-Error delete exception', async () => {
@@ -254,7 +254,7 @@ describe('UserDetails - Additional Coverage', () => {
     deleteUserMock.mockRejectedValue('String error')
 
     vi.spyOn(window, 'confirm').mockReturnValue(true)
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
+    
 
     render(
       <MemoryRouter initialEntries={['/users/1']}>
@@ -273,10 +273,10 @@ describe('UserDetails - Additional Coverage', () => {
 
     await waitFor(() => {
       expect(deleteUserMock).toHaveBeenCalled()
-      expect(alertSpy).toHaveBeenCalledWith('Failed to delete user')
+      expect(screen.getByText('Failed to delete user')).toBeInTheDocument()
     })
 
-    alertSpy.mockRestore()
+    
   })
 
 it('should successfully update user and exit edit mode', async () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from './utils/test-utils';
 import { MemoryRouter } from 'react-router-dom';
 import TasksList from '../src/pages/KanbanBoard/KanbanBoard';
 import * as api from '../src/api';

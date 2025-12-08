@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import TaskCreate from '../src/pages/TaskCreate/TaskCreate'
-import { render, waitFor } from '@testing-library/react'
+import { render, waitFor } from './utils/test-utils'
 import { MemoryRouter } from 'react-router-dom'
 import * as api from '../src/api'
 

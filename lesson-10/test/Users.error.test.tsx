@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import Users from '../src/pages/Users/Users'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from './utils/test-utils'
 import { MemoryRouter } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import * as api from '../src/api'
@@ -66,7 +66,6 @@ describe('Users - Additional Coverage', () => {
     deleteUserMock.mockRejectedValue(new Error('Delete failed'))
 
     vi.spyOn(window, 'confirm').mockReturnValue(true)
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
 
     render(
       <MemoryRouter>
@@ -83,10 +82,8 @@ describe('Users - Additional Coverage', () => {
 
     await waitFor(() => {
       expect(deleteUserMock).toHaveBeenCalled()
-      expect(alertSpy).toHaveBeenCalledWith('Delete failed')
+      expect(screen.getByText('Delete failed')).toBeInTheDocument()
     })
-
-    alertSpy.mockRestore()
   })
 
   it('should handle non-Error delete exception', async () => {
@@ -110,7 +107,6 @@ describe('Users - Additional Coverage', () => {
     deleteUserMock.mockRejectedValue('String error')
 
     vi.spyOn(window, 'confirm').mockReturnValue(true)
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
 
     render(
       <MemoryRouter>
@@ -127,10 +123,8 @@ describe('Users - Additional Coverage', () => {
 
     await waitFor(() => {
       expect(deleteUserMock).toHaveBeenCalled()
-      expect(alertSpy).toHaveBeenCalledWith('Failed to delete user')
+      expect(screen.getByText('Failed to delete user')).toBeInTheDocument()
     })
-
-    alertSpy.mockRestore()
   })
 
   it('should successfully delete user and update list', async () => {

@@ -221,7 +221,7 @@
   .kanban-columns {
     grid-template-columns: 1fr;
   }
-  
+
   .kanban-column {
     min-height: 300px;
   }

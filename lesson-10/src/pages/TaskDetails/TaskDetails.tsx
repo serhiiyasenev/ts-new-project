@@ -1,35 +1,39 @@
-import { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import type { Task } from '@shared/task.types';
-import './TaskDetails.css';
-import { fetchTaskById, updateTask, deleteTask, fetchUsers } from '../../api';
-import { taskSchema, type TaskFormFields } from '../../schema/taskSchema';
-import { User } from '@shared/user.types';
+import { useEffect, useState } from 'react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import type { Task } from '@shared/task.types'
+import './TaskDetails.css'
+import { fetchTaskById, updateTask, deleteTask, fetchUsers } from '../../api'
+import { taskSchema, type TaskFormFields } from '../../schema/taskSchema'
+import { User } from '@shared/user.types'
+import { useToast } from '../../hooks/useToast'
 
 const TaskDetails = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const [task, setTask] = useState<Task | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+  const [task, setTask] = useState<Task | null>(null)
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const { showToast } = useToast()
 
-  const { register, handleSubmit, formState: { errors, isDirty, isValid }, reset } = useForm<TaskFormFields>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isDirty, isValid },
+    reset,
+  } = useForm<TaskFormFields>({
     resolver: zodResolver(taskSchema),
-  });
+  })
 
   useEffect(() => {
     if (id) {
-      Promise.all([
-        fetchTaskById(Number(id)),
-        fetchUsers()
-      ])
+      Promise.all([fetchTaskById(Number(id)), fetchUsers()])
         .then(([taskData, usersData]) => {
-          setTask(taskData);
-          setUsers(usersData);
+          setTask(taskData)
+          setUsers(usersData)
           if (taskData) {
             reset({
               title: taskData.title,
@@ -37,41 +41,43 @@ const TaskDetails = () => {
               status: taskData.status,
               priority: taskData.priority,
               userId: taskData.userId,
-            });
+            })
           }
         })
         .catch((err: Error) => {
-          setError(err.message);
+          setError(err.message)
         })
         .finally(() => {
-          setLoading(false);
-        });
+          setLoading(false)
+        })
     }
-  }, [id, reset]);
+  }, [id, reset])
 
   const handleUpdate = async (data: TaskFormFields) => {
     try {
-      const updated = await updateTask(Number(id!), data);
-      setTask(updated);
-      setIsEditing(false);
+      const updated = await updateTask(Number(id!), data)
+      setTask(updated)
+      setIsEditing(false)
+      showToast('Task updated successfully', 'success')
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to update task');
+      showToast(err instanceof Error ? err.message : 'Failed to update task', 'error')
     }
-  };
+  }
 
   const handleDelete = async () => {
-    if (!id || !window.confirm('Are you sure you want to delete this task?')) return;
+    if (!id || !window.confirm('Are you sure you want to delete this task?')) return
     try {
-      await deleteTask(Number(id));
-      navigate('/board');
+      await deleteTask(Number(id))
+      showToast('Task deleted successfully', 'success')
+      navigate('/board')
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to delete task');
+      showToast(err instanceof Error ? err.message : 'Failed to delete task', 'error')
     }
-  };
+  }
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div className="error-message">Error: {error}</div>;
-  if (!task) return <div>Task not found</div>;
+  if (loading) return <div>Loading...</div>
+  if (error) return <div className="error-message">Error: {error}</div>
+  if (!task) return <div>Task not found</div>
 
   if (isEditing) {
     return (
@@ -83,13 +89,13 @@ const TaskDetails = () => {
             <input id="title" type="text" {...register('title')} />
             <div className="error">{errors.title?.message}</div>
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="description">Description:</label>
             <textarea id="description" {...register('description')} rows={5} />
             <div className="error">{errors.description?.message}</div>
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="status">Status:</label>
             <select id="status" {...register('status')}>
@@ -100,7 +106,7 @@ const TaskDetails = () => {
             </select>
             <div className="error">{errors.status?.message}</div>
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="priority">Priority:</label>
             <select id="priority" {...register('priority')}>
@@ -110,17 +116,19 @@ const TaskDetails = () => {
             </select>
             <div className="error">{errors.priority?.message}</div>
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="userId">Assign to User:</label>
             <select id="userId" {...register('userId', { valueAsNumber: true })}>
               <option value="">None</option>
-              {users.map(user => (
-                <option key={user.id} value={user.id}>{user.name}</option>
+              {users.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.name}
+                </option>
               ))}
             </select>
           </div>
-          
+
           <div className="form-actions">
             <button type="button" onClick={() => setIsEditing(false)} className="button-secondary">
               Cancel
@@ -131,16 +139,18 @@ const TaskDetails = () => {
           </div>
         </form>
       </div>
-    );
+    )
   }
 
   return (
     <div className="task-details">
-      <Link to="/board" className="back-button">← Back to Board</Link>
-      
+      <Link to="/board" className="back-button">
+        ← Back to Board
+      </Link>
+
       <div className="task-content">
         <h1>{task.title}</h1>
-        
+
         <div className="task-info">
           <div className="info-item">
             <strong>Status:</strong>
@@ -154,7 +164,11 @@ const TaskDetails = () => {
           </div>
           <div className="info-item">
             <strong>Assigned To:</strong>
-            <span>{task.userId ? users.find(u => u.id === task.userId)?.name || `User #${task.userId}` : 'Unassigned'}</span>
+            <span>
+              {task.userId
+                ? users.find((u) => u.id === task.userId)?.name || `User #${task.userId}`
+                : 'Unassigned'}
+            </span>
           </div>
           <div className="info-item">
             <strong>Created:</strong>
@@ -170,12 +184,16 @@ const TaskDetails = () => {
           <p>{task.description || 'No description provided'}</p>
         </div>
         <div className="form-actions">
-          <button onClick={() => setIsEditing(true)} className="button-primary">Edit</button>
-          <button onClick={handleDelete} className="button-danger">Delete</button>
+          <button onClick={() => setIsEditing(true)} className="button-primary">
+            Edit
+          </button>
+          <button onClick={handleDelete} className="button-danger">
+            Delete
+          </button>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default TaskDetails;
+export default TaskDetails
