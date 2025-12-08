@@ -1,10 +1,14 @@
 import './App.css'
+import './styles/toast.css'
 import router from './router'
 import { RouterProvider } from 'react-router-dom'
+import { ToastProvider } from './components/ToastProvider'
 
 function App() {
   return (
-    <RouterProvider router={router} />
+    <ToastProvider>
+      <RouterProvider router={router} />
+    </ToastProvider>
   )
 }
 

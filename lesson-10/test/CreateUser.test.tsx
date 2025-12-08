@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import CreateUser from "../src/pages/CreateUser/CreateUser"
-import { render, screen, waitFor } from "@testing-library/react"
+import { render, screen, waitFor } from "./utils/test-utils"
 import { MemoryRouter } from "react-router-dom"
 import userEvent from "@testing-library/user-event"
 import * as api from '../src/api'
@@ -109,7 +109,7 @@ describe('CreateUser', () => {
     const createUserMock = vi.mocked(api.createUser);
     createUserMock.mockRejectedValue(new Error('Network error'));
 
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    ;
 
     render(
       <MemoryRouter>
@@ -125,10 +125,10 @@ describe('CreateUser', () => {
 
     await waitFor(() => {
       expect(createUserMock).toHaveBeenCalled();
-      expect(alertSpy).toHaveBeenCalledWith('Network error');
+      expect(screen.getByText('Network error')).toBeInTheDocument();
     });
 
-    alertSpy.mockRestore();
+    ;
   })
 
   it('handles non-Error exception when createUser fails', async () => {
@@ -136,7 +136,7 @@ describe('CreateUser', () => {
     const createUserMock = vi.mocked(api.createUser);
     createUserMock.mockRejectedValue('String error');
 
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    ;
 
     render(
       <MemoryRouter>
@@ -152,9 +152,9 @@ describe('CreateUser', () => {
 
     await waitFor(() => {
       expect(createUserMock).toHaveBeenCalled();
-      expect(alertSpy).toHaveBeenCalledWith('Error creating user');
+      expect(screen.getByText('Error creating user')).toBeInTheDocument();
     });
 
-    alertSpy.mockRestore();
+    ;
   })
 })

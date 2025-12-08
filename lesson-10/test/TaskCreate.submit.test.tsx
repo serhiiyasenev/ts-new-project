@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from './utils/test-utils'
 import { MemoryRouter } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import TaskCreate from '../src/pages/TaskCreate/TaskCreate'
@@ -25,7 +25,7 @@ describe('TaskCreate - Submit Error Handling', () => {
   it('handles Error exception when createTask fails', async () => {
     const user = userEvent.setup()
     vi.mocked(api.createTask).mockRejectedValue(new Error('Network error'))
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
+    
 
     render(
       <MemoryRouter>
@@ -39,16 +39,16 @@ describe('TaskCreate - Submit Error Handling', () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Network error')
+      expect(screen.getByText('Network error')).toBeInTheDocument()
     })
 
-    alertSpy.mockRestore()
+    
   })
 
   it('handles non-Error exception when createTask fails', async () => {
     const user = userEvent.setup()
     vi.mocked(api.createTask).mockRejectedValue('String error')
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
+    
 
     render(
       <MemoryRouter>
@@ -62,10 +62,10 @@ describe('TaskCreate - Submit Error Handling', () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Error creating task')
+      expect(screen.getByText('Error creating task')).toBeInTheDocument()
     })
 
-    alertSpy.mockRestore()
+    
   })
 
   it('successfully creates task and navigates to tasks list', async () => {

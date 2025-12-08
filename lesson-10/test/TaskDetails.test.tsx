@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from './utils/test-utils';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import TaskDetails from '../src/pages/TaskDetails/TaskDetails';
 import { TaskStatus, TaskPriority, Task } from '@shared/task.types';

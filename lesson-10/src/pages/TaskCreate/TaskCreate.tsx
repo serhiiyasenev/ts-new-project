@@ -1,17 +1,22 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import './TaskCreate.css';
-import { createTask, fetchUsers } from '../../api';
-import { taskSchema } from '../../schema/taskSchema';
-import type { TaskFormFields } from '../../schema/taskSchema';
-import type { User } from '@shared/user.types';
-import { TaskStatus, TaskPriority } from '@shared/task.types';
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import './TaskCreate.css'
+import { createTask, fetchUsers } from '../../api'
+import { taskSchema } from '../../schema/taskSchema'
+import type { TaskFormFields } from '../../schema/taskSchema'
+import type { User } from '@shared/user.types'
+import { TaskStatus, TaskPriority } from '@shared/task.types'
+import { useToast } from '../../hooks/useToast'
 
 const TaskCreate = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const { register, handleSubmit, formState: { errors } } = useForm<TaskFormFields>({
+  const [users, setUsers] = useState<User[]>([])
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<TaskFormFields>({
     mode: 'onChange',
     resolver: zodResolver(taskSchema),
     defaultValues: {
@@ -21,43 +26,38 @@ const TaskCreate = () => {
       priority: TaskPriority.Medium,
       userId: '',
     },
-  });
+  })
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const { showToast } = useToast()
 
   useEffect(() => {
-    fetchUsers().then(setUsers).catch(console.error);
-  }, []);
+    fetchUsers().then(setUsers).catch(console.error)
+  }, [])
 
   const onSubmit = async (data: TaskFormFields) => {
     try {
       const taskData = {
         ...data,
-        userId: data.userId && data.userId !== "" ? Number(data.userId) : undefined
-      };
-      await createTask(taskData);
-      navigate("/board");
+        userId: data.userId && data.userId !== '' ? Number(data.userId) : undefined,
+      }
+      await createTask(taskData)
+      showToast('Task created successfully', 'success')
+      navigate('/board')
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Error creating task");
+      showToast(error instanceof Error ? error.message : 'Error creating task', 'error')
     }
   }
 
   return (
     <div className="task-create">
       <h1>Create New Task</h1>
-      
+
       <form onSubmit={handleSubmit(onSubmit)} className="task-form">
         <div className="form-group">
           <label htmlFor="title">Title:</label>
-          <input
-            id="title"
-            type="text"
-            {...register('title')}
-            placeholder="Enter task title"
-          />
-          {errors.title && (
-            <div className="error">{errors.title.message}</div>
-          )}
+          <input id="title" type="text" {...register('title')} placeholder="Enter task title" />
+          {errors.title && <div className="error">{errors.title.message}</div>}
         </div>
 
         <div className="form-group">
@@ -68,9 +68,7 @@ const TaskCreate = () => {
             placeholder="Enter task description"
             rows={5}
           />
-          {errors.description && (
-            <div className="error">{errors.description.message}</div>
-          )}
+          {errors.description && <div className="error">{errors.description.message}</div>}
         </div>
 
         <div className="form-group">
@@ -98,8 +96,10 @@ const TaskCreate = () => {
           <label htmlFor="userId">Assign to User (optional):</label>
           <select id="userId" {...register('userId')}>
             <option value="">None</option>
-            {users.map(user => (
-              <option key={user.id} value={user.id}>{user.name}</option>
+            {users.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.name}
+              </option>
             ))}
           </select>
         </div>
@@ -114,7 +114,7 @@ const TaskCreate = () => {
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default TaskCreate;
+export default TaskCreate

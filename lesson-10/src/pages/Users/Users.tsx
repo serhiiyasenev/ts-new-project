@@ -1,45 +1,50 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import "./Users.css";
-import type { User } from "@shared/user.types";
-import { fetchUsers, deleteUser } from "../../api";
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import './Users.css'
+import type { User } from '@shared/user.types'
+import { fetchUsers, deleteUser } from '../../api'
+import { useToast } from '../../hooks/useToast'
 
 const Users = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const { showToast } = useToast()
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const result = await fetchUsers();
-        setUsers(result);
+        const result = await fetchUsers()
+        setUsers(result)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch users');
+        setError(err instanceof Error ? err.message : 'Failed to fetch users')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchUserData();
-  }, []);
+    }
+    fetchUserData()
+  }, [])
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
+    if (!window.confirm('Are you sure you want to delete this user?')) return
     try {
-      await deleteUser(id);
-      setUsers(users.filter(u => u.id !== id));
+      await deleteUser(id)
+      setUsers(users.filter((u) => u.id !== id))
+      showToast('User deleted successfully', 'success')
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to delete user');
+      showToast(err instanceof Error ? err.message : 'Failed to delete user', 'error')
     }
-  };
+  }
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div className="error-message">{error}</div>;
+  if (loading) return <div>Loading...</div>
+  if (error) return <div className="error-message">{error}</div>
   return (
     <div className="users-container">
       <div className="users-header">
         <h1>Users</h1>
-        <Link to="/users/create" className="button-primary">Create User</Link>
+        <Link to="/users/create" className="button-primary">
+          Create User
+        </Link>
       </div>
       <table className="users-table">
         <thead>
@@ -67,8 +72,12 @@ const Users = () => {
               </td>
               <td>{new Date(user.createdAt).toLocaleDateString()}</td>
               <td className="actions-cell">
-                <Link to={`/users/${user.id}`} className="button-secondary">Edit</Link>
-                <button onClick={() => handleDelete(user.id)} className="button-danger">Delete</button>
+                <Link to={`/users/${user.id}`} className="button-secondary">
+                  Edit
+                </Link>
+                <button onClick={() => handleDelete(user.id)} className="button-danger">
+                  Delete
+                </button>
               </td>
             </tr>
           ))}
@@ -76,7 +85,6 @@ const Users = () => {
       </table>
     </div>
   )
-
 }
 
-export default Users;
+export default Users

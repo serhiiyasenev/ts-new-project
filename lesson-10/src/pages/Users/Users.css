@@ -24,7 +24,7 @@
 }
 
 .users-header h1::before {
-  content: "👥";
+  content: '👥';
   font-size: 2rem;
 }
 
@@ -122,7 +122,7 @@
 }
 
 .status-badge.active::before {
-  content: "✓";
+  content: '✓';
   font-weight: bold;
 }
 
@@ -132,7 +132,7 @@
 }
 
 .status-badge.inactive::before {
-  content: "✗";
+  content: '✗';
   font-weight: bold;
 }
 
@@ -198,6 +198,6 @@
 }
 
 .button-primary::before {
-  content: "+ ";
+  content: '+ ';
   font-size: 1.2rem;
 }

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import TasksList from '../src/pages/KanbanBoard/KanbanBoard'
-import { render, screen, waitFor, fireEvent } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent } from './utils/test-utils'
 import { MemoryRouter } from 'react-router-dom'
 import * as api from '../src/api'
 import { TaskStatus, TaskPriority, Task } from '@shared/task.types';
@@ -224,7 +224,7 @@ describe('TasksList - Drag and Drop', () => {
     fetchUsersMock.mockResolvedValue(mockUsers)
     updateTaskMock.mockRejectedValue(new Error('Update failed'))
 
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
+    
 
     render(
       <MemoryRouter>
@@ -245,10 +245,10 @@ describe('TasksList - Drag and Drop', () => {
 
     await waitFor(() => {
       expect(updateTaskMock).toHaveBeenCalled()
-      expect(alertSpy).toHaveBeenCalledWith('Failed to update task: Update failed')
+      expect(screen.getByText('Failed to update task: Update failed')).toBeInTheDocument()
     })
 
-    alertSpy.mockRestore()
+    
   })
 
   it('should update only the dragged task and keep others unchanged', async () => {
@@ -336,7 +336,7 @@ describe('TasksList - Drag and Drop', () => {
     fetchUsersMock.mockResolvedValue(mockUsers)
     updateTaskMock.mockRejectedValue('String error')
 
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
+    
 
     render(
       <MemoryRouter>
@@ -357,9 +357,9 @@ describe('TasksList - Drag and Drop', () => {
 
     await waitFor(() => {
       expect(updateTaskMock).toHaveBeenCalled()
-      expect(alertSpy).toHaveBeenCalledWith('Failed to update task: Failed to update task')
+      expect(screen.getByText('Failed to update task: Failed to update task')).toBeInTheDocument()
     })
 
-    alertSpy.mockRestore()
+    
   })
 })

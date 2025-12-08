@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import TaskDetails from '../src/pages/TaskDetails/TaskDetails'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from './utils/test-utils'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import * as api from '../src/api'
@@ -40,7 +40,7 @@ describe('TaskDetails - Additional Coverage', () => {
     ])
     updateTaskMock.mockRejectedValue(new Error('Update failed'))
 
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
+    
 
     render(
       <MemoryRouter initialEntries={['/tasks/1']}>
@@ -70,10 +70,10 @@ describe('TaskDetails - Additional Coverage', () => {
 
     await waitFor(() => {
       expect(updateTaskMock).toHaveBeenCalled()
-      expect(alertSpy).toHaveBeenCalledWith('Update failed')
+      expect(screen.getByText('Update failed')).toBeInTheDocument()
     })
 
-    alertSpy.mockRestore()
+    
   })
 
   it('should handle delete cancellation', async () => {
@@ -143,7 +143,7 @@ describe('TaskDetails - Additional Coverage', () => {
     deleteTaskMock.mockRejectedValue(new Error('Delete failed'))
 
     vi.spyOn(window, 'confirm').mockReturnValue(true)
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
+    
 
     render(
       <MemoryRouter initialEntries={['/tasks/1']}>
@@ -162,10 +162,10 @@ describe('TaskDetails - Additional Coverage', () => {
 
     await waitFor(() => {
       expect(deleteTaskMock).toHaveBeenCalled()
-      expect(alertSpy).toHaveBeenCalledWith('Delete failed')
+      expect(screen.getByText('Delete failed')).toBeInTheDocument()
     })
 
-    alertSpy.mockRestore()
+    
   })
 
   it('should handle non-Error update exception', async () => {
@@ -191,7 +191,7 @@ describe('TaskDetails - Additional Coverage', () => {
     ])
     updateTaskMock.mockRejectedValue('String error')
 
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
+    
 
     render(
       <MemoryRouter initialEntries={['/tasks/1']}>
@@ -222,10 +222,10 @@ describe('TaskDetails - Additional Coverage', () => {
 
     await waitFor(() => {
       expect(updateTaskMock).toHaveBeenCalled()
-      expect(alertSpy).toHaveBeenCalledWith('Failed to update task')
+      expect(screen.getByText('Failed to update task')).toBeInTheDocument()
     })
 
-    alertSpy.mockRestore()
+    
   })
 
   it('should handle non-Error delete exception', async () => {
@@ -252,7 +252,7 @@ describe('TaskDetails - Additional Coverage', () => {
     deleteTaskMock.mockRejectedValue('String error')
 
     vi.spyOn(window, 'confirm').mockReturnValue(true)
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
+    
 
     render(
       <MemoryRouter initialEntries={['/tasks/1']}>
@@ -271,10 +271,10 @@ describe('TaskDetails - Additional Coverage', () => {
 
     await waitFor(() => {
       expect(deleteTaskMock).toHaveBeenCalled()
-      expect(alertSpy).toHaveBeenCalledWith('Failed to delete task')
+      expect(screen.getByText('Failed to delete task')).toBeInTheDocument()
     })
 
-    alertSpy.mockRestore()
+    
   })
 
   it('should successfully update task and exit edit mode', async () => {
