@@ -1,14 +1,9 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 export const userSchema = z.object({
-    firstName: z.string().nonempty("First name is required").regex(/^[A-Za-z]+$/i, "First name must contain only letters"),
-    lastName: z.string().nonempty("Last name is required").regex(/^[A-Za-z]+$/i, "Last name must contain only letters"),
-    email: z.email("Invalid email address").min(1, "Email is required"),
-    dateOfBirth: z.string().nonempty("Date of birth is required").refine((date) => {
-        const dob = new Date(date);
-        const today = new Date();
-        return dob < today;
-    }, { message: "Date of birth must be in the past" }),
-});
+  name: z.string().min(2, 'Name must have at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  isActive: z.boolean().optional(),
+})
 
-export type UserFormFields = z.infer<typeof userSchema>;
+export type UserFormFields = z.infer<typeof userSchema>

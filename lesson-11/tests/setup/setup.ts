@@ -1,5 +1,14 @@
 import { afterAll, beforeAll } from "vitest";
+import { register } from "tsconfig-paths";
 import sequelize from "../../src/config/database";
+
+// Register tsconfig paths for @shared alias
+register({
+  baseUrl: "../",
+  paths: {
+    "@shared/*": ["../shared/*"],
+  },
+});
 
 // Single place for DB clean-up: runs once before the whole test suite.
 beforeAll(async () => {

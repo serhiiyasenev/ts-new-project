@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from './utils/test-utils';
 import '@testing-library/jest-dom';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import UserDetails from '../src/pages/UserDetails/UserDetails';
 import * as api from '../src/api';
+import { User } from '@shared/user.types';
 
 vi.mock('../src/api');
 
@@ -15,11 +16,12 @@ describe('UserDetails', () => {
   it('should display user details correctly', async () => {
     const mockUser = {
       id: 1,
-      firstName: 'John',
-      lastName: 'Doe',
+      name: 'John Doe',
       email: 'john@example.com',
-      dateOfBirth: '1990-01-15',
-      createdAt: '2025-11-20'
+      isActive: true,
+      lastLoginAt: null,
+      createdAt: '2025-11-20',
+      updatedAt: '2025-11-20'
     };
 
     vi.mocked(api.fetchUserById).mockResolvedValue(mockUser);
@@ -33,13 +35,11 @@ describe('UserDetails', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('User Details')).toBeInTheDocument();
+      expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('John')).toBeInTheDocument();
-    expect(screen.getByText('Doe')).toBeInTheDocument();
     expect(screen.getByText('john@example.com')).toBeInTheDocument();
-    expect(screen.getByText('1990-01-15')).toBeInTheDocument();
+    expect(screen.getByText('Active')).toBeInTheDocument();
   });
 
   it('should show loading state initially', () => {
@@ -80,11 +80,12 @@ describe('UserDetails', () => {
   it('should have back to users link', async () => {
     const mockUser = {
       id: 1,
-      firstName: 'John',
-      lastName: 'Doe',
+      name: 'John Doe',
       email: 'john@example.com',
-      dateOfBirth: '1990-01-15',
-      createdAt: '2025-11-20'
+      isActive: true,
+      lastLoginAt: null,
+      createdAt: '2025-11-20',
+      updatedAt: '2025-11-20'
     };
 
     vi.mocked(api.fetchUserById).mockResolvedValue(mockUser);
@@ -105,8 +106,8 @@ describe('UserDetails', () => {
     expect(backLink).toHaveAttribute('href', '/users');
   });
 
-  it('should show "User not found" when API returns null', async () => {
-    vi.mocked(api.fetchUserById).mockResolvedValue(null);
+  it('should show error when API returns null', async () => {
+    vi.mocked(api.fetchUserById).mockRejectedValue(new Error('User not found'));
 
     render(
       <MemoryRouter initialEntries={['/users/1']}>
@@ -117,7 +118,7 @@ describe('UserDetails', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/User not found/i)).toBeInTheDocument();
+      expect(screen.getByText(/Error:/i)).toBeInTheDocument();
     });
   });
 
@@ -132,4 +133,47 @@ describe('UserDetails', () => {
 
     expect(screen.getByText(/Loading/i)).toBeInTheDocument();
   });
+
+  it('renders user not found when API returns null', async () => {
+    vi.mocked(api.fetchUserById).mockResolvedValue(null as unknown as User);
+
+    render(
+      <MemoryRouter initialEntries={['/users/999']}>
+        <Routes>
+          <Route path="/users/:id" element={<UserDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/User not found/i)).toBeInTheDocument();
+    });
+  });
+
+  it('renders inactive user status correctly', async () => {
+    const mockUser = {
+      id: 1,
+      name: 'Inactive User',
+      email: 'inactive@example.com',
+      isActive: false,
+      lastLoginAt: null,
+      createdAt: '2025-11-20',
+      updatedAt: '2025-11-20'
+    };
+
+    vi.mocked(api.fetchUserById).mockResolvedValue(mockUser);
+
+    render(
+      <MemoryRouter initialEntries={['/users/1']}>
+        <Routes>
+          <Route path="/users/:id" element={<UserDetails />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Inactive')).toBeInTheDocument();
+    });
+  });
+
 });

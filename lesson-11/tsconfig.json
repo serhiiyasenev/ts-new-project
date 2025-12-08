@@ -3,9 +3,8 @@
     "module": "CommonJS",
     "target": "ES2020",
     "moduleResolution": "node",
-    "types": ["vitest"],
+    "types": ["vitest", "node"],
 
-    "rootDir": "./src",
     "outDir": "./dist",
 
     "strict": true,
@@ -20,8 +19,13 @@
     "declarationMap": false,
 
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["../shared/*"]
+    }
   },
-  "include": ["src"],
-  "exclude": ["dist", "node_modules", "test"]
+  "include": ["src", "tests", "../shared"],
+  "exclude": ["dist", "node_modules"]
 }

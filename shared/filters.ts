@@ -1,0 +1,22 @@
+import { TaskPriority, TaskStatus } from "./task.types";
+
+export interface UserFilters {
+  name?: string;
+  email?: string;
+  isActive?: boolean;
+}
+
+export interface TaskFilters {
+  status?: TaskStatus[];
+  priority?: TaskPriority[];
+  title?: string;
+  userId?: number;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+export interface PostFilters {
+  title?: string;
+  content?: string;
+  userId?: number;
+}
